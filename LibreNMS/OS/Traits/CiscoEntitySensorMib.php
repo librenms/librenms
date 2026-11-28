@@ -30,6 +30,7 @@ use App\Facades\PortCache;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\SensorType;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Util\Rewrite;
 use SnmpQuery;
 
@@ -47,24 +48,22 @@ trait CiscoEntitySensorMib
     /**
      * CISCO-ENTITY-SENSOR-MIB sensors replace the ENTITY-SENSOR-MIB sensors of the same entity.
      *
-     * @param  list<SensorType>  $types
-     * @param  Collection<int, Sensor>  $sensors
      * @return Collection<int, Sensor>
+     *
+     * @throws SnmpConnectionException when the device did not answer
      */
-    protected function withCiscoEntitySensors(array $types, Collection $sensors): Collection
+    public function discoverEntitySensors(): Collection
     {
-        $cisco = $this->discoverCiscoEntitySensors($types);
+        $cisco = $this->discoverCiscoEntitySensors();
         $keys = $cisco->map(fn (Sensor $sensor) => "$sensor->sensor_class-$sensor->sensor_index")->flip();
 
-        return $cisco->merge($sensors->reject(fn (Sensor $sensor) => $sensor->sensor_type == 'entity-sensor'
-            && $keys->has("$sensor->sensor_class-$sensor->sensor_index")));
+        return $cisco->merge(parent::discoverEntitySensors()->reject(fn (Sensor $sensor) => $keys->has("$sensor->sensor_class-$sensor->sensor_index")));
     }
 
     /**
-     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverCiscoEntitySensors(array $types): Collection
+    public function discoverCiscoEntitySensors(): Collection
     {
         $sensors = new Collection;
         $data = SnmpQuery::enumStrings()->walk([
@@ -75,7 +74,6 @@ trait CiscoEntitySensorMib
             'CISCO-ENTITY-SENSOR-MIB::entSensorPrecision',
         ])->table(1);
 
-        $data = array_filter($data, fn ($entry) => in_array($this->ciscoEntitySensorClass($entry['CISCO-ENTITY-SENSOR-MIB::entSensorType'] ?? null), $types, true));
         if (empty($data)) {
             return $sensors;
         }
@@ -101,6 +99,7 @@ trait CiscoEntitySensorMib
         foreach ($data as $index => $entry) {
             $value = $entry['CISCO-ENTITY-SENSOR-MIB::entSensorValue'] ?? null;
             $class = $this->ciscoEntitySensorClass($entry['CISCO-ENTITY-SENSOR-MIB::entSensorType'] ?? null);
+
             if ($class === null || ! is_numeric($value) || ! is_numeric($index)) {
                 continue;
             }

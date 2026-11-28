@@ -28,40 +28,28 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use SnmpQuery;
 
 trait NetSnmpSensors
 {
     /**
-     * @param  list<SensorType>  $types
-     * @return Collection<int, Sensor>
-     */
-    public function discoverNetSnmpSensors(array $types): Collection
-    {
-        return $this->discoverLmSensors($types)->merge($this->discoverUpsNutSensors($types));
-    }
-
-    /**
      * LM-SENSORS-MIB temperature, fan and voltage tables
      *
-     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverLmSensors(array $types): Collection
+    #[DiscoversSensors(SensorType::Fanspeed, SensorType::Temperature, SensorType::Voltage)]
+    public function discoverLmSensors(): Collection
     {
         $sensors = new Collection;
-        $data = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
+        $data = SnmpQuery::hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
 
         foreach ([
             ['lmTempSensors', SensorType::Temperature, '.1.3.6.1.4.1.2021.13.16.2.1.3', 1000],
             ['lmFanSensors', SensorType::Fanspeed, '.1.3.6.1.4.1.2021.13.16.3.1.3', 1],
             ['lmVoltSensors', SensorType::Voltage, '.1.3.6.1.4.1.2021.13.16.4.1.3', 1000],
         ] as [$table, $type, $oid, $divisor]) {
-            if (! in_array($type, $types, true)) {
-                continue;
-            }
-
             foreach ($data as $row) {
                 $index = $row[$table . 'Index'] ?? null;
                 if ($index === null || empty($row[$table . 'Device'])) {
@@ -90,13 +78,13 @@ trait NetSnmpSensors
     /**
      * The ups-nut extend outputs one value per line, the line number tells what it is
      *
-     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverUpsNutSensors(array $types): Collection
+    #[DiscoversSensors(SensorType::Charge, SensorType::Load, SensorType::Runtime, SensorType::State, SensorType::Temperature, SensorType::Voltage)]
+    public function discoverUpsNutSensors(): Collection
     {
         $sensors = new Collection;
-        $lines = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
+        $lines = SnmpQuery::hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
         $lines = array_map(fn ($line) => $line['nsExtendOutLine'] ?? null, array_shift($lines) ?? []);
         $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116';
 
@@ -111,10 +99,6 @@ trait NetSnmpSensors
             8 => [SensorType::Load, 'Ups Load', 1, [0, 0, null, 100]],
             24 => [SensorType::Temperature, 'Battery Temperature', 1, [10, 15, 35, 40]],
         ] as $line => [$type, $descr, $divisor, $limits]) {
-            if (! in_array($type, $types, true)) {
-                continue;
-            }
-
             $value = $lines[$line] ?? null;
             // voltages may be 0, other values are integers that must not be 0
             $value = $type === SensorType::Voltage ? (is_numeric($value) ? $value : null) : ((int) $value ?: null);
@@ -138,10 +122,6 @@ trait NetSnmpSensors
                     'rrd_type' => 'GAUGE',
                 ]));
             }
-        }
-
-        if (! in_array(SensorType::State, $types, true)) {
-            return $sensors;
         }
 
         foreach ([

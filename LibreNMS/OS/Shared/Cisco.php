@@ -52,6 +52,8 @@ use App\Models\Vrf;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Discovery\DiscoversSensors;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -109,11 +111,6 @@ class Cisco extends OS implements
 
     private Collection $qosIdxToParent;
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
-
-    public function discoverSensors(array $types): Collection
-    {
-        return $this->withCiscoEntitySensors($types, parent::discoverSensors($types));
-    }
 
     public function discoverOS(Device $device): void
     {
@@ -1404,9 +1401,13 @@ class Cisco extends OS implements
         return $families;
     }
 
-    protected function discoverCountSensors(): Collection
+    /**
+     * @return Collection<int, Sensor>
+     */
+    #[DiscoversSensors(SensorType::Count)]
+    protected function discoverCiscoCountSensors(): Collection
     {
-        $sensors = parent::discoverCountSensors();
+        $sensors = new Collection;
 
         foreach ([
             ['CISCO-WAN-3G-MIB::c3gGsmNumberOfNearbyCell', '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.5', 'Nearby cells'],
@@ -1428,9 +1429,13 @@ class Cisco extends OS implements
         return $sensors;
     }
 
-    protected function discoverTemperatureSensors(): Collection
+    /**
+     * @return Collection<int, Sensor>
+     */
+    #[DiscoversSensors(SensorType::Temperature)]
+    protected function discoverCiscoTemperatureSensors(): Collection
     {
-        $sensors = parent::discoverTemperatureSensors();
+        $sensors = new Collection;
 
         $data = SnmpQuery::hideMib()->enumStrings()->walk('CISCO-ENVMON-MIB::ciscoEnvMonTemperatureStatusTable')->valuesByIndex();
         foreach ($data as $index => $entry) {
@@ -1463,9 +1468,13 @@ class Cisco extends OS implements
         return $sensors;
     }
 
-    protected function discoverStateSensors(): Collection
+    /**
+     * @return Collection<int, Sensor>
+     */
+    #[DiscoversSensors(SensorType::State)]
+    protected function discoverCiscoStateSensors(): Collection
     {
-        $sensors = parent::discoverStateSensors();
+        $sensors = new Collection;
         $stack = ['CISCO-STACKWISE-MIB::cswGlobals', 'CISCO-STACKWISE-MIB::cswSwitchRole', 'CISCO-STACKWISE-MIB::cswSwitchState', 'CISCO-STACKWISE-MIB::cswStackPortOperStatus'];
         // some 15.x switches report stacking when they are not stacked
         $skipStack = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value() == 'false'

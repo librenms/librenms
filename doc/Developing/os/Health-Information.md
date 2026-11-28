@@ -346,32 +346,38 @@ PHP class of the OS, `LibreNMS/OS/$Os.php`. Use YAML where YAML is
 possible. We usually reject PHP discovery in that case, because PHP
 causes more problems later.
 
-The sensors module gets the sensors from `discoverSensors()` of the OS.
-It passes the sensor classes to discover, all of them or the classes of
-`-m sensors/<class>`. It discovers, in this order:
+The sensors module discovers all sensor classes, or only those of
+`-m sensors/<class>`, such as `-m sensors/dbm,sensors/temperature`.
+The OS discovers, in this order:
 
-1. ENTITY-SENSOR-MIB sensors (`discoverEntitySensors()`).
-   Shared\Cisco adds CISCO-ENTITY-SENSOR-MIB sensors, they replace the
-   ENTITY-SENSOR-MIB sensors of the same entity.
-2. The sensors of the OS code, a method for each class, such as
-   `discoverTemperatureSensors()` or `discoverStateSensors()`. OS that run on
-   servers (Unix, Windows, VMware ESXi) use the `ServerHardware` trait,
-   it adds the sensors of the Dell OpenManage, HP Insight or Supermicro
-   SuperDoctor agent that answers.
+1. ENTITY-SENSOR-MIB sensors (`discoverEntitySensors()`). OS that use
+   the `CiscoEntitySensorMib` trait add CISCO-ENTITY-SENSOR-MIB sensors,
+   they replace the ENTITY-SENSOR-MIB sensors of the same entity.
+2. The sensors of the OS code, the methods with the `DiscoversSensors`
+   attribute. OS that run on servers (Unix, Windows, VMware ESXi) use
+   the `ServerHardware` trait, it adds the sensors of the Dell
+   OpenManage, HP Insight or Supermicro SuperDoctor agent that answers.
 3. UPS-MIB sensors when the OS has the `rfc1628_compat` setting.
 4. The YAML sensors.
 
 A sensor replaces earlier sensors of the same class, type and index.
 
-To add sensors, override the method of the class, such as
-`discoverDbmSensors()`, and return a Collection of `App\Models\Sensor`
-models of that class. Include the sensors of the parent class, the OS
-may extend a group class with sensors of its own.
+To add sensors, add a protected method to the OS class that returns a
+Collection of `App\Models\Sensor` models, and list the sensor classes
+it returns in its `#[DiscoversSensors(...)]` attribute. The method only
+runs when one of its classes is discovered, and sensors of classes the
+attribute does not list are dropped. Walk a table that has sensors of
+several classes once, in one method that lists all of them. The name of the method is free, name it after what it
+discovers. Methods of a parent class and its traits run too, you do not
+need to call them.
 
-When one table has sensors of several classes, override
-`discoverSensors(array $types)` instead and walk the table once. Add
-the sensors of the given classes to those of the parent class, sensors
-of other classes are dropped.
+```php
+#[DiscoversSensors(SensorType::Fanspeed, SensorType::Temperature)]
+protected function discoverHealthSensors(): Collection
+```
+
+An override of a method keeps the classes of its attribute, unless it
+has an attribute of its own.
 
 The attributes of a sensor are:
 
@@ -466,9 +472,10 @@ statistics of CM-PERFORMANCE-MIB. It adds the code to the OS class,
 `LibreNMS/OS/AdvaFsp150.php`:
 
 ```php
-protected function discoverDbmSensors(): Collection
+#[DiscoversSensors(SensorType::Dbm)]
+protected function discoverOpticalPowerSensors(): Collection
 {
-    $sensors = parent::discoverDbmSensors();
+    $sensors = new Collection;
     $data = SnmpQuery::walk([
         'CM-FACILITY-MIB::cmEthernetTrafficPortTable',
         'CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPT',

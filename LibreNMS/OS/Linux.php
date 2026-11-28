@@ -32,6 +32,7 @@ use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\OS\Traits\VminfoVmware;
@@ -173,25 +174,17 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         return $string;
     }
 
-    public function discoverSensors(array $types): Collection
-    {
-        return parent::discoverSensors($types)
-            ->merge($this->discoverRpiGpioMonitorSensors($types))
-            ->merge($this->discoverLinuxSensors($types));
-    }
-
     /**
      * The rpigpiomonitor extend outputs a configuration line for each sensor
      * (name,type,descr,low limit,low warn limit,warn limit,high limit[,group];value,generic,descr;...)
      * followed by a line with its value.
      *
-     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    private function discoverRpiGpioMonitorSensors(array $types): Collection
+    #[DiscoversSensors]
+    protected function discoverRpiGpioMonitorSensors(): Collection
     {
         $sensors = new Collection;
-        $classes = array_map(fn (SensorType $type) => $type->value, $types);
         $lines = SnmpQuery::numericIndex()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."rpigpiomonitor"')->valuesByIndex();
         $config = null;
         $sensorIndex = 0;
@@ -207,11 +200,6 @@ class Linux extends Shared\Unix implements VminfoDiscovery
             $valueIndex = $sensorIndex++;
             if ($config === null) {
                 Log::error("[rpigpiomonitor] An error occurred while reading a sensor! Please run 'rpigpiomonitor.php -validate' on the target device to verify the configuration.");
-                continue;
-            }
-
-            if (! in_array($config['type'], $classes, true)) {
-                $config = null;
                 continue;
             }
 
@@ -275,15 +263,15 @@ class Linux extends Shared\Unix implements VminfoDiscovery
     /**
      * Raspberry Pi (raspberry extend), NTC CHIP (power-stat extend) and HP iLO sensors
      *
-     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    private function discoverLinuxSensors(array $types): Collection
+    #[DiscoversSensors(SensorType::Charge, SensorType::Current, SensorType::Frequency, SensorType::State, SensorType::Temperature, SensorType::Voltage)]
+    protected function discoverLinuxSensors(): Collection
     {
         $sensors = new Collection;
-        $sensor = fn (SensorType $class, string $oid, int|string $index, string $sensorType, string $descr, mixed $value, array $extra = []) => new Sensor([
+        $sensor = fn (SensorType $type, string $oid, int|string $index, string $sensorType, string $descr, mixed $value, array $extra = []) => new Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => $class->value,
+            'sensor_class' => $type->value,
             'sensor_oid' => $oid,
             'sensor_index' => $index,
             'sensor_type' => $sensorType,
@@ -308,12 +296,12 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         foreach ([
             [SensorType::Voltage, 'raspberry_volts', [2 => 'Core', 3 => 'SDRAMc', 4 => 'SDRAMi', 5 => 'SDRAMp']],
             [SensorType::Frequency, 'raspberry_freq', [6 => 'ARM', 7 => 'Core']],
-        ] as [$lineType, $sensorType, $descriptions]) {
+        ] as [$type, $sensorType, $descriptions]) {
             foreach ($descriptions as $line => $descr) {
                 if (! is_numeric($lines[$line] ?? null)) {
                     break;
                 }
-                $sensors->push($sensor($lineType, "$raspberry.$line", $line, $sensorType, $descr, $lines[$line]));
+                $sensors->push($sensor($type, "$raspberry.$line", $line, $sensorType, $descr, $lines[$line]));
             }
         }
         foreach ([8 => 'H264 codec', 9 => 'MPG2 codec', 10 => 'WVC1 codec', 11 => 'MPG4 codec', 12 => 'MJPG codec', 13 => 'WMV9 codec'] as $line => $descr) {
@@ -344,14 +332,14 @@ class Linux extends Shared\Unix implements VminfoDiscovery
                 6 => [SensorType::Voltage, 'chip_volts', 'Battery voltage', ['sensor_limit_low' => 2.75, 'sensor_limit_low_warn' => 2.8, 'sensor_limit_warn' => 4.2, 'sensor_limit' => 4.2]],
                 7 => [SensorType::Current, 'chip_currents', 'Battery current', ['sensor_limit_low' => 0, 'sensor_limit_low_warn' => 0]],
                 8 => [SensorType::Charge, 'chip_battery_charge', 'Battery charge', ['sensor_limit_low' => 5, 'sensor_limit_low_warn' => 9]],
-            ] as $line => [$lineType, $sensorType, $descr, $limits]) {
+            ] as $line => [$type, $sensorType, $descr, $limits]) {
                 if (is_numeric($values["$powerStat.$line"] ?? null)) {
-                    $sensors->push($sensor($lineType, "$powerStat.$line", "116.$line", $sensorType, $descr, $values["$powerStat.$line"], $limits));
+                    $sensors->push($sensor($type, "$powerStat.$line", "116.$line", $sensorType, $descr, $values["$powerStat.$line"], $limits));
                 }
             }
         }
 
-        if (in_array(SensorType::Temperature, $types, true) && Str::startsWith((string) $this->getDevice()->sysObjectID, '.1.3.6.1.4.1.232.')) {
+        if (Str::startsWith((string) $this->getDevice()->sysObjectID, '.1.3.6.1.4.1.232.')) {
             // CPQHLTH-MIB::cpqHeTemperatureTable of chassis 1
             $temperatures = SnmpQuery::numeric()->mibDir('hp')->walk([
                 '.1.3.6.1.4.1.232.6.2.6.8.1.2.1',
@@ -373,6 +361,6 @@ class Linux extends Shared\Unix implements VminfoDiscovery
             }
         }
 
-        return $sensors->whereIn('sensor_class', array_map(fn (SensorType $type) => $type->value, $types));
+        return $sensors;
     }
 }

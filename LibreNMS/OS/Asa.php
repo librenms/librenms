@@ -31,11 +31,11 @@ use Illuminate\Support\Collection;
 class Asa extends Shared\Cisco
 {
     /**
-     * ENTITY-SENSOR-MIB values of ASA security contexts are not valid
+     * ENTITY-SENSOR-MIB values of ASA security contexts are not valid, CISCO-ENTITY-SENSOR-MIB values are
      */
-    public function discoverEntitySensors(array $types): Collection
+    public function discoverEntitySensors(): Collection
     {
-        return str_ends_with((string) $this->getDevice()->hardware, 'sc') ? new Collection : parent::discoverEntitySensors($types);
+        return str_ends_with((string) $this->getDevice()->hardware, 'sc') ? $this->discoverCiscoEntitySensors() : parent::discoverEntitySensors();
     }
 
     // disable unsupported netstats

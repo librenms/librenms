@@ -60,11 +60,4 @@ class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
 
         return $polled->isEmpty() ? $vms : $polled;
     }
-
-    public function discoverSensors(array $types): Collection
-    {
-        return parent::discoverSensors($types)
-            ->merge($this->discoverServerHardwareSensors($types))
-            ->merge($this->discoverNetSnmpSensors($types));
-    }
 }

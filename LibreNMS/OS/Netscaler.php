@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -174,10 +175,13 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
 
     /**
      * Health counters are named by their index, the name tells the type
+     *
+     * @return Collection<int, Sensor>
      */
-    public function discoverSensors(array $types): Collection
+    #[DiscoversSensors(SensorType::Fanspeed, SensorType::Temperature, SensorType::Voltage)]
+    protected function discoverHealthCounterSensors(): Collection
     {
-        $sensors = parent::discoverSensors($types);
+        $sensors = new Collection;
 
         foreach (SnmpQuery::walk('NS-ROOT-MIB::sysHealthCounterValue')->table(1) as $name => $data) {
             $name = trim((string) $name, '"');
@@ -194,7 +198,7 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
                 continue;
             }
 
-            if (in_array($type, $types, true) && is_numeric($value)) {
+            if (is_numeric($value)) {
                 $sensors->push(new Sensor([
                     'poller_type' => 'snmp',
                     'sensor_class' => $type->value,

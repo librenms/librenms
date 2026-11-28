@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 use LibreNMS\Util\Number;
@@ -46,21 +47,16 @@ class RittalCmcIiiPu extends OS
     /**
      * ENTITY-SENSOR-MIB duplicates the CMC III sensors
      */
-    public function discoverEntitySensors(array $types): Collection
+    public function discoverEntitySensors(): Collection
     {
         return new Collection;
     }
 
-    public function discoverSensors(array $types): Collection
-    {
-        return parent::discoverSensors($types)->merge($this->discoverCmcIiiSensors($types));
-    }
-
     /**
-     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverCmcIiiSensors(array $types): Collection
+    #[DiscoversSensors(SensorType::Current, SensorType::Frequency, SensorType::Percent, SensorType::Power, SensorType::PowerConsumed, SensorType::State, SensorType::Temperature, SensorType::Voltage, SensorType::Waterflow)]
+    public function discoverCmcIiiSensors(): Collection
     {
         $variables = SnmpQuery::hideMib()->enumStrings()->walk('RITTAL-CMC-III-MIB::cmcIIIVarTable')->valuesByIndex();
         /** @var array<int, CmcSensor> $cmcSensors */
@@ -106,7 +102,6 @@ class RittalCmcIiiPu extends OS
 
         foreach ($cmcSensors as $id => $cmcSensor) {
             if (! isset($cmcSensor['oid'], $cmcSensor['type'])
-                || ! in_array($cmcSensor['type'], $types, true)
                 || in_array($cmcSensor['name'], ['System V24 Port', 'Memory USB-Stick', 'Memory SD-Card', 'Login'])
                 || preg_match('/(Power Factor)|(Runtime)/', $cmcSensor['name'])) {
                 Log::debug("{$cmcSensor['name']} skipped");

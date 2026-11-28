@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 use SnmpQuery;
@@ -36,10 +37,13 @@ class GwEydfa extends OS
 {
     /**
      * Power supply alarm states (discretePropertyTable)
+     *
+     * @return Collection<int, Sensor>
      */
-    protected function discoverStateSensors(): Collection
+    #[DiscoversSensors(SensorType::State)]
+    protected function discoverPowerSupplySensors(): Collection
     {
-        $sensors = parent::discoverStateSensors();
+        $sensors = new Collection;
         $psus = ['.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.100.0.2', '.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.101.0.2'];
         $states = SnmpQuery::numeric()->get($psus)->values();
 
@@ -64,44 +68,39 @@ class GwEydfa extends OS
 
     /**
      * The analog readings, their limits are in the analogPropertyTable
+     *
+     * @return Collection<int, Sensor>
      */
-    public function discoverSensors(array $types): Collection
+    #[DiscoversSensors(SensorType::Current, SensorType::Dbm, SensorType::Temperature, SensorType::Voltage)]
+    protected function discoverAmplifierSensors(): Collection
     {
-        $sensors = parent::discoverSensors($types);
+        $sensors = new Collection;
 
         // class, oid, index, descr, value, divisor, oid of the limits when they are not those of the value
         $readings = [];
 
-        if (in_array(SensorType::Current, $types, true) || in_array(SensorType::Temperature, $types, true)) {
-            foreach (SnmpQuery::walk('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaPumpTable')->table(1) as $index => $pump) {
-                $readings[] = [SensorType::Current, ".1.3.6.1.4.1.17409.1.11.4.1.2.$index", "oaPumpBIAS$index", "BIAS Pump - $index", $pump['NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaPumpBIAS'] ?? null, 1000, null];
-                if ($index == 1) {
-                    $readings[] = [SensorType::Current, '.1.3.6.1.4.1.17409.1.11.4.1.3.1', 'oaPumpTEC1', 'TEC Pump - 1', $pump['NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaPumpTEC'] ?? null, 100, null];
-                    $readings[] = [SensorType::Temperature, '.1.3.6.1.4.1.17409.1.11.4.1.4.1', 'oaPumpTemp1', 'Temperature Pump - 1', $pump['NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaPumpTemp'] ?? null, 10, null];
-                }
+        foreach (SnmpQuery::walk('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaPumpTable')->table(1) as $index => $pump) {
+            $readings[] = [SensorType::Current, ".1.3.6.1.4.1.17409.1.11.4.1.2.$index", "oaPumpBIAS$index", "BIAS Pump - $index", $pump['NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaPumpBIAS'] ?? null, 1000, null];
+            if ($index == 1) {
+                $readings[] = [SensorType::Current, '.1.3.6.1.4.1.17409.1.11.4.1.3.1', 'oaPumpTEC1', 'TEC Pump - 1', $pump['NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaPumpTEC'] ?? null, 100, null];
+                $readings[] = [SensorType::Temperature, '.1.3.6.1.4.1.17409.1.11.4.1.4.1', 'oaPumpTemp1', 'Temperature Pump - 1', $pump['NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaPumpTemp'] ?? null, 10, null];
             }
         }
 
-        if (in_array(SensorType::Temperature, $types, true)) {
-            // the internal temperature limits are those of commonInternalTemperature
-            $readings[] = [SensorType::Temperature, '.1.3.6.1.4.1.17409.1.3.3.2.2.1.12.1', 'commonDeviceInternalTemperature.1', 'Internal Temp',
-                SnmpQuery::get('NSCRTV-HFCEMS-COMMON-MIB::commonDeviceInternalTemperature.1')->value(), 1, '.1.3.6.1.4.1.17409.1.3.1.13.0'];
+        // the internal temperature limits are those of commonInternalTemperature
+        $readings[] = [SensorType::Temperature, '.1.3.6.1.4.1.17409.1.3.3.2.2.1.12.1', 'commonDeviceInternalTemperature.1', 'Internal Temp',
+            SnmpQuery::get('NSCRTV-HFCEMS-COMMON-MIB::commonDeviceInternalTemperature.1')->value(), 1, '.1.3.6.1.4.1.17409.1.3.1.13.0'];
+
+        foreach (SnmpQuery::walk('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaDCPowerVoltage')->pluck() as $index => $voltage) {
+            $readings[] = [SensorType::Voltage, ".1.3.6.1.4.1.17409.1.11.7.1.2.$index", "oaDCPowerVoltage$index", "DC +5V - $index", $voltage, 10, null];
         }
 
-        if (in_array(SensorType::Voltage, $types, true)) {
-            foreach (SnmpQuery::walk('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaDCPowerVoltage')->pluck() as $index => $voltage) {
-                $readings[] = [SensorType::Voltage, ".1.3.6.1.4.1.17409.1.11.7.1.2.$index", "oaDCPowerVoltage$index", "DC +5V - $index", $voltage, 10, null];
-            }
-        }
+        $readings[] = [SensorType::Dbm, '.1.3.6.1.4.1.17409.1.11.2.0', 'oaOutputOpticalPower.0', 'Per Output Power',
+            SnmpQuery::get('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaOutputOpticalPower.0')->value(), 10, null];
+        $readings[] = [SensorType::Dbm, '.1.3.6.1.4.1.17409.1.11.3.0', 'oaInputOpticalPower.0', 'Input Power',
+            SnmpQuery::get('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaInputOpticalPower.0')->value(), 10, null];
 
-        if (in_array(SensorType::Dbm, $types, true)) {
-            $readings[] = [SensorType::Dbm, '.1.3.6.1.4.1.17409.1.11.2.0', 'oaOutputOpticalPower.0', 'Per Output Power',
-                SnmpQuery::get('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaOutputOpticalPower.0')->value(), 10, null];
-            $readings[] = [SensorType::Dbm, '.1.3.6.1.4.1.17409.1.11.3.0', 'oaInputOpticalPower.0', 'Input Power',
-                SnmpQuery::get('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaInputOpticalPower.0')->value(), 10, null];
-        }
-
-        $readings = array_filter($readings, fn (array $reading) => in_array($reading[0], $types, true) && is_numeric($reading[4]));
+        $readings = array_filter($readings, fn (array $reading) => is_numeric($reading[4]));
         if (empty($readings)) {
             return $sensors;
         }

@@ -34,9 +34,11 @@ use App\Models\Sensor;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SensorType;
@@ -94,6 +96,7 @@ use LibreNMS\OS\Traits\YamlSensorDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
+use ReflectionClass;
 
 class OS implements
     BgpPeerDiscovery,
@@ -163,6 +166,9 @@ class OS implements
     private ?PerDeviceMethodResults $methodResults = null;
 
     protected ?string $entityVendorTypeMib = null;
+
+    /** @var array<class-string<OS>, array<string, list<SensorType>>> */
+    private static array $sensorDiscoveryMethods = [];
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
@@ -507,52 +513,30 @@ class OS implements
     }
 
     /**
-     * ENTITY-SENSOR-MIB sensors, then the sensors this OS discovers with code for each class,
-     * the legacy includes, UPS-MIB and the yaml sensors.
-     * A sensor replaces earlier sensors of the same class, type and index.
-     * To discover several classes from the same data, override this and add the sensors of the given classes.
+     * Sensors of the given classes from the methods that have the DiscoversSensors attribute,
+     * then the legacy includes, UPS-MIB and the yaml sensors.
+     * ENTITY-SENSOR-MIB comes first, a sensor replaces earlier sensors of the same class, type and index.
      *
      * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
     public function discoverSensors(array $types): Collection
     {
-        $sensors = $this->discoverEntitySensors($types);
+        $sensors = new Collection;
 
-        foreach ($types as $type) {
-            $sensors = $sensors->merge(match ($type) {
-                SensorType::Airflow => $this->discoverAirflowSensors(),
-                SensorType::Ber => $this->discoverBerSensors(),
-                SensorType::Bitrate => $this->discoverBitrateSensors(),
-                SensorType::Charge => $this->discoverChargeSensors(),
-                SensorType::ChromaticDispersion => $this->discoverChromaticDispersionSensors(),
-                SensorType::Cooling => $this->discoverCoolingSensors(),
-                SensorType::Count => $this->discoverCountSensors(),
-                SensorType::Current => $this->discoverCurrentSensors(),
-                SensorType::Dbm => $this->discoverDbmSensors(),
-                SensorType::Delay => $this->discoverDelaySensors(),
-                SensorType::Eer => $this->discoverEerSensors(),
-                SensorType::Fanspeed => $this->discoverFanspeedSensors(),
-                SensorType::Frequency => $this->discoverFrequencySensors(),
-                SensorType::Humidity => $this->discoverHumiditySensors(),
-                SensorType::Load => $this->discoverLoadSensors(),
-                SensorType::Loss => $this->discoverLossSensors(),
-                SensorType::Percent => $this->discoverPercentSensors(),
-                SensorType::Power => $this->discoverPowerSensors(),
-                SensorType::PowerConsumed => $this->discoverPowerConsumedSensors(),
-                SensorType::PowerFactor => $this->discoverPowerFactorSensors(),
-                SensorType::Pressure => $this->discoverPressureSensors(),
-                SensorType::QualityFactor => $this->discoverQualityFactorSensors(),
-                SensorType::Runtime => $this->discoverRuntimeSensors(),
-                SensorType::Signal => $this->discoverSignalSensors(),
-                SensorType::Snr => $this->discoverSnrSensors(),
-                SensorType::State => $this->discoverStateSensors(),
-                SensorType::Temperature => $this->discoverTemperatureSensors(),
-                SensorType::TvSignal => $this->discoverTvSignalSensors(),
-                SensorType::Voltage => $this->discoverVoltageSensors(),
-                SensorType::Waterflow => $this->discoverWaterflowSensors(),
-                SensorType::SignalLoss => $this->discoverSignalLossSensors(),
-            });
+        foreach (self::sensorDiscoveryMethods(static::class) as $method => $methodTypes) {
+            if (! array_any($methodTypes ?: $types, fn (SensorType $type) => in_array($type, $types, true))) {
+                continue;
+            }
+
+            foreach ($this->$method() as $sensor) {
+                $type = SensorType::tryFrom((string) $sensor->sensor_class);
+                if (! empty($methodTypes) && ! in_array($type, $methodTypes, true)) {
+                    Log::error("$method() returned a $sensor->sensor_class sensor, which its DiscoversSensors attribute does not list");
+                } elseif (in_array($type, $types, true)) {
+                    $sensors->push($sensor);
+                }
+            }
         }
 
         return $sensors
@@ -562,251 +546,29 @@ class OS implements
     }
 
     /**
-     * @return Collection<int, Sensor>
+     * The methods of the class that have the DiscoversSensors attribute and their sensor classes,
+     * the methods of parent classes first.
+     *
+     * @param  class-string<OS>  $class
+     * @return array<string, list<SensorType>>
      */
-    protected function discoverAirflowSensors(): Collection
+    private static function sensorDiscoveryMethods(string $class): array
     {
-        return new Collection;
-    }
+        if (isset(self::$sensorDiscoveryMethods[$class])) {
+            return self::$sensorDiscoveryMethods[$class];
+        }
 
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverBerSensors(): Collection
-    {
-        return new Collection;
-    }
+        $parent = get_parent_class($class);
+        $methods = $parent ? self::sensorDiscoveryMethods($parent) : [];
 
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverBitrateSensors(): Collection
-    {
-        return new Collection;
-    }
+        foreach ((new ReflectionClass($class))->getMethods() as $method) {
+            $attribute = $method->getAttributes(DiscoversSensors::class)[0] ?? null;
+            if ($attribute !== null) {
+                $methods[$method->getName()] = $attribute->newInstance()->types;
+            }
+        }
 
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverChargeSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverChromaticDispersionSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverCoolingSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverCountSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverCurrentSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverDbmSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverDelaySensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverEerSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverFanspeedSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverFrequencySensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverHumiditySensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverLoadSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverLossSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverPercentSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverPowerSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverPowerConsumedSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverPowerFactorSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverPressureSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverQualityFactorSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverRuntimeSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverSignalSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverSnrSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverStateSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverTemperatureSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverTvSignalSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverVoltageSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverWaterflowSensors(): Collection
-    {
-        return new Collection;
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    protected function discoverSignalLossSensors(): Collection
-    {
-        return new Collection;
+        return self::$sensorDiscoveryMethods[$class] = $methods;
     }
 
     /**

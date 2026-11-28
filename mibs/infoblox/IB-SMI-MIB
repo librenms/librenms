@@ -9,13 +9,13 @@ IB-SMI-MIB DEFINITIONS ::= BEGIN
 --
 
 IMPORTS MODULE-IDENTITY, OBJECT-TYPE, enterprises
-		        FROM SNMPv2-SMI 
+		        FROM SNMPv2-SMI
         TEXTUAL-CONVENTION
 		        FROM SNMPv2-TC;
 
 --
 -- Module Identity
---        
+--
 
 infoblox MODULE-IDENTITY
          LAST-UPDATED  "200911120000Z"  --  Nov 12, 2009
@@ -31,13 +31,13 @@ infoblox MODULE-IDENTITY
 
          REVISION  "200801140000Z"  --  Jan 14, 2008
          DESCRIPTION   "Updated copyright and CONTACT_INFO"
-                                                                                                
+
          REVISION  "200501100000Z"  --  Jan 10, 2005
          DESCRIPTION   "Added copyright"
-                                                                                                
+
          REVISION  "200405210000Z"  --  May 21, 2004
          DESCRIPTION   "Creation of the MIB file"
-                                                                                                
+
          ::= {  enterprises  7779  }
 
 infobloxProducts  OBJECT IDENTIFIER ::= { infoblox 1 }
@@ -90,7 +90,7 @@ IbNode ::= TEXTUAL-CONVENTION
    STATUS        current
    DESCRIPTION   "A node name string"
    SYNTAX        OCTET STRING (SIZE (0..127))
-                                                                                
+
 IbIpAddr ::= TEXTUAL-CONVENTION
    STATUS        current
    DESCRIPTION   "An Ip address in xxx.xxx.xxx.xxx notation"
@@ -100,6 +100,12 @@ IbIpv6Addr ::= TEXTUAL-CONVENTION
    STATUS        current
    DESCRIPTION   "An Ipv6 address in semicolon notation"
    SYNTAX        OCTET STRING (SIZE (0..46))
+
+IbFloat ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION "A floating point number represented as a string"
+    SYNTAX      OCTET STRING (SIZE (0..255))
 
 END
 

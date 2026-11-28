@@ -3,7 +3,6 @@
 namespace LibreNMS\OS;
 
 use Illuminate\Support\Collection;
-use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\NetSnmpSensors;
 
@@ -15,13 +14,5 @@ class Truenas extends OS
     {
         // discover both yaml and HR storage
         return $this->discoverYamlStorage()->merge($this->discoverHrStorage());
-    }
-
-    /**
-     * LM-SENSORS-MIB and ups-nut temperatures of the FreeBSD base
-     */
-    protected function discoverTemperatureSensors(): Collection
-    {
-        return parent::discoverTemperatureSensors()->merge($this->discoverNetSnmpSensors([SensorType::Temperature]));
     }
 }

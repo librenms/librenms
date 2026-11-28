@@ -26,7 +26,6 @@
 
 namespace LibreNMS\OS;
 
-use Illuminate\Support\Collection;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\CiscoCdpMib;
 use LibreNMS\OS\Traits\CiscoEntitySensorMib;
@@ -35,9 +34,4 @@ class Viptela extends OS
 {
     use CiscoCdpMib;
     use CiscoEntitySensorMib;
-
-    public function discoverSensors(array $types): Collection
-    {
-        return $this->withCiscoEntitySensors($types, parent::discoverSensors($types));
-    }
 }
