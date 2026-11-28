@@ -46,7 +46,6 @@ class LegacyModule implements Module, SupportsSubmodules
 
     private array $module_deps = [
         'arp-table' => ['ports'],
-        'fdb-table' => ['ports', 'vlans'],
         'transceivers' => ['ports'],
         'vlans' => ['ports'],
     ];
@@ -91,7 +90,6 @@ class LegacyModule implements Module, SupportsSubmodules
 
         try {
             include_once base_path('includes/dbFacile.php');
-            include_once base_path('includes/rewrites.php');
             include base_path("includes/discovery/$this->name.inc.php");
         } finally {
             Debug::enableErrorReporting(); // and back to normal
@@ -110,7 +108,6 @@ class LegacyModule implements Module, SupportsSubmodules
         $submodules = $this->submodules;
 
         include_once base_path('includes/dbFacile.php');
-        include_once base_path('includes/rewrites.php');
         include base_path("includes/polling/$this->name.inc.php");
     }
 
@@ -210,7 +207,7 @@ class LegacyModule implements Module, SupportsSubmodules
 
     private function collectComponents(int $device_id): array
     {
-        $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
+        $components = new Component()->getComponents($device_id)[$device_id] ?? [];
         $components = Arr::sort($components, fn ($item) => $item['type'] . $item['label']);
 
         return array_values($components);

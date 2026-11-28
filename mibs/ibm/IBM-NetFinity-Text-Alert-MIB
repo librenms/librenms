@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (DOS end-of-file character)
  IBM-NetFinity-Text-Alert-MIB DEFINITIONS ::= BEGIN
 
         IMPORTS
@@ -129,4 +130,3 @@
 
  END
 
-

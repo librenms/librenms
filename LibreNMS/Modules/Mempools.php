@@ -34,16 +34,16 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\MempoolsPolling;
+use LibreNMS\Interfaces\RemovesMethodData;
 use LibreNMS\OS;
-use LibreNMS\Polling\Providers\MempoolsProvider;
-use LibreNMS\Polling\Providers\Snmp\SnmpMempools;
-use LibreNMS\Polling\Providers\UnixAgent\UnixAgentMempools;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
-class Mempools implements Module
+class Mempools implements Module, RemovesMethodData
 {
     use SyncsModels;
 
@@ -112,15 +112,14 @@ class Mempools implements Module
     /**
      * Each mempool is polled by the method that discovered it, mempools of unavailable methods are skipped.
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function poll(OS $os, WriteInterface $datastore): void
     {
         $polled = new EloquentCollection;
 
         foreach ($os->getDevice()->mempools->groupBy(fn (Mempool $mempool): string => $mempool->polling_method->value) as $type => $mempools) {
-            $provider = $this->provider($os, PollingMethodType::from($type));
-            if ($provider !== null) {
-                $provider->pollMempools($mempools);
-                $polled = $polled->merge($mempools);
+            $source = $os->dataSource(PollingMethodType::from($type), MempoolsPolling::class);
+            if ($source !== null) {
+                $polled = $polled->merge($source->pollMempools($mempools));
             }
         }
 
@@ -138,20 +137,11 @@ class Mempools implements Module
                 ->addDataset('used', 'GAUGE', 0)
                 ->addDataset('free', 'GAUGE', 0);
 
-            $tags = [
-                'mempool_type' => $mempool->mempool_type,
-                'mempool_class' => $mempool->mempool_class,
-                'mempool_index' => $mempool->mempool_index,
-                'rrd_name' => ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index],
-                'rrd_oldname' => ['mempool', $mempool->mempool_type, $mempool->mempool_index],
-                'rrd_def' => $rrd_def,
-            ];
-            $fields = [
+            $metric = $mempool->setRelation('device', $os->getDevice())->metricIdentity('mempool');
+            $datastore->write($metric->measurement, [
                 'used' => $mempool->mempool_used,
                 'free' => $mempool->mempool_free,
-            ];
-
-            $datastore->put($os->getDeviceArray(), 'mempool', $tags, $fields);
+            ], $metric->tags, ['metric' => $metric, 'rrd_def' => $rrd_def]);
         });
     }
 
@@ -162,7 +152,7 @@ class Mempools implements Module
      */
     private function discoverValid(OS $os, PollingMethodType $type): Collection
     {
-        return ($this->provider($os, $type)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
+        return ($os->dataSource($type, MempoolsDiscovery::class)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
             if ($mempool->isValid()) {
                 return true;
             }
@@ -198,27 +188,14 @@ class Mempools implements Module
         return array_values(array_filter($this->pollingMethods($device), $device->polling()->isEnabled(...)));
     }
 
-    /**
-     * The mempools of a method, null when the method is not available or has none for this device.
-     * The method is checked the first time it is needed in this poll or discovery.
-     */
-    private function provider(OS $os, PollingMethodType $type): ?MempoolsProvider
-    {
-        $result = $os->getMethodResults()->result($type);
-        if (! $result?->isSuccess()) {
-            return null;
-        }
-
-        return match ($type) {
-            PollingMethodType::Snmp => app(SnmpMempools::class, ['os' => $os]),
-            PollingMethodType::UnixAgent => UnixAgentMempools::fromOutput((string) $result->stat('output')),
-            default => null,
-        };
-    }
-
     public function dataExists(Device $device): bool
     {
         return $device->mempools()->exists();
+    }
+
+    public function removeMethodData(Device $device, PollingMethodType $type): void
+    {
+        $device->mempools()->where('polling_method', $type)->delete();
     }
 
     public function cleanup(Device $device): int

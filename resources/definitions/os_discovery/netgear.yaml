@@ -6,9 +6,13 @@ modules:
                 free: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemFree
                 precision: 1024
     os:
-        sysDescr_regex: '/^(?<hardware>\S+) .*, (?<version>[\d.]+),/'
-        serial: ENTITY-MIB::entPhysicalSerialNum.1
-        version: ENTITY-MIB::entPhysicalSoftwareRev.1
+        sysDescr_regex: '/^(?:NETGEAR )?(?<hardware>\S+) .*, (?<version>[\d.]+),/'
+        serial:
+            - ENTITY-MIB::entPhysicalSerialNum.1
+            - ENTITY-MIB::entPhysicalSerialNum.2
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+            - ENTITY-MIB::entPhysicalSoftwareRev.2
     sensors:
         power:
             data:
@@ -43,8 +47,107 @@ modules:
                     index: 'boxServicesTempSensorTemperature.{{ $index }}'
                     low_limit: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMin
                     high_limit: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMax
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsTemperature
+                    num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.2.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} Temperature'
+                    index: 'boxServicesFiberPortOpticsTemperature.{{ $index }}'
+                    divisor: 10
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage
+                            op: '<='
+                            value: 0
+        voltage:
+            data:
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage
+                    num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.3.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} Voltage'
+                    index: 'boxServicesFiberPortOpticsVoltage.{{ $index }}'
+                    divisor: 1000
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage
+                            op: '<='
+                            value: 0
+        current:
+            data:
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsCurrent
+                    num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.4.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} Bias Current'
+                    index: 'boxServicesFiberPortOpticsCurrent.{{ $index }}'
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 10000
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage
+                            op: '<='
+                            value: 0
+        dbm:
+            data:
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsPowerOut
+                    num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.5.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} Tx Power'
+                    index: 'boxServicesFiberPortOpticsPowerOut.{{ $index }}'
+                    divisor: 1000
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage
+                            op: '<='
+                            value: 0
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsPowerIn
+                    num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.6.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} Rx Power'
+                    index: 'boxServicesFiberPortOpticsPowerIn.{{ $index }}'
+                    divisor: 1000
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage
+                            op: '<='
+                            value: 0
         state:
             data:
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsLos
+                    num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.8.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} Loss of Signal'
+                    index: 'boxServicesFiberPortOpticsLos.{{ $index }}'
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    state_name: boxServicesFiberPortOpticsLos
+                    states:
+                        - { value: 1, generic: 2, descr: 'true' }
+                        - { value: 2, generic: 0, descr: 'false' }
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage
+                            op: '<='
+                            value: 0
                 -
                     oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFansTable
                     value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState

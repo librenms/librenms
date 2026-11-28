@@ -12,7 +12,7 @@
                     "features": "F/W 5.10 FPGA 0416",
                     "location": "<private>",
                     "os": "endrun",
-                    "type": "appliance",
+                    "type": "timing",
                     "serial": "1811718433",
                     "icon": "endrun.png"
                 }

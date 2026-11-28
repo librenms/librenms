@@ -1,4 +1,5 @@
------------------------------------------------------------------------------
+-- LibreNMS: fix syntax error (dashes in comment lines; trailing comma before })
+------------------------------------------------------------------------------
 --  File         : gbnL2QACL-MIB.mi2
 --  Description  : ADMIN  Enterprise MIB 
 --  Version      : 0.01
@@ -89,9 +90,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
        "broadcast、multicast、unicast"
     SYNTAX      INTEGER { broadcast(1), multicast(2), unicast(3) }  
        
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the quene-scheduer QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosQueueSchedulerGroup  OBJECT IDENTIFIER ::= { gbnL2QACL 1 }
  
@@ -346,7 +347,7 @@ PacketFlowType ::= TEXTUAL-CONVENTION
             aclNumStdDefaultRoute
             	 TruthValue,
             aclNumStdL3IntfId
-                Integer32,            	 
+                Integer32            	 
             }   
             
     aclNumStdNum OBJECT-TYPE
@@ -902,7 +903,7 @@ PacketFlowType ::= TEXTUAL-CONVENTION
             aclNumLnkSubitemSrcInnerVlanID
                 VlanId,                 
             aclNumLnkSubitemSrcEndVlanID
-                VlanId, 
+                VlanId 
             }   
             
     aclNumLnkNum OBJECT-TYPE
@@ -1911,7 +1912,7 @@ PacketFlowType ::= TEXTUAL-CONVENTION
             aclNamedLnkSubitemSrcInnerVlanID
                 VlanId,            
             aclNamedLnkSubitemSrcEndVlanID
-                VlanId,
+                VlanId
             }   
             
     aclNamedLnkName OBJECT-TYPE
@@ -2476,9 +2477,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
             --"周期时间段的当前状态"
         ::= { aclTimeRangePeriodEntry 8 }
                                           
-    -----------------------------------------------------
+    ------------------------------------------------------
     -- the active ACL group
-    -----------------------------------------------------
+    ------------------------------------------------------
     
     aclActiveTable OBJECT-TYPE
         SYNTAX  SEQUENCE OF AclActiveEntry
@@ -2753,9 +2754,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                 --引用acl的端口，为0表示全局引用。
         ::= { aclActiveEntry 24 }
         
-    -----------------------------------------------------
+    ------------------------------------------------------
     -- the mirror-to QOS group
-    -----------------------------------------------------
+    ------------------------------------------------------
   
     qosMirrorToTable OBJECT-TYPE
         SYNTAX  SEQUENCE OF QosMirrorToEntry
@@ -3015,9 +3016,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                 --流镜像在block 11 中的优先级，16表示没有过滤规则在硬件中                
         ::= { qosMirrorToEntry 23 }                     
     
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the rate-limit QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosRateLimitTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosRateLimitEntry
@@ -3454,9 +3455,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
           "this value determines whether the rate-limit QOS use a two rate policer."                          
       ::= { qosRateLimitEntry 39 }        
       
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the traffic-priority QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosTrafficPriorityTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosTrafficPriorityEntry
@@ -3746,9 +3747,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                --报文优先级在block 11 中的优先级，16表示没有过滤规则在硬件中                
        ::= { qosTrafficPriorityEntry 26 }       
  
-    -----------------------------------------------------
+    ------------------------------------------------------
    -- the traffic-policy based route
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosTrafficPbrTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosTrafficPbrEntry
@@ -3790,7 +3791,7 @@ PacketFlowType ::= TEXTUAL-CONVENTION
            qosTrafficPbrRunning
                TruthValue,
            qosTrafficPbrRowStatus
-               RowStatus,
+               RowStatus
        }
  
    qosTrafficPbrIndex OBJECT-TYPE
@@ -3881,9 +3882,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
            "This object indicates the status of this entry."
        ::= { qosTrafficPbrEntry 11 }     
        
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the traffic redirect QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosTrafficRedirectTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosTrafficRedirectEntry
@@ -4143,9 +4144,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                --报文重定向在block 11 中的优先级，16表示没有过滤规则在硬件中                
        ::= { qosTrafficRedirectEntry 23 } 
                                
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the traffic statistics QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosTrafficStatisticsTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosTrafficStatisticsEntry
@@ -4418,9 +4419,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                 "ingress/egress of rule.default is inbound"
                 --入口/出口acl，默认为入口。
         ::= { qosTrafficStatisticsEntry 24 }     
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the line-rate QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosLineRateTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosLineRateEntry
@@ -4463,9 +4464,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                "the target rate of the line-rate QOS. "
        ::= { qosLineRateEntry 2 }  
  
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the traffic copy to cpu QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosTrafficCopyToCpuTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosTrafficCopyToCpuEntry
@@ -4715,9 +4716,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                --报文拷贝到CPU在block 11 中的优先级，16表示没有过滤规则在硬件中                
        ::= { qosTrafficCopyToCpuEntry 22 }    
                  
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the port-isolation configuration 
-   -----------------------------------------------------                                           
+   ------------------------------------------------------
    qaclAppPortIsolationGroup  OBJECT IDENTIFIER ::= { gbnL2QACL 24 }
  
    qaclAppPortIsolationDownLinkPorts OBJECT-TYPE
@@ -4729,9 +4730,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                -- QACL应用端口隔离的下行端口列表 --
        ::= { qaclAppPortIsolationGroup 1 }  
 
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the storm control 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    stormControlTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF StormControlEntry
@@ -4798,9 +4799,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                 --风暴控制行状态
         ::= { stormControlEntry 4 }    
 
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the traffic rewrite vlan QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosTrafficRewriteVlanTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosTrafficRewriteVlanEntry
@@ -5053,9 +5054,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                "the block 11 priority of the traffic-rewrite-vlan QOS. 16 means no filter rules in the Hardware."               
        ::= { qosTrafficRewriteVlanEntry 23 } 
 
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the traffic insert vlan QOS 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosTrafficInsertVlanTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosTrafficInsertVlanEntry
@@ -5308,9 +5309,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                "the block 11 priority of the traffic-insert-vlan QOS. 16 means no filter rules in the Hardware."               
        ::= { qosTrafficInsertVlanEntry 23 } 
 
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the two rate policer 
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosTwoRatePolicerTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosTwoRatePolicerEntry
@@ -5463,9 +5464,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
            "This object indicates the status of this entry."
        ::= { qosTwoRatePolicerEntry 13 }
 
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the L2 priority remark table
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosL2PriorityRemarkTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosL2PriorityRemarkEntry
@@ -5548,9 +5549,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
                "the CoS applied to the packet. "
        ::= { qosL2PriorityRemarkEntry 6 }
 
-   -----------------------------------------------------
+   ------------------------------------------------------
    -- the L3 priority remark table
-   -----------------------------------------------------
+   ------------------------------------------------------
  
    qosL3PriorityRemarkTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosL3PriorityRemarkEntry
@@ -5632,9 +5633,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
        DESCRIPTION
                "the CoS applied to the packet. "
        ::= { qosL3PriorityRemarkEntry 6 }
-    -----------------------------------------------------
+    ------------------------------------------------------
    -- the trTCM mode 
-   -----------------------------------------------------
+   ------------------------------------------------------
    qosRateLimittrTCMMode OBJECT IDENTIFIER ::= { gbnL2QACL 31 }
    trTCMMode  OBJECT-TYPE
         SYNTAX INTEGER{
@@ -5658,9 +5659,9 @@ PacketFlowType ::= TEXTUAL-CONVENTION
         DESCRIPTION
            "two rate three color marking pre-color value."
         ::= { qosRateLimittrTCMMode 2 }                
--------------------------------------------------------------
-----acl ipv6 mode
--------------------------------------------------------------
+--------------------------------------------------------------
+--  acl ipv6 mode
+--------------------------------------------------------------
    aclIpv6KeyMode  OBJECT-TYPE
         SYNTAX INTEGER{
               mac(1),

@@ -27,12 +27,16 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\NetSnmpSensors;
 use SnmpQuery;
 
 class Qnap extends OS implements OSDiscovery
 {
+    use NetSnmpSensors;
+
     public function discoverOS(Device $device): void
     {
         $response = SnmpQuery::next([
@@ -44,5 +48,10 @@ class Qnap extends OS implements OSDiscovery
         $device->version = trim((string) $response->value('ENTITY-MIB::entPhysicalFirmwareRev'), '\"') ?: null;
         $device->hardware = $response->value('NAS-MIB::enclosureModel') ?: null;
         $device->serial = $response->value('NAS-MIB::enclosureSerialNum') ?: null;
+    }
+
+    protected function discoverOsSensors(): Collection
+    {
+        return parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors());
     }
 }

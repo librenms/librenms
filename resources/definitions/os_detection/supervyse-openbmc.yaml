@@ -1,6 +1,6 @@
 os: supervyse-openbmc
 text: 'Supervyse OpenBMC'
-type: appliance
+type: management
 icon: supervyse-openbmc
 mib_dir: supervyse-openbmc
 over:

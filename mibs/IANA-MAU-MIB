@@ -8,7 +8,7 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
        ;
 
      ianaMauMIB MODULE-IDENTITY
-       LAST-UPDATED "201704100000Z" -- April 10, 2017
+       LAST-UPDATED "202607150000Z" -- July 15, 2026
        ORGANIZATION "IANA"
        CONTACT-INFO "        Internet Assigned Numbers Authority
 
@@ -18,6 +18,7 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
 
                         Tel: +1-310-301-5800
                       EMail: iana&iana.org"
+
        DESCRIPTION
          "This MIB module defines dot3MauType OBJECT-IDENTITIES and
          IANAifMauListBits, IANAifMauMediaAvailable,
@@ -39,14 +40,8 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
 
          The following reference is used throughout this MIB module:
 
-         [IEEE802.3] refers to:
-            IEEE Std 802.3, 2005 Edition: 'IEEE Standard for
-            Information technology - Telecommunications and information
-            exchange between systems - Local and metropolitan area
-            networks - Specific requirements -
-            Part 3: Carrier sense multiple access with collision
-            detection (CSMA/CD) access method and physical layer
-            specifications'.
+         [IEEE802.3] refers to IEEE Std 802.3-2022: 
+         'IEEE Standard for Ethernet'.
 
          This reference should be updated as appropriate when new
          MAU types, Media Availability states, Auto Negotiation
@@ -58,14 +53,58 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
          Supplementary information may be available at:
          http://www.ietf.org/copyrights/ianamib.html"
 
+       REVISION     "202607150000Z" -- July 15, 2026
+       DESCRIPTION  "Added coverage for IEEE Std 802.3cs-2022 (Super-PON 10GBASE-SP1
+                    and 10/2.5GBASE-SP1 PHYs), IEEE Std 802.3db-2022 (100GBASE-SR1,
+                    100GBASE-VR1, 200GBASE-SR2, 200GBASE-VR2, 400GBASE-SR4, and
+                    400GBASE-VR4 PHYs), IEEE Std 802.3ck-2022 (100GBASE-CR1/KR1,
+                    200GBASE-CR2/KR2, and 400GBASE-CR4/KR4 PHYs and associated
+                    Auto-Negotiation capabilities), IEEE Std 802.3da-2026 (10BASE-T1M
+                    PHY), IEEE Std 802.3dk-2026 (100GBASE-BR10, 100GBASE-BR20, and
+                    100GBASE-BR40 PHYs), and IEEE Std 802.3dg-2026 (100BASE-T1L PHY and
+                    associated Auto-Negotiation capability)."
+
+       REVISION     "202404020000Z" -- April 2, 2024
+       DESCRIPTION  "Added support for IEEE Std 802.3df-2024 (400GBASE-DR4-2, 
+                    800GBASE-CR8, 800GBASE-DR8, 800GBASE-DR8-2, 800GBASE-KR8, 
+                    800GBASE-R, 800GBASE-SR8, and 800GBASE-VR8PHYs)."
+
+       REVISION     "202309070000Z"  -- September 7, 2023
+       DESCRIPTION  "Added support for IEEE Std 802.3cy-2023 (25GBASE-T1 PHYs)."
+
+       REVISION     "202306140000Z"  -- June 14, 2023
+       DESCRIPTION  "Added coverage for IEEE Std 802.3cz-2023 (entries for 
+                     2.5GBASE-AU, 5GBASE-AU, 10GBASE-AU, 25GBASE-AU, and 
+                     50GBASE-AU)."
+
+       REVISION     "202302060000Z"  -- February 6, 2023
+       DESCRIPTION  "Added MAU types specified in the IEEE Std 802.3cm-2020, 
+                     IEEE Std 802.3ch-2020, IEEE Std 802.3ca-2020, IEEE Std 
+                     802.3ct-2021, IEEE Std 802.3cp-2021, and aligned with 
+                     IEEE Std 802.3-2022."
+
+       REVISION     "202208100000Z"  -- August 10, 2022
+       DESCRIPTION  "Added MAU types specified in IEEE Std 802.3cu-2021"
+
+       REVISION     "202001300000Z"  -- January 30, 2020
+       DESCRIPTION  "Added MAU types and associated AutoNeg
+                     capability bits specified in the IEEE Std 802.3-2018, 
+                     as well as IEEE Std 802.3cb-2018, IEEE Std 802.3bt-2018, 
+                     IEEE Std 802.3cd-2018, IEEE Std 802.3cn-2019, and 
+                     IEEE Std 802.3cg-2019"
+
+       REVISION     "201907110000Z"  -- July 11, 2019
+       DESCRIPTION  "Added support for 2.5GBase-T and 5GBase-T media 
+                     types."
+
        REVISION     "201704100000Z"  -- April 10, 2017
-       DESCRIPTION  "Added new MAU types and associated AutoNeg
-                     capability bits specified in the IEEE 802.3
-                     amendments IEEE Std 802.3bk-2013, IEEE Std
-                     802.3bj-2014 and IEEE Std 802.3bm-2015, which
-                     are now published in IEEE Std 802.3-2015, as
-                     well as IEEE Std 802.3bw-2015, IEEE Std
-                     802.3by-2016, IEEE Std 802.3bq-2016 and IEEE
+       DESCRIPTION  "Added new MAU types and associated AutoNeg 
+                     capability bits specified in the IEEE 802.3 
+                     amendments IEEE Std 802.3bk-2013, IEEE Std 
+                     802.3bj-2014 and IEEE Std 802.3bm-2015, which 
+                     are now published in IEEE Std 802.3-2015, as 
+                     well as IEEE Std 802.3bw-2015, IEEE Std 
+                     802.3by-2016, IEEE Std 802.3bq-2016 and IEEE 
                      Std 802.3bp-2016."
 
        REVISION     "201408010000Z"  -- August 1, 2014
@@ -75,18 +114,19 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION  "Updated contact info."
 
        REVISION     "201108120000Z"  -- August 12, 2011
-       DESCRIPTION  "Added MAU types and associated AutoNeg capability
-                     bits specified in amendments to IEEE Std
-                     802.3-2008: IEEE Std 802.3ba-2010 and IEEE Std
+       DESCRIPTION  "Added MAU types and associated AutoNeg capability 
+                     bits specified in amendments to IEEE Std 
+                     802.3-2008: IEEE Std 802.3ba-2010 and IEEE Std 
                      802.3bg-2011."
 
        REVISION     "201002230000Z"  -- February 23, 2010
-       DESCRIPTION  "Added assignments that will be included in
+       DESCRIPTION  "Added assignments that will be included in 
                      Clause 14 of IEEE P802.3.1."
-
+                     
        REVISION     "200704210000Z"  -- April 21, 2007
        DESCRIPTION  "Initial version of this MIB as published in
                      RFC 4836."
+                                   
        ::= { mib-2 154 }
 
      -- Textual Conventions
@@ -193,30 +233,178 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
               b100GbaseSR10(76),   -- 100GBASE-SR10
               b100GbaseLR4(77),   -- 100GBASE-LR4
               b100GbaseER4(78),    -- 100GBASE-ER4
-              b1000baseT1(79), -- 1000BASE-T1
-              b1000basePX30D(80), -- 1000BASE-PX30D
-              b1000basePX30U(81), -- 1000BASE-PX30U
-              b1000basePX40D(82), -- 1000BASE-PX40D
-              b1000basePX40U(83), -- 1000BASE-PX40U
-              b10G1GbasePRXD4(84), -- 10/1GBASE-PRX-D4
-              b10G1GbasePRXU4(85), -- 10/1GBASE-PRX-U4
-              b10GbasePRD4(86), -- 10GBASE-PRD4
-              b10GbasePRU4(87), -- 10GBASE-PRU4
-              b25GbaseCR(88), -- 25GBASE-CR
-              b25GbaseCRS(89), -- 25GBASE-CR-S
-              b25GbaseKR(90), -- 25GBASE-KR
-              b25GbaseKRS(91), -- 25GBASE-KR-S
-              b25GbaseR(92), -- 25GBASE-R
-              b25GbaseSR(93), -- 25GBASE-SR
-              b25GbaseT(94), -- 25GBASE-T
-              b40GbaseER4(95), -- 40GBASE-ER4
-              b40GbaseR(96), -- 40GBASE-R
-              b40GbaseT(97), -- 40GBASE-T
-              b100GbaseCR4(98), -- 100GBASE-CR4
-              b100GbaseKR4(99), -- 100GBASE-KR4
-              b100GbaseKP4(100), -- 100GBASE-KP4
-              b100GbaseR(101), -- 100GBASE-R
-              b100GbaseSR4(102) -- 100GBASE-SR4
+              b1000baseT1(79), -- 1000BASE-T1 
+              b1000basePX30D(80), -- 1000BASE-PX30D 
+              b1000basePX30U(81), -- 1000BASE-PX30U 
+              b1000basePX40D(82), -- 1000BASE-PX40D 
+              b1000basePX40U(83), -- 1000BASE-PX40U 
+              b10G1GbasePRXD4(84), -- 10/1GBASE-PRX-D4 
+              b10G1GbasePRXU4(85), -- 10/1GBASE-PRX-U4 
+              b10GbasePRD4(86), -- 10GBASE-PRD4 
+              b10GbasePRU4(87), -- 10GBASE-PRU4 
+              b25GbaseCR(88), -- 25GBASE-CR 
+              b25GbaseCRS(89), -- 25GBASE-CR-S 
+              b25GbaseKR(90), -- 25GBASE-KR 
+              b25GbaseKRS(91), -- 25GBASE-KR-S 
+              b25GbaseR(92), -- 25GBASE-R 
+              b25GbaseSR(93), -- 25GBASE-SR 
+              b25GbaseT(94), -- 25GBASE-T 
+              b40GbaseER4(95), -- 40GBASE-ER4 
+              b40GbaseR(96), -- 40GBASE-R 
+              b40GbaseT(97), -- 40GBASE-T 
+              b100GbaseCR4(98), -- 100GBASE-CR4 
+              b100GbaseKR4(99), -- 100GBASE-KR4 
+              b100GbaseKP4(100), -- 100GBASE-KP4 
+              b100GbaseR(101), -- 100GBASE-R 
+              b100GbaseSR4(102), -- 100GBASE-SR4
+              b2p5GbaseT(103), -- 2.5GBASE-T
+              b5GbaseT(104), -- 5GBASE-T
+              b100baseT1(105), -- 100BASE-T1
+              b1000baseRHA(106), -- 1000BASE-RHA
+              b1000baseRHB(107), -- 1000BASE-RHB
+              b1000baseRHC(108), -- 1000BASE-RHC
+              b2p5GbaseKX(109), -- 2.5GBASE-KX
+              b2p5GbaseX(110), -- 2.5GBASE-X
+              b5GbaseKR(111), -- 5GBASE-KR
+              b5GbaseR(112), -- 5GBASE-R
+              b10GpassXR(113), -- 10GPASS-XR
+              b25GbaseLR(114), -- 25GBASE-LR
+              b25GbaseER(115), -- 25GBASE-ER
+              b50GbaseR(116), -- 50GBASE-R
+              b50GbaseCR(117), -- 50GBASE-CR
+              b50GbaseKR(118), -- 50GBASE-KR
+              b50GbaseSR(119), -- 50GBASE-SR
+              b50GbaseFR(120), -- 50GBASE-FR
+              b50GbaseLR(121), -- 50GBASE-LR
+              b50GbaseER(122), -- 50GBASE-ER
+              b100GbaseCR2(123), -- 100GBASE-CR2
+              b100GbaseKR2(124), -- 100GBASE-KR2
+              b100GbaseSR2(125), -- 100GBASE-SR2
+              b100GbaseDR(126), -- 100GBASE-DR
+              b200GbaseR(127), -- 200GBASE-R
+              b200GbaseDR4(128), -- 200GBASE-DR4
+              b200GbaseFR4(129), -- 200GBASE-FR4
+              b200GbaseLR4(130), -- 200GBASE-LR4
+              b200GbaseCR4(131), -- 200GBASE-CR4
+              b200GbaseKR4(132), -- 200GBASE-KR4
+              b200GbaseSR4(133), -- 200GBASE-SR4
+              b200GbaseER4(134), -- 200GBASE-ER4
+              b400GbaseR(135), -- 400GBASE-R
+              b400GbaseSR16(136), -- 400GBASE-SR16
+              b400GbaseDR4(137), -- 400GBASE-DR4
+              b400GbaseFR8(138), -- 400GBASE-FR8
+              b400GbaseLR8(139), -- 400GBASE-LR8
+              b400GbaseER8(140), -- 400GBASE-ER8
+              b10baseT1L(141), -- 10BASE-T1L
+              b10baseT1SHD(142), -- 10BASE-T1S half duplex mode
+              b10baseT1SMD(143), -- 10BASE-T1S multidrop mode
+              b10baseT1SFD(144), -- 10BASE-T1S full duplex mode
+              b100GbaseFR1(145), -- 100GBASE-FR1
+              b100GbaseLR1(146), -- 100GBASE-LR1
+              b400GbaseFR4(147), -- 400GBASE-FR4
+              b400GbaseLR46(148), -- 400GBASE-LR4-6
+              b400GbaseSR8(149), -- 400GBASE-SR8
+              b400GbaseSR4p2(150), -- 400GBASE-LR4.2
+              b2p5GbaseT1(151), -- 2.5GBASE-T1
+              b5GbaseT1(152), -- 5GBASE-T1
+              b10GbaseT1(153), -- 10GBASE-T1
+              b25G10GbasePQGD2(154), -- 25/10GBASE-PQG-D2
+              b25G10GbasePQGD3(155), -- 25/10GBASE-PQG-D3
+              b25G10GbasePQGU2(156), -- 25/10GBASE-PQG-U2
+              b25G10GbasePQGU3(157), -- 25/10GBASE-PQG-U3
+              b25G10GbasePQXD2(158), -- 25/10GBASE-PQX-D2
+              b25G10GbasePQXD3(159), -- 25/10GBASE-PQX-D3
+              b25G10GbasePQXU2(160), -- 25/10GBASE-PQX-U2
+              b25G10GbasePQXU3(161), -- 25/10GBASE-PQX-U3
+              b25GbasePQGD2(162), -- 25GBASE-PQG-D2
+              b25GbasePQGD3(163), -- 25GBASE-PQG-D3
+              b25GbasePQGU2(164), -- 25GBASE-PQG-U2
+              b25GbasePQGU3(165), -- 25GBASE-PQG-U3
+              b25GbasePQXD2(166), -- 25GBASE-PQX-D2
+              b25GbasePQXD3(167), -- 25GBASE-PQX-D3
+              b25GbasePQXU2(168), -- 25GBASE-PQX-U2
+              b25GbasePQXU3(169), -- 25GBASE-PQX-U3
+              b50G10GbasePQGD2(170), -- 50/10GBASE-PQG-D2
+              b50G10GbasePQGD3(171), -- 50/10GBASE-PQG-D3
+              b50G10GbasePQGU2(172), -- 50/10GBASE-PQG-U2
+              b50G10GbasePQGU3(173), -- 50/10GBASE-PQG-U3
+              b50G10GbasePQXD2(174), -- 50/10GBASE-PQX-D2
+              b50G10GbasePQXD3(175), -- 50/10GBASE-PQX-D3
+              b50G10GbasePQXU2(176), -- 50/10GBASE-PQX-U2
+              b50G10GbasePQXU3(177), -- 50/10GBASE-PQX-U3
+              b50G25GbasePQGD2(178), -- 50/25GBASE-PQG-D2
+              b50G25GbasePQGD3(179), -- 50/25GBASE-PQG-D3
+              b50G25GbasePQGU2(180), -- 50/25GBASE-PQG-U2
+              b50G25GbasePQGU3(181), -- 50/25GBASE-PQG-U3
+              b50G25GbasePQXD2(182), -- 50/25GBASE-PQX-D2
+              b50G25GbasePQXD3(183), -- 50/25GBASE-PQX-D3
+              b50G25GbasePQXU2(184), -- 50/25GBASE-PQX-U2
+              b50G25GbasePQXU3(185), -- 50/25GBASE-PQX-U3
+              b50GbasePQGD2(186), -- 50GBASE-PQG-D2
+              b50GbasePQGD3(187), -- 50GBASE-PQG-D3
+              b50GbasePQGU2(188), -- 50GBASE-PQG-U2
+              b50GbasePQGU3(189), -- 50GBASE-PQG-U3
+              b50GbasePQXD2(190), -- 50GBASE-PQX-D2
+              b50GbasePQXD3(191), -- 50GBASE-PQX-D3
+              b50GbasePQXU2(192), -- 50GBASE-PQX-U2
+              b50GbasePQXU3(193), -- 50GBASE-PQX-U3
+              b100GbaseZR(194), -- 100GBASE-ZR
+              b10GbaseBR10D(195), -- 10GBASE-BR10-D
+              b10GbaseBR10U(196), -- 10GBASE-BR10-U
+              b10GbaseBR20D(197), -- 10GBASE-BR20-D
+              b10GbaseBR20U(198), -- 10GBASE-BR20-U
+              b10GbaseBR40D(199), -- 10GBASE-BR40-D
+              b10GbaseBR40U(200), -- 10GBASE-BR40-U
+              b25GbaseBR10D(201), -- 25GBASE-BR10-D
+              b25GbaseBR10U(202), -- 25GBASE-BR10-U
+              b25GbaseBR20D(203), -- 25GBASE-BR20-D
+              b25GbaseBR20U(204), -- 25GBASE-BR20-U
+              b25GbaseBR40D(205), -- 25GBASE-BR40-D
+              b25GbaseBR40U(206), -- 25GBASE-BR40-U
+              b50GbaseBR10D(207), -- 50GBASE-BR10-D
+              b50GbaseBR10U(208), -- 50GBASE-BR10-U
+              b50GbaseBR20D(209), -- 50GBASE-BR20-D
+              b50GbaseBR20U(210), -- 50GBASE-BR20-U
+              b50GbaseBR40D(211), -- 50GBASE-BR40-D
+              b50GbaseBR40U(212), -- 50GBASE-BR40-U
+              b2p5GbaseAU(213), -- 2.5GBASE-AU
+              b5GbaseAU(214), -- 5GBASE-AU
+              b10GbaseAU(215), -- 10GBASE-AU
+              b25GbaseAU(216), -- 25GBASE-AU
+              b50GbaseAU(217), -- 50GBASE-AU
+              b25GbaseT1(218), -- 25GBASE-T1
+              b400GbaseDR42(219), -- 400GBASE-DR4-2
+              b800GbaseCR8(220), -- 800GBASE-CR8
+              b800GbaseDR8(221), -- 800GBASE-DR8
+              b800GbaseDR82(222), -- 800GBASE-DR8-2
+              b800GbaseKR8(223), -- 800GBASE-KR8
+              b800GbaseR(224), -- 800GBASE-R
+              b800GbaseSR8(225), -- 800GBASE-SR8
+              b800GbaseVR8(226), -- 800GBASE-VR8
+              b10GbaseSP1D(227), -- 10GBASE-SP1-D
+              b10GbaseSP1U(228), -- 10GBASE-SP1-U
+              b10G2p5GbaseSP1D(229), -- 10/2.5GBASE-SP1-D
+              b10G2p5GbaseSP1U(230), -- 10/2.5GBASE-SP1-U
+              b100GbaseSR1(231), -- 100GBASE-SR1
+              b100GbaseVR1(232), -- 100GBASE-VR1
+              b200GbaseSR2(233), -- 200GBASE-SR2
+              b200GbaseVR2(234), -- 200GBASE-VR2
+              b400GbaseSR4(235), -- 400GBASE-SR4
+              b400GbaseVR4(236), -- 400GBASE-VR4
+              b100GbaseCR1(237), -- 100GBASE-CR1
+              b100GbaseKR1(238), -- 100GBASE-KR1
+              b200GbaseCR2(239), -- 200GBASE-CR2
+              b200GbaseKR2(240), -- 200GBASE-KR2
+              b400GbaseCR4(241), -- 400GBASE-CR4
+              b400GbaseKR4(242), -- 400GBASE-KR4
+              b10baseT1M(243), -- 10BASE-T1M
+              b100GbaseBR10D(244), -- 100GBASE-BR10-D
+              b100GbaseBR10U(245), -- 100GBASE-BR10-U
+              b100GbaseBR20D(246), -- 100GBASE-BR20-D
+              b100GbaseBR20U(247), -- 100GBASE-BR20-U
+              b100GbaseBR40D(248), -- 100GBASE-BR40-D
+              b100GbaseBR40U(249), -- 100GBASE-BR40-U
+              b100baseT1L(250) -- 100BASE-T1L
          }
 
      IANAifMauMediaAvailable ::= TEXTUAL-CONVENTION
@@ -390,6 +578,7 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
               wisFrameLoss(13),
               wisSignalLoss(14),
               pcsLinkFault(15),
+
               excessiveBER(16),
               dxsLinkFault(17),
               pxsLinkFault(18),
@@ -441,21 +630,40 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
               b40GbaseKR4(20),    -- 40GBASE-KR4
               b40GbaseCR4(21),    -- 40GBASE-CR4
               b100GbaseCR10(22),  -- 100GBASE-CR10
-              b1000baseT1(23), -- 1000BASE-T1
-              b25GbaseRS(24), -- 25GBASE-CR-S or 25GBASE-KR-S
-              b25GbaseR(25), -- 25GBASE-CR or 25GBASE-KR
-              bRSFEC25Greq(26), -- 25Gb/s RS-FEC
-              bBaseFEC25Greq(27), -- 25Gb/s BASE-R FEC
-              b25GbaseT(28), -- 25GBASE-T
-              b40GbaseT(29), -- 40GBASE-T
-              b100GbaseCR4(30), -- 100GBASE-CR4
-              b100GbaseKR4(31), -- 100GBASE-KR4
-              b100GbaseKP4(32), -- 100GBASE-KP4
-              bForceMS(33) -- 1000BASE-T1 Force MS
+              b1000baseT1(23), -- 1000BASE-T1 
+              b25GbaseRS(24), -- 25GBASE-CR-S or 25GBASE-KR-S 
+              b25GbaseR(25), -- 25GBASE-CR or 25GBASE-KR 
+              bRSFEC25Greq(26), -- 25Gb/s RS-FEC 
+              bBaseFEC25Greq(27), -- 25Gb/s BASE-R FEC 
+              b25GbaseT(28), -- 25GBASE-T 
+              b40GbaseT(29), -- 40GBASE-T 
+              b100GbaseCR4(30), -- 100GBASE-CR4 
+              b100GbaseKR4(31), -- 100GBASE-KR4 
+              b100GbaseKP4(32), -- 100GBASE-KP4 
+              bForceMS(33), -- 1000BASE-T1 Force MS
+              b2p5GbaseT(34), -- 2.5GBASE-T
+              b5GBaseT(35), -- 5GBASE-T
+              b2p5GbaseKX(36), -- 2.5GBASE-KX
+              b5GbaseKR(37), -- 5GBASE-KR
+              b50GbaseR(38), -- 50GBASE-CR or 50GBASE-KR
+              b100GbaseR2(39), -- 100GBASE-CR2 or 100GBASE-KR2
+              b200GbaseR4(40), -- 200GBASE-CR4 or 200GBASE-KR4
+              b10baseT1L(41), -- 10BASE-T1L
+              b10baseT1S(42), -- 10BASE-T1S
+              b2p5GbaseT1(43), -- 2.5GBASE-T1
+              b5GbaseT1(44), -- 5GBASE-T1
+              b10GbaseT1(45), -- 10GBASE-T1
+              b25GbaseT1(46), -- 25GBASE-T1
+              b800GR8(47), -- 800GBASE-CR8 or 800GBASE-KR8
+              b100GbaseR1(48), -- 100GBASE-CR1 or 100GBASE-KR1
+              b200GbaseR2(49), -- 200GBASE-CR2 or 200GBASE-KR2
+              b400GbaseR4(50), -- 400GBASE-CR4 or 400GBASE-KR4
+              b100baseT1L(51) -- 100BASE-T1L
          }
 
      IANAifJackType ::= TEXTUAL-CONVENTION
        STATUS       current
+
        DESCRIPTION
          "Common enumeration values for repeater and interface MAU
          jack types.  This data type is used as the syntax of the
@@ -603,6 +811,7 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
      dot3MauType10BaseFLFD OBJECT-IDENTITY
        STATUS      current
        DESCRIPTION "async fiber MAU, full duplex mode"
+
        REFERENCE   "[IEEE802.3], Section 18"
        ::= { dot3MauType 13 }
 
@@ -651,6 +860,7 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
      ------ new since RFC 2239:
      dot3MauType1000BaseXHD OBJECT-IDENTITY
        STATUS      current
+
        DESCRIPTION "PCS/PMA, unknown PMD, half duplex mode"
        REFERENCE   "[IEEE802.3], Section 36"
        ::= { dot3MauType 21 }
@@ -748,6 +958,7 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
        ::= { dot3MauType 35 }
 
      dot3MauType10GigBaseSR OBJECT-IDENTITY
+
        STATUS      current
        DESCRIPTION "R fiber over 850 nm optics"
        REFERENCE   "[IEEE802.3], Section 52"
@@ -965,214 +1176,1030 @@ IANA-MAU-MIB DEFINITIONS ::= BEGIN
 
        dot3MauType40GbaseKR4 OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "40GBASE-R PCS/PMA over an electrical
+         DESCRIPTION "40GBASE-R PCS/PMA over an electrical 
                       backplane"
          REFERENCE   "IEEE Std 802.3, Clause 84"
          ::= { dot3MauType 70 }
 
        dot3MauType40GbaseCR4 OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "40GBASE-R PCS/PMA over 4 lane shielded
+         DESCRIPTION "40GBASE-R PCS/PMA over 4 lane shielded 
                       copper balanced cable"
          REFERENCE   "IEEE Std 802.3, Clause 85"
          ::= { dot3MauType 71 }
 
        dot3MauType40GbaseSR4 OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "40GBASE-R PCS/PMA over 4 lane multimode
+         DESCRIPTION "40GBASE-R PCS/PMA over 4 lane multimode 
                       fiber"
          REFERENCE   "IEEE Std 802.3, Clause 86"
          ::= { dot3MauType 72 }
 
        dot3MauType40GbaseFR OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "40GBASE-R PCS/PMA over single mode
+         DESCRIPTION "40GBASE-R PCS/PMA over single mode 
                       fiber"
          REFERENCE   "IEEE Std 802.3, Clause 89"
          ::= { dot3MauType 73 }
 
        dot3MauType40GbaseLR4 OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "40GBASE-R PCS/PMA over 4 WDM lane
+         DESCRIPTION "40GBASE-R PCS/PMA over 4 WDM lane 
                       single mode fiber"
          REFERENCE   "IEEE Std 802.3, Clause 87"
          ::= { dot3MauType 74 }
 
        dot3MauType100GbaseCR10 OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "100GBASE-R PCS/PMA over 10 lane
+         DESCRIPTION "100GBASE-R PCS/PMA over 10 lane 
                       shielded copper balanced cable"
          REFERENCE   "IEEE Std 802.3, Clause 85"
          ::= { dot3MauType 75 }
 
        dot3MauType100GbaseSR10 OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "100GBASE-R PCS/PMA over 10 lane
+         DESCRIPTION "100GBASE-R PCS/PMA over 10 lane 
                       multimode fiber"
          REFERENCE   "IEEE Std 802.3, Clause 86"
          ::= { dot3MauType 76 }
 
        dot3MauType100GbaseLR4 OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "100GBASE-R PCS/PMA over 4 WDM lane
+         DESCRIPTION "100GBASE-R PCS/PMA over 4 WDM lane 
                       single mode fiber, long reach"
          REFERENCE   "IEEE Std 802.3, Clause 88"
          ::= { dot3MauType 77 }
 
        dot3MauType100GbaseER4 OBJECT-IDENTITY
          STATUS      current
-         DESCRIPTION "100GBASE-R PCS/PMA over 4 WDM lane
+         DESCRIPTION "100GBASE-R PCS/PMA over 4 WDM lane 
                       single mode fiber PMD, extended reach"
          REFERENCE   "IEEE Std 802.3, Clause 88"
          ::= { dot3MauType 78 }
 
-       dot3MauType1000baseT1 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "1000BASE-T1 single balanced twisted-pair copper cabling PHY"
-         REFERENCE "IEEE Std 802.3, Clause 96"
-         ::= { dot3MauType 79 }
+       dot3MauType1000baseT1 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "1000BASE-T1 single balanced twisted-pair copper cabling PHY" 
+         REFERENCE "IEEE Std 802.3, Clause 97" 
+         ::= { dot3MauType 79 } 
 
-       dot3MauType1000basePX30D OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "One single-mode fiber EPON OLT, 20km, 1:32 split ratio"
-         REFERENCE "IEEE Std 802.3, Clause 60"
-         ::= { dot3MauType 80 }
+       dot3MauType1000basePX30D OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "One single-mode fiber EPON OLT, 20km, 1:32 split ratio" 
+         REFERENCE "IEEE Std 802.3, Clause 60" 
+         ::= { dot3MauType 80 } 
 
-       dot3MauType1000basePX30U OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "One single-mode fiber EPON ONU, 20km, 1:32 split ratio"
-         REFERENCE "IEEE Std 802.3, Clause 60"
-         ::= { dot3MauType 81 }
+       dot3MauType1000basePX30U OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "One single-mode fiber EPON ONU, 20km, 1:32 split ratio" 
+         REFERENCE "IEEE Std 802.3, Clause 60" 
+         ::= { dot3MauType 81 } 
 
-       dot3MauType1000basePX40D OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "One single-mode fiber EPON OLT, 20km, 1:64 split ratio"
-         REFERENCE "IEEE Std 802.3, Clause 60"
-         ::= { dot3MauType 82 }
+       dot3MauType1000basePX40D OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "One single-mode fiber EPON OLT, 20km, 1:64 split ratio" 
+         REFERENCE "IEEE Std 802.3, Clause 60" 
+         ::= { dot3MauType 82 } 
 
-       dot3MauType1000basePX40U OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "One single-mode fiber EPON ONU, 20km, 1:64 split ratio"
-         REFERENCE "IEEE Std 802.3, Clause 60"
-         ::= { dot3MauType 83 }
+       dot3MauType1000basePX40U OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "One single-mode fiber EPON ONU, 20km, 1:64 split ratio" 
+         REFERENCE "IEEE Std 802.3, Clause 60" 
+         ::= { dot3MauType 83 } 
 
-       dot3MauType10G1GbasePRXD4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "One single-mode fiber asymmetric-rate EPON OLT, supporting
-                      extended power budget (PRX40)"
-         REFERENCE "IEEE Std 802.3, Clause 75"
-         ::= { dot3MauType 84 }
+       dot3MauType10G1GbasePRXD4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "One single-mode fiber asymmetric-rate EPON OLT, supporting 
+                      extended power budget (PRX40)" 
+         REFERENCE "IEEE Std 802.3, Clause 75" 
+         ::= { dot3MauType 84 } 
 
-       dot3MauType10G1GbasePRXU4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "One single-mode fiber asymmetric-rate EPON ONU, supporting
-                      extended power budget (PRX40)"
-         REFERENCE "IEEE Std 802.3, Clause 75"
-         ::= { dot3MauType 85 }
+       dot3MauType10G1GbasePRXU4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "One single-mode fiber asymmetric-rate EPON ONU, supporting 
+                      extended power budget (PRX40)" 
+         REFERENCE "IEEE Std 802.3, Clause 75" 
+         ::= { dot3MauType 85 } 
 
-       dot3MauType10GbasePRD4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "One single-mode fiber symmetric-rate EPON OLT, supporting
-                      extended power budget (PR40)"
-         REFERENCE "IEEE Std 802.3, Clause 75"
-         ::= { dot3MauType 86 }
+       dot3MauType10GbasePRD4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "One single-mode fiber symmetric-rate EPON OLT, supporting 
+                      extended power budget (PR40)" 
+         REFERENCE "IEEE Std 802.3, Clause 75" 
+         ::= { dot3MauType 86 } 
 
-       dot3MauType10GbasePRU4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "One single-mode fiber symmetric-rate EPON ONU, supporting
-                      extended power budget (PR40)"
-         REFERENCE "IEEE Std 802.3, Clause 75"
-         ::= { dot3MauType 87 }
+       dot3MauType10GbasePRU4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "One single-mode fiber symmetric-rate EPON ONU, supporting 
+                      extended power budget (PR40)" 
+         REFERENCE "IEEE Std 802.3, Clause 75" 
+         ::= { dot3MauType 87 } 
 
-       dot3MauType25GbaseCR OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "25GBASE-R PCS/PMA over shielded balanced copper cable"
-         REFERENCE "IEEE Std 802.3, Clause 110"
-         ::= { dot3MauType 88 }
+       dot3MauType25GbaseCR OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "25GBASE-R PCS/PMA over shielded balanced copper cable" 
+         REFERENCE "IEEE Std 802.3, Clause 110" 
+         ::= { dot3MauType 88 } 
 
-       dot3MauType25GbaseCRS OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "25GBASE-R PCS/PMA over shielded balanced copper cable
-                      without RS-FEC"
-         REFERENCE "IEEE Std 802.3, Clause 110"
-         ::= { dot3MauType 89 }
+       dot3MauType25GbaseCRS OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "25GBASE-R PCS/PMA over shielded balanced copper cable 
+                      without RS-FEC" 
+         REFERENCE "IEEE Std 802.3, Clause 110" 
+         ::= { dot3MauType 89 } 
 
-       dot3MauType25GbaseKR OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "25GBASE-R PCS/PMA over an electrical backplane"
-         REFERENCE "IEEE Std 802.3, Clause 111"
-         ::= { dot3MauType 90 }
+       dot3MauType25GbaseKR OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "25GBASE-R PCS/PMA over an electrical backplane" 
+         REFERENCE "IEEE Std 802.3, Clause 111" 
+         ::= { dot3MauType 90 } 
 
-       dot3MauType25GbaseKRS OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "25GBASE-R PCS/PMA over an electrical backplane without RS-FEC"
-         REFERENCE "IEEE Std 802.3, Clause 111"
-         ::= { dot3MauType 91 }
+       dot3MauType25GbaseKRS OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "25GBASE-R PCS/PMA over an electrical backplane without RS-FEC" 
+         REFERENCE "IEEE Std 802.3, Clause 111" 
+         ::= { dot3MauType 91 } 
 
-       dot3MauType25GbaseR OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "25GBASE-R PCS/PMA over undefined PMD"
-         REFERENCE "IEEE Std 802.3, Clause 107 and 109"
-         ::= { dot3MauType 92 }
+       dot3MauType25GbaseR OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "25GBASE-R PCS/PMA over undefined PMD" 
+         REFERENCE "IEEE Std 802.3, Clause 107 and 109" 
+         ::= { dot3MauType 92 } 
 
-       dot3MauType25GbaseSR OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "25GBASE-R PCS/PMA over multimode fiber"
-         REFERENCE "IEEE Std 802.3, Clause 112"
-         ::= { dot3MauType 93 }
+       dot3MauType25GbaseSR OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "25GBASE-R PCS/PMA over multimode fiber" 
+         REFERENCE "IEEE Std 802.3, Clause 112" 
+         ::= { dot3MauType 93 } 
 
-       dot3MauType25GbaseT OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "Four-pair twisted-pair balanced copper cabling"
-         REFERENCE "IEEE Std 802.3, Clause 113"
-         ::= { dot3MauType 94 }
+       dot3MauType25GbaseT OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "Four-pair twisted-pair balanced copper cabling" 
+         REFERENCE "IEEE Std 802.3, Clause 113" 
+         ::= { dot3MauType 94 } 
 
-       dot3MauType40GbaseER4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "40GBASE-R PCS/PMA over 4 WDM lane single mode fiber"
-         REFERENCE "IEEE Std 802.3, Clause 82"
-         ::= { dot3MauType 95 }
+       dot3MauType40GbaseER4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "40GBASE-R PCS/PMA over 4 WDM lane single mode fiber" 
+         REFERENCE "IEEE Std 802.3, Clause 82" 
+         ::= { dot3MauType 95 } 
 
-       dot3MauType40GbaseR OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "40GBASE-R PCS as over undefined PMA/PMD"
-         REFERENCE "IEEE Std 802.3, Clause 82"
-         ::= { dot3MauType 96 }
+       dot3MauType40GbaseR OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "40GBASE-R PCS as over undefined PMA/PMD" 
+         REFERENCE "IEEE Std 802.3, Clause 82" 
+         ::= { dot3MauType 96 } 
 
-       dot3MauType40GbaseT OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "Four-pair twisted-pair balanced copper cabling"
-         REFERENCE "IEEE Std 802.3, Clause 113"
-         ::= { dot3MauType 97 }
+       dot3MauType40GbaseT OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "Four-pair twisted-pair balanced copper cabling" 
+         REFERENCE "IEEE Std 802.3, Clause 113" 
+         ::= { dot3MauType 97 } 
 
-       dot3MauType100GbaseCR4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION " 100GBASE-R PCS/PMA over 4 lane shielded copper balanced cable"
-         REFERENCE "IEEE Std 802.3, Clause 92"
-         ::= { dot3MauType 98 }
+       dot3MauType100GbaseCR4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION " 100GBASE-R PCS/PMA over 4 lane shielded copper balanced cable" 
+         REFERENCE "IEEE Std 802.3, Clause 92" 
+         ::= { dot3MauType 98 } 
 
-       dot3MauType100GbaseKR4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "100GBASE-R PCS/PMA over an electrical backplane"
-         REFERENCE "IEEE Std 802.3, Clause 93"
-         ::= { dot3MauType 99 }
+       dot3MauType100GbaseKR4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "100GBASE-R PCS/PMA over an electrical backplane" 
+         REFERENCE "IEEE Std 802.3, Clause 93" 
+         ::= { dot3MauType 99 } 
 
-       dot3MauType100GbaseKP4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "100GBASE-P PCS/PMA over an electrical backplane PMD"
-         REFERENCE "IEEE Std 802.3, Clause 94"
-         ::= { dot3MauType 100 }
+       dot3MauType100GbaseKP4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "100GBASE-P PCS/PMA over an electrical backplane PMD" 
+         REFERENCE "IEEE Std 802.3, Clause 94" 
+         ::= { dot3MauType 100 } 
 
-       dot3MauType100GbaseR OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "100GBASE-R Multi-lane PCS over undefined PMA/PMD"
-         REFERENCE "IEEE Std 802.3, Clause 82"
-         ::= { dot3MauType 101 }
+       dot3MauType100GbaseR OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "100GBASE-R Multi-lane PCS over undefined PMA/PMD" 
+         REFERENCE "IEEE Std 802.3, Clause 82" 
+         ::= { dot3MauType 101 } 
 
-       dot3MauType100GbaseSR4 OBJECT-IDENTITY
-         STATUS current
-         DESCRIPTION "100GBASE-R PCS/PMA over 4 lane multimode fiber"
-         REFERENCE "IEEE Std 802.3, Clause 95"
+       dot3MauType100GbaseSR4 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "100GBASE-R PCS/PMA over 4 lane multimode fiber" 
+         REFERENCE "IEEE Std 802.3, Clause 95" 
          ::= { dot3MauType 102 }
 
+       dot3MauType2p5GigT OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "2.5GBASE-T Four-pair twisted-pair balanced copper cabling PHY" 
+         REFERENCE "IEEE Std 802.3-2018, Clause 126" 
+         ::= { dot3MauType 103 }
+
+       dot3MauType5GigT OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "5GBASE-T Four-pair twisted-pair balanced copper cabling PHY" 
+         REFERENCE "IEEE Std 802.3-2018, Clause 126" 
+         ::= { dot3MauType 104 }
+
+       dot3MauType100baseT1 OBJECT-IDENTITY 
+         STATUS current 
+         DESCRIPTION "100BASE-T1 Single balanced twisted-pair copper cabling PHY" 
+         REFERENCE "IEEE Std 802.3, Clause 96"
+         ::= { dot3MauType 105 }
+
+       dot3MauType1000baseRHA OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "1000BASE-RHA Plastic optical fiber PHY"
+         REFERENCE "IEEE Std 802.3, Clause 115"
+         ::= { dot3MauType 106 }
+
+       dot3MauType1000baseRHB OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "1000BASE-RHB Plastic optical fiber PHY"
+         REFERENCE "IEEE Std 802.3, Clause 115"
+         ::= { dot3MauType 107 }
+
+       dot3MauType1000baseRHC OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "1000BASE-RHC Plastic optical fiber PHY"
+         REFERENCE "IEEE Std 802.3, Clause 115"
+         ::= { dot3MauType 108 }
+
+       dot3MauType2p5GbaseKX OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "2.5GBASE-X PMD over an electrical backplane"
+         REFERENCE "IEEE Std 802.3, Clause 128"
+         ::= { dot3MauType 109 }
+
+       dot3MauType2p5GbaseX OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "2.5GBASE-X PCS/PMA over undefined PMD"
+         REFERENCE "IEEE Std 802.3, Clause 127"
+         ::= { dot3MauType 110 }
+
+       dot3MauType5GbaseKR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "5GBASE-KR PMD over an electrical backplane"
+         REFERENCE "IEEE Std 802.3, Clause 130"
+         ::= { dot3MauType 111 }
+
+       dot3MauType5GbaseR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "5GBASE-R PCS/PMA over undefined PMD"
+         REFERENCE "IEEE Std 802.3, Clause 129"
+         ::= { dot3MauType 112 }
+
+       dot3MauType10GpassXR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "Coax cable distribution network PHY continuous downstream/burst mode upstream PHY"
+         REFERENCE "IEEE Std 802.3, Clause 100 and 101"
+         ::= { dot3MauType 113 }
+
+       dot3MauType25GbaseLR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "25GBASE-R PCS/PMA over single-mode fiber PMD, with long reach"
+         REFERENCE "IEEE Std 802.3, Clause 114"
+         ::= { dot3MauType 114 }
+
+       dot3MauType25GbaseER OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "25GBASE-R PCS/PMA over single-mode fiber PMD, with extended reach"
+         REFERENCE "IEEE Std 802.3, Clause 114"
+         ::= { dot3MauType 115 }
+
+       dot3MauType50GbaseR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "50GBASE-R Multi-lane PCS over undefined PMA/PMD"
+         REFERENCE "IEEE Std 802.3, Clause 133 and 135"
+         ::= { dot3MauType 116 }
+
+       dot3MauType50GbaseCR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "50GBASE-R PCS/PMA over shielded copper balanced cable PMD"
+         REFERENCE "IEEE Std 802.3, Clause 136"
+         ::= { dot3MauType 117 }
+
+       dot3MauType50GbaseKR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "50GBASE-R PCS/PMA over an electrical backplane PMD"
+         REFERENCE "IEEE Std 802.3, Clause 137"
+         ::= { dot3MauType 118 }
+
+       dot3MauType50GbaseSR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "50GBASE-R PCS/PMA over multimode fiber PMD"
+         REFERENCE "IEEE Std 802.3, Clause 138"
+         ::= { dot3MauType 119 }
+
+       dot3MauType50GbaseFR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "50GBASE-R PCS/PMA over single mode fiber PMD with reach up to at least 2 km"
+         REFERENCE "IEEE Std 802.3, Clause 139"
+         ::= { dot3MauType 120 }
+
+       dot3MauType50GbaseLR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "50GBASE-R PCS/PMA over single mode fiber PMD with reach up to at least 10 km"
+         REFERENCE "IEEE Std 802.3, Clause 139"
+         ::= { dot3MauType 121 }
+
+       dot3MauType50GbaseER OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "50GBASE-R PCS/PMA over single-mode fiber PMD with reach up to at least 40 km"
+         REFERENCE "IEEE Std 802.3, Clause 139"
+         ::= { dot3MauType 122 }
+
+       dot3MauType100GbaseCR2 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over 2 lane shielded copper balanced cable PMD"
+         REFERENCE "IEEE Std 802.3, Clause 136"
+         ::= { dot3MauType 123 }
+
+       dot3MauType100GbaseKR2 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over an electrical backplane PMD"
+         REFERENCE "IEEE Std 802.3, Clause 137"
+         ::= { dot3MauType 124 }
+
+       dot3MauType100GbaseSR2 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over 2 lane multimode fiber PMD"
+         REFERENCE "IEEE Std 802.3, Clause 138"
+         ::= { dot3MauType 125 }
+
+       dot3MauType100GbaseDR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over single mode fiber PMD"
+         REFERENCE "IEEE Std 802.3, Clause 140"
+         ::= { dot3MauType 126 }
+
+       dot3MauType200GbaseR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "200GBASE-R Multi-lane PCS over undefined PMA/PMD"
+         REFERENCE "IEEE Std 802.3, Clause 119"
+         ::= { dot3MauType 127 }
+
+       dot3MauType200GbaseDR4 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 4-lane single-mode fiber PMD"
+         REFERENCE "IEEE Std 802.3, Clause 121"
+         ::= { dot3MauType 128 }
+
+       dot3MauType200GbaseFR4 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 4 WDM lane single-mode fiber PMD with reach up to at least 2 km"
+         REFERENCE "IEEE Std 802.3, Clause 122"
+         ::= { dot3MauType 129 }
+
+       dot3MauType200GbaseLR4 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 4 WDM lane single-mode fiber PMD with reach up to at least 10 km"
+         REFERENCE "IEEE Std 802.3, Clause 122"
+         ::= { dot3MauType 130 }
+
+       dot3MauType200GbaseCR4 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 4 lane shielded copper balanced cable PMD"
+         REFERENCE "IEEE Std 802.3, Clause 136"
+         ::= { dot3MauType 131 }
+
+       dot3MauType200GbaseKR4 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over an electrical backplane PMD"
+         REFERENCE "IEEE Std 802.3, Clause 137"
+         ::= { dot3MauType 132 }
+
+       dot3MauType200GbaseSR4 OBJECT-IDENTITY STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 4 lane multimode fiber PMD"
+         REFERENCE "IEEE Std 802.3, Clause 138"
+         ::= { dot3MauType 133 }
+
+       dot3MauType200GbaseER4 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 4 WDM lane single-mode fiber PMD with reach up to at least 40 km"
+         REFERENCE "IEEE Std 802.3, Clause 122"
+         ::= { dot3MauType 134 }
+
+       dot3MauType400GbaseR OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "400GBASE-R Multi-lane PCS over undefined PMA/PMD"
+         REFERENCE "IEEE Std 802.3, Clause 119"
+         ::= { dot3MauType 135 }
+
+       dot3MauType400GbaseSR16 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 16-lane multimode fiber PMD"
+         REFERENCE "IEEE Std 802.3, Clause 123"
+         ::= { dot3MauType 136 }
+
+       dot3MauType400GbaseDR4 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 4-lane single-mode fiber PMD"
+         REFERENCE "IEEE Std 802.3, Clause 124"
+         ::= { dot3MauType 137 }
+
+       dot3MauType400GbaseFR8 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 8 WDM lane single-mode fiber PMD with reach up to at least 2 km"
+         REFERENCE "IEEE Std 802.3, Clause 122"
+         ::= { dot3MauType 138 }
+
+       dot3MauType400GbaseLR8 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 8 WDM lane single-mode fiber PMD with reach up to at least 10 km"
+         REFERENCE "IEEE Std 802.3, Clause 122"
+         ::= { dot3MauType 139 }
+
+       dot3MauType400GbaseER8 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 8 WDM lane single-mode fiber PMD with reach up to at least 40 km"
+         REFERENCE "IEEE Std 802.3, Clause 122"
+         ::= { dot3MauType 140 }
+
+       dot3MauType10baseT1L OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "10BASE-T1L Single balanced pair PHY"
+         REFERENCE "IEEE Std 802.3, Clause 146"
+         ::= { dot3MauType 141 }
+
+       dot3MauType10baseT1SHD OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "10BASE-T1S Single balanced pair PHY, half duplex mode"
+         REFERENCE "IEEE Std 802.3, Clause 147"
+         ::= { dot3MauType 142 }
+
+       dot3MauType10baseT1SMD OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "10BASE-T1S Single balanced pair PHY, multidrop mode"
+         REFERENCE "IEEE Std 802.3, Clause 147"
+         ::= { dot3MauType 143 }
+
+       dot3MauType10baseT1SFD OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "10BASE-T1S Single balanced pair PHY, full duplex mode"
+         REFERENCE "IEEE Std 802.3, Clause 147"
+         ::= { dot3MauType 144 }
+
+       dot3MauType100GbaseFR1 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over single-mode fiber PMD with reach up to at least 2 km"
+         REFERENCE "IEEE Std 802.3, Clause 140"
+         ::= { dot3MauType 145 }
+
+       dot3MauType100GbaseLR1 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over single-mode fiber PMD with reach up to at least 10 km"
+         REFERENCE "IEEE Std 802.3, Clause 140"
+         ::= { dot3MauType 146 }
+
+       dot3MauType400GbaseFR4 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 4 WDM lane single-mode fiber PMD with reach up to at least 2 km"
+         REFERENCE "IEEE Std 802.3, Clause 151"
+         ::= { dot3MauType 147 }
+
+       dot3MauType400GbaseLR46 OBJECT-IDENTITY 
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 4 WDM lane single-mode fiber PMD with reach up to at least 6 km"
+         REFERENCE "IEEE Std 802.3, Clause 151"
+         ::= { dot3MauType 148 }
+
+       dot3MauType400GbaseSR8 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 8-lane multimode fiber PMD as specified in Clause 138"
+         ::= { dot3MauType 149 }
+
+       dot3MauType400GbaseSR4p2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 8-lane multimode fiber PMD as specified in Clause 150"
+         ::= { dot3MauType 150 }
+
+       dot3MauType2p5GbaseT1 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Single balanced pair of conductors PHY as specified in Clause 149"
+         ::= { dot3MauType 151 }
+
+       dot3MauType5GbaseT1 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Single balanced pair of conductors PHY as specified in Clause 149"
+         ::= { dot3MauType 152 }
+
+       dot3MauType10GbaseT1 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Single balanced pair of conductors PHY as specified in Clause 149"
+         ::= { dot3MauType 153 }
+
+       dot3MauType25G10GbasePQGD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous transmission / 1 x 10.3125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 154 }
+
+       dot3MauType25G10GbasePQGD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous transmission / 1 x 10.3125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 155 }
+
+       dot3MauType25G10GbasePQGU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous reception / 1 x 10.3125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 156 }
+
+       dot3MauType25G10GbasePQGU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous reception / 1 x 10.3125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 157 }
+         
+       dot3MauType25G10GbasePQXD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous transmission / 1 x 10.3125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 158 }
+
+       dot3MauType25G10GbasePQXD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous transmission / 1 x 10.3125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 159 }
+
+       dot3MauType25G10GbasePQXU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous reception / 1 x 10.3125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 160 }
+
+       dot3MauType25G10GbasePQXU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous reception / 1 x 10.3125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 161 }
+
+       dot3MauType25GbasePQGD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous transmission / 1 x 25.78125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 162 }
+
+       dot3MauType25GbasePQGD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous transmission / 1 x 25.78125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 163 }
+
+       dot3MauType25GbasePQGU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous reception / 1 x 25.78125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 164 }
+
+       dot3MauType25GbasePQGU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous reception / 1 x 25.78125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 165 }
+
+       dot3MauType25GbasePQXD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous transmission / 1 x 25.78125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 166 }
+
+       dot3MauType25GbasePQXD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous transmission / 1 x 25.78125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 167 }
+
+       dot3MauType25GbasePQXU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous reception / 1 x 25.78125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 168 }
+
+       dot3MauType25GbasePQXU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 1 x 25.78125 GBd continuous reception / 1 x 25.78125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 169 }
+
+       dot3MauType50G10GbasePQGD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 1 x 10.3125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 170 }
+
+       dot3MauType50G10GbasePQGD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 1 x 10.3125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 171 }
+
+       dot3MauType50G10GbasePQGU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 1 x 10.3125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 172 }
+
+       dot3MauType50G10GbasePQGU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 1 x 10.3125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 173 }
+
+       dot3MauType50G10GbasePQXD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 1 x 10.3125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 174 }
+
+       dot3MauType50G10GbasePQXD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 1 x 10.3125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 175 }
+
+       dot3MauType50G10GbasePQXU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 1 x 10.3125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 176 }
+
+       dot3MauType50G10GbasePQXU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 1 x 10.3125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 177 }
+
+       dot3MauType50G25GbasePQGD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 1 x 25.78125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 178 }
+
+       dot3MauType50G25GbasePQGD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 1 x 25.78125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 179 }
+
+       dot3MauType50G25GbasePQGU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 1 x 25.78125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 180 }
+
+       dot3MauType50G25GbasePQGU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 1 x 25.78125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 181 }
+
+       dot3MauType50G25GbasePQXD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 1 x 25.78125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 182 }
+
+       dot3MauType50G25GbasePQXD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 1 x 25.78125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 183 }
+
+       dot3MauType50G25GbasePQXU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 1 x 25.78125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 184 }
+
+       dot3MauType50G25GbasePQXU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 1 x 25.78125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 185 }
+
+       dot3MauType50GbasePQGD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 2 x 25.78125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 186 }
+
+       dot3MauType50GbasePQGD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 2 x 25.78125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 187 }
+
+       dot3MauType50GbasePQGU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 2 x 25.78125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 188 }
+
+       dot3MauType50GbasePQGU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 2 x 25.78125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 189 }
+
+       dot3MauType50GbasePQXD2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 2 x 25.78125 GBd burst mode reception, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 190 }
+
+       dot3MauType50GbasePQXD3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous transmission / 2 x 25.78125 GBd burst mode reception, high power class, as specified in Clause 141"
+         ::= { dot3MauType 191 }
+
+       dot3MauType50GbasePQXU2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 2 x 25.78125 GBd burst mode transmission, medium power class, as specified in Clause 141"
+         ::= { dot3MauType 192 }
+
+       dot3MauType50GbasePQXU3 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single mode fiber, 2 x 25.78125 GBd continuous reception / 2 x 25.78125 GBd burst mode transmission, high power class, as specified in Clause 141"
+         ::= { dot3MauType 193 }
+
+       dot3MauType100GbaseZR OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/100GBASE-ZR PMA over a PMD with reach up to at least 80 km as specified in Clause 154"
+         ::= { dot3MauType 194 }
+
+       dot3MauType10GbaseBR10D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 10 km as specified in Clause 158"
+         ::= { dot3MauType 195 }
+
+       dot3MauType10GbaseBR10U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 10 km as specified in Clause 158"
+         ::= { dot3MauType 196 }
+
+       dot3MauType10GbaseBR20D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 20 km as specified in Clause 158"
+         ::= { dot3MauType 197 }
+
+       dot3MauType10GbaseBR20U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 20 km as specified in Clause 158"
+         ::= { dot3MauType 198 }
+
+       dot3MauType10GbaseBR40D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 40 km as specified in Clause 158"
+         ::= { dot3MauType 199 }
+
+       dot3MauType10GbaseBR40U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 40 km as specified in Clause 158"
+         ::= { dot3MauType 200 }
+
+       dot3MauType25GbaseBR10D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 10 km as specified in Clause 159"
+         ::= { dot3MauType 201 }
+
+       dot3MauType25GbaseBR10U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 10 km as specified in Clause 159"
+         ::= { dot3MauType 202 }
+
+       dot3MauType25GbaseBR20D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 20 km as specified in Clause 159"
+         ::= { dot3MauType 203 }
+
+       dot3MauType25GbaseBR20U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 20 km as specified in Clause 159"
+         ::= { dot3MauType 204 }
+
+       dot3MauType25GbaseBR40D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 40 km as specified in Clause 159"
+         ::= { dot3MauType 205 }
+
+       dot3MauType25GbaseBR40U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 40 km as specified in Clause 159"
+         ::= { dot3MauType 206 }
+
+       dot3MauType50GbaseBR10D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 10 km as specified in Clause 160"
+         ::= { dot3MauType 207 }
+
+       dot3MauType50GbaseBR10U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 10 km as specified in Clause 160"
+         ::= { dot3MauType 208 }
+
+       dot3MauType50GbaseBR20D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 20 km as specified in Clause 160"
+         ::= { dot3MauType 209 }
+
+       dot3MauType50GbaseBR20U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 20 km as specified in Clause 160"
+         ::= { dot3MauType 210 }
+
+       dot3MauType50GbaseBR40D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least 40 km as specified in Clause 160"
+         ::= { dot3MauType 211 }
+
+       dot3MauType50GbaseBR40U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least 40 km as specified in Clause 160"
+         ::= { dot3MauType 212 }
+
+       dot3MauType2p5GbaseAU OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Glass optical fiber PHY as specified in Clause 166"
+         ::= { dot3MauType 213 }
+
+       dot3MauType5GbaseAU OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Glass optical fiber PHY as specified in Clause 166"
+         ::= { dot3MauType 214 }
+
+       dot3MauType10GbaseAU OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Glass optical fiber PHY as specified in Clause 166"
+         ::= { dot3MauType 215 }
+
+       dot3MauType25GbaseAU OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Glass optical fiber PHY as specified in Clause 166"
+         ::= { dot3MauType 216 }
+
+       dot3MauType50GbaseAU OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Glass optical fiber PHY as specified in Clause 166"
+         ::= { dot3MauType 217 }
+
+       dot3MauType25GbaseT1 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Single balanced pair of conductors PHY as specified in Clause 165"
+         ::= { dot3MauType 218 }
+
+       dot3MauType400GbaseDR42 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 4 single-mode fibers in each direction
+                      PMD with reach up to at least 2 km as specified in Clause 124"
+         ::= { dot3MauType 219 }
+
+       dot3MauType800GbaseCR8 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "800GBASE-R PCS/PMA over 8-lane shielded balanced copper cable
+                      PMD as specified in Clause 162"
+         ::= { dot3MauType 220 }
+
+       dot3MauType800GbaseDR8 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "800GBASE-R PCS/PMA over 8 single-mode fibers in each direction
+                      PMD with reach up to at least 500 m as specified in Clause 124"
+         ::= { dot3MauType 221 }
+
+       dot3MauType800GbaseDR82 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "800GBASE-R PCS/PMA over 8 single-mode fibers in each direction
+                      PMD with reach up to at least 2 km as specified in Clause 124"
+         ::= { dot3MauType 222 }
+
+       dot3MauType800GbaseKR8 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "800GBASE-R PCS/PMA over an electrical backplane PMD as specified
+                     in Clause 163"
+         ::= { dot3MauType 223 }
+
+       dot3MauType800GbaseR OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Multi-lane PCS as specified in Clause 172 over undefined PMA/PMD"
+         ::= { dot3MauType 224 }
+
+       dot3MauType800GbaseSR8 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "800GBASE-R PCS/PMA over 8 multimode fibers in each direction
+                      PMD with reach up to at least 100 m as specified in Clause 167"
+         ::= { dot3MauType 225 }
+
+       dot3MauType800GbaseVR8 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "800GBASE-R PCS/PMA over 8 multimode fibers in each direction
+                      PMD with reach up to at least 50 m as specified in Clause 167"
+         ::= { dot3MauType 226 }
+
+       dot3MauType10GbaseSP1D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Super-PON OLT PHY, 10 Gb/s downstream, over one single-mode fiber
+                      supporting a distance of at least 50 km as specified in Clause 164"
+         ::= { dot3MauType 227 }
+
+       dot3MauType10GbaseSP1U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Super-PON ONU PHY, 10 Gb/s upstream, over one single-mode fiber
+                      supporting a distance of at least 50 km as specified in Clause 164"
+         ::= { dot3MauType 228 }
+
+       dot3MauType10G2p5GbaseSP1D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Super-PON OLT PHY, 10 Gb/s downstream / 2.5 Gb/s upstream, over one
+                      single-mode fiber supporting a distance of at least 50 km as
+                      specified in Clause 164"
+         ::= { dot3MauType 229 }
+
+       dot3MauType10G2p5GbaseSP1U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "Super-PON ONU PHY, 10 Gb/s downstream / 2.5 Gb/s upstream, over one
+                      single-mode fiber supporting a distance of at least 50 km as
+                      specified in Clause 164"
+         ::= { dot3MauType 230 }
+
+       dot3MauType100GbaseSR1 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over 1 multimode fiber in each direction
+                      PMD with reach up to at least 100 m as specified in Clause 167"
+         ::= { dot3MauType 231 }
+
+       dot3MauType100GbaseVR1 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over 1 multimode fiber in each direction
+                      PMD with reach up to at least 50 m as specified in Clause 167"
+         ::= { dot3MauType 232 }
+
+       dot3MauType200GbaseSR2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 2 multimode fibers in each direction
+                      PMD with reach up to at least 100 m as specified in Clause 167"
+         ::= { dot3MauType 233 }
+
+       dot3MauType200GbaseVR2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 2 multimode fibers in each direction
+                      PMD with reach up to at least 50 m as specified in Clause 167"
+         ::= { dot3MauType 234 }
+
+       dot3MauType400GbaseSR4 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 4 multimode fibers in each direction
+                      PMD with reach up to at least 100 m as specified in Clause 167"
+         ::= { dot3MauType 235 }
+
+       dot3MauType400GbaseVR4 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 4 multimode fibers in each direction
+                      PMD with reach up to at least 50 m as specified in Clause 167"
+         ::= { dot3MauType 236 }
+
+       dot3MauType100GbaseCR1 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over 1-lane shielded balanced copper cable
+                      PMD as specified in Clause 162"
+         ::= { dot3MauType 237 }
+
+       dot3MauType100GbaseKR1 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "100GBASE-R PCS/PMA over an electrical backplane PMD as specified
+                      in Clause 163"
+         ::= { dot3MauType 238 }
+
+       dot3MauType200GbaseCR2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over 2-lane shielded balanced copper cable
+                      PMD as specified in Clause 162"
+         ::= { dot3MauType 239 }
+
+       dot3MauType200GbaseKR2 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "200GBASE-R PCS/PMA over an electrical backplane PMD as specified
+                      in Clause 163"
+         ::= { dot3MauType 240 }
+
+       dot3MauType400GbaseCR4 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over 4-lane shielded balanced copper cable
+                      PMD as specified in Clause 162"
+         ::= { dot3MauType 241 }
+
+       dot3MauType400GbaseKR4 OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "400GBASE-R PCS/PMA over an electrical backplane PMD as specified
+                      in Clause 163"
+         ::= { dot3MauType 242 }
+
+       dot3MauType10baseT1M OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "10BASE-T1M Single balanced pair multidrop PHY as specified in
+                      Clause 188"
+         ::= { dot3MauType 243 }
+
+       dot3MauType100GbaseBR10D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least
+                      10 km as specified in Clause 168"
+         ::= { dot3MauType 244 }
+
+       dot3MauType100GbaseBR10U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least
+                      10 km as specified in Clause 168"
+         ::= { dot3MauType 245 }
+
+       dot3MauType100GbaseBR20D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least
+                      20 km as specified in Clause 168"
+         ::= { dot3MauType 246 }
+
+       dot3MauType100GbaseBR20U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least
+                      20 km as specified in Clause 168"
+         ::= { dot3MauType 247 }
+
+       dot3MauType100GbaseBR40D OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber OLT PHY supporting a distance of at least
+                      40 km as specified in Clause 168"
+         ::= { dot3MauType 248 }
+
+       dot3MauType100GbaseBR40U OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "One single-mode fiber ONU PHY supporting a distance of at least
+                      40 km as specified in Clause 168"
+         ::= { dot3MauType 249 }
+
+       dot3MauType100baseT1L OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION "100BASE-T1L Single balanced pair PHY as specified in Clause 190"
+         ::= { dot3MauType 250 }
 END

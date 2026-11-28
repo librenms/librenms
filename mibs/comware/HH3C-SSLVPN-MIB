@@ -1,24 +1,26 @@
 -- ==========================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Private MIB File For SSL VPN
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 -- V1.0  2017-07-05 Initial Version created by wuqingchun 11459.
+-- V1.1  2022-06-23 Updated by wangyun 19368
+--                  Add hh3cSslvpnUserNumOverSpec, hh3cSslvpnUserNumBelowSpec
 -- ==========================================================================
 HH3C-SSLVPN-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     hh3cCommon
         FROM HH3C-OID-MIB
-    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, NOTIFICATION-TYPE
         FROM SNMPv2-SMI         -- [RFC2578]
     DisplayString
         FROM SNMPv2-TC;         -- [RFC2578]
 
 hh3cSslvpn MODULE-IDENTITY
-    LAST-UPDATED "201707051920Z"  -- July 05, 2017 at 19:20 GMT
+    LAST-UPDATED "202206231150Z"  -- June 23, 2022 at 11:50 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -30,6 +32,10 @@ hh3cSslvpn MODULE-IDENTITY
     DESCRIPTION
         "The private MIB file includes the SSL VPN information of
          a device."
+    -- Revision History
+    REVISION      "202206231150Z"  -- June 23, 2022
+    DESCRIPTION
+        "Add hh3cSslvpnUserNumOverSpec, hh3cSslvpnUserNumBelowSpec"
     REVISION      "201707051920Z"
     DESCRIPTION
         "Initial revision of this MIB module."
@@ -118,5 +124,26 @@ hh3cSslvpnCtxIpacServerOutBytes OBJECT-TYPE
             "Number of IP-access packet bytes that the SSL VPN
              context sent to server."
     ::= { hh3cSslvpnCtxIpacStatEntry 5 }
+
+
+hh3cSslvpnTrapObjects OBJECT IDENTIFIER ::= { hh3cSslvpn 2 }
+
+hh3cSslvpnTrap OBJECT IDENTIFIER ::= { hh3cSslvpnTrapObjects 1 }
+
+hh3cSslvpnTrapPrefix OBJECT IDENTIFIER ::= { hh3cSslvpnTrap 0 }
+
+hh3cSslvpnUserNumOverSpec NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the whole on-line user number
+        exceed specification."
+    ::= { hh3cSslvpnTrapPrefix 1 }
+
+hh3cSslvpnUserNumBelowSpec NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the whole on-line user number
+        below specification."
+    ::= { hh3cSslvpnTrapPrefix 2 }
 
 END

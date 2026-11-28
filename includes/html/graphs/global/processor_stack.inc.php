@@ -6,7 +6,7 @@ foreach (dbFetchRows('SELECT * FROM `processors` AS P, devices AS D WHERE D.devi
     $rrd_filename = Rrd::name($proc['hostname'], ['processor', $proc['processor_type'], $proc['processor_index']]);
 
     if (Rrd::checkRrdExists($rrd_filename)) {
-        $descr = short_hrDeviceDescr($proc['processor_descr']);
+        $descr = \LibreNMS\Util\Rewrite::processorDescr($proc['processor_descr']);
 
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $descr;

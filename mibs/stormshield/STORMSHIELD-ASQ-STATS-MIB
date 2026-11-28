@@ -7,7 +7,7 @@ STORMSHIELD-ASQ-STATS-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                                                  FROM STORMSHIELD-SMI-MIB;
 
    snsASQStats MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "202507150000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -20,6 +20,8 @@ STORMSHIELD-ASQ-STATS-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield ASQ Statistics"
+      REVISION      "202507150000Z"
+      DESCRIPTION   "Adding description to OIDs"
       REVISION      "201702200000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 12 }
@@ -35,56 +37,56 @@ STORMSHIELD-ASQ-STATS-MIB DEFINITIONS ::= BEGIN
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets blocked"
       ::= { snsASQStatsStateful 1 }
 
    snsASQStatsStatefulPktBlockedAsync OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets blocked by asynchronous ASQ"
       ::= { snsASQStatsStateful 2 }
 
    snsASQStatsStatefulPktBlockedSynProxy OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets blocked by synproxy"
       ::= { snsASQStatsStateful 3 }
 
    snsASQStatsStatefulPktAccepted OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets accepted"
       ::= { snsASQStatsStateful 4 }
 
    snsASQStatsStatefulLogged OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets logged"
       ::= { snsASQStatsStateful 5 }
 
    snsASQStatsStatefulLogOverflow OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets not logged due to overflow"
       ::= { snsASQStatsStateful 6 }
 
    snsASQStatsStatefulFilterOverflow OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets not logged due to filter queue overflow"
       ::= { snsASQStatsStateful 7 }
 
    snsASQStatsStatefulAlarmOverflow OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets not logged due to alarm queue overflow"
       ::= { snsASQStatsStateful 8 }
 
    snsASQStatsStatefulSeismoFacts OBJECT-TYPE
@@ -105,224 +107,224 @@ STORMSHIELD-ASQ-STATS-MIB DEFINITIONS ::= BEGIN
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Minor alarms"
       ::= { snsASQStatsStateful 11 }
 
    snsASQStatsStatefulMajorAlarm OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Major alarms"
       ::= { snsASQStatsStateful 12 }
 
    snsASQStatsStatefulPktFragmented OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Packets fragmented"
       ::= { snsASQStatsStateful 13 }
 
    snsASQStatsStatefulInBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Incoming traffic"
+      DESCRIPTION "Bytes received"
       ::= { snsASQStatsStateful 14 }
 
    snsASQStatsStatefulOutBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Outgoing traffic"
+      DESCRIPTION "Bytes transmitted"
       ::= { snsASQStatsStateful 15 }
 
    snsASQStatsStatefulNatFailures OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Failed NAT port allocations"
       ::= { snsASQStatsStateful 16 }
 
    snsASQStatsStatefulFlowConflicts OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Generic flow management conflicts"
       ::= { snsASQStatsStateful 17 }
 
    snsASQStatsStatefulFlowFailures OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Generic flow management failures"
       ::= { snsASQStatsStateful 18 }
 
    snsASQStatsStatefulInterfaceMute OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Interface mutes due to loop detection"
       ::= { snsASQStatsStateful 19 }
 
    snsASQStatsStatefulTcpPkt OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "TCP packets received and transmitted"
       ::= { snsASQStatsStateful 20 }
 
    snsASQStatsStatefulTcpInBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Incoming TCP traffic"
+      DESCRIPTION "TCP bytes received"
       ::= { snsASQStatsStateful 21 }
 
    snsASQStatsStatefulTcpOutBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Outgoing TCP traffic"
+      DESCRIPTION "TCP bytes transmitted"
       ::= { snsASQStatsStateful 22 }
 
    snsASQStatsStatefulTcpConn OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "TCP connections"
       ::= { snsASQStatsStateful 23 }
 
    snsASQStatsStatefulTcpNatConnSrc OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "TCP NAT source connections"
       ::= { snsASQStatsStateful 24 }
 
    snsASQStatsStatefulTcpNatConnDst OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "TCP NAT destination connections"
       ::= { snsASQStatsStateful 25 }
 
    snsASQStatsStatefulTcpNoNatConnSrc OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "TCP non NAT source connections"
       ::= { snsASQStatsStateful 26 }
 
    snsASQStatsStatefulTcpNoNatConnDst OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "TCP non NAT destination connections"
       ::= { snsASQStatsStateful 27 }
 
    snsASQStatsStatefulTcpSmallWindowRst OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "TCP connections timing out when using a small TCP window"
       ::= { snsASQStatsStateful 28 }
 
    snsASQStatsStatefulTcpEmptyDupAckBlk OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Duplicates ACKs with no data and no blocked window update"
       ::= { snsASQStatsStateful 29 }
 
    snsASQStatsStatefulUdpPkt OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "UDP packets received and transmitted"
       ::= { snsASQStatsStateful 30 }
 
    snsASQStatsStatefulUdpInBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Incoming UDP traffic"
+      DESCRIPTION "UDP bytes received"
       ::= { snsASQStatsStateful 31 }
 
    snsASQStatsStatefulUdpOutBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Outgoing UDP traffic"
+      DESCRIPTION "UDP bytes transmitted"
       ::= { snsASQStatsStateful 32 }
 
    snsASQStatsStatefulUdpConn OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "UDP connections"
          ::= { snsASQStatsStateful 33 }
 
    snsASQStatsStatefulUdpNatConnSrc OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "UDP NAT source connections"
       ::= { snsASQStatsStateful 34 }
 
    snsASQStatsStatefulUdpNatConnDst OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "UDP NAT destination connections"
       ::= { snsASQStatsStateful 35 }
 
    snsASQStatsStatefulUdpNoNatConnSrc OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "UDP non NAT source connections"
       ::= { snsASQStatsStateful 36 }
 
    snsASQStatsStatefulUdpNoNatConnDst OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "UDP non NAT destination connections"
       ::= { snsASQStatsStateful 37 }
 
    snsASQStatsStatefulIcmpPkt OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "ICMP packets received and transmitted"
       ::= { snsASQStatsStateful 38 }
 
    snsASQStatsStatefulIcmpInBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Incoming ICMP traffic"
+      DESCRIPTION "ICMP bytes received"
       ::= { snsASQStatsStateful 39 }
 
    snsASQStatsStatefulIcmpOutBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Outgoing ICMP traffic"
+      DESCRIPTION "ICMP bytes transmitted"
       ::= { snsASQStatsStateful 40 }
 
    snsASQStatsStatefulHttpTimeoutRst OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "HTTP connections timed out"
       ::= { snsASQStatsStateful 41 }
 
    snsASQStatsStatefulNatUnusable OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "NATs that could not be applied"
       ::= { snsASQStatsStateful 42 }
 
    snsASQStatsStatefulSctpAssoc OBJECT-TYPE
@@ -336,49 +338,49 @@ STORMSHIELD-ASQ-STATS-MIB DEFINITIONS ::= BEGIN
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "SCTP packets"
+      DESCRIPTION "SCTP packets received and transmitted"
       ::= { snsASQStatsStateful 44 }
 
    snsASQStatsStatefulSctpInBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Incoming SCTP traffic"
+      DESCRIPTION "SCTP bytes received"
       ::= { snsASQStatsStateful 45 }
 
    snsASQStatsStatefulSctpOutBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Outgoing SCTP traffic"
+      DESCRIPTION "SCTP bytes transmitted"
       ::= { snsASQStatsStateful 46 }
 
    snsASQStatsStatefulEtherstateConn OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Open ethernet connections"
       ::= { snsASQStatsStateful 47 }
 
    snsASQStatsStatefulEtherstatePackets OBJECT-TYPE
       SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Ethernet packets received"
       ::= { snsASQStatsStateful 48 }
 
    snsASQStatsStatefulEtherstateInBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Ethernet bytes received"
       ::= { snsASQStatsStateful 49 }
 
    snsASQStatsStatefulEtherstateOutBytes OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION ""
+      DESCRIPTION "Ethernet bytes transmitted"
       ::= { snsASQStatsStateful 50 }
    -----------------------------------
    -- ASQ Statistics Global Group --

@@ -26,17 +26,11 @@
 
 namespace LibreNMS\Device;
 
-use App\Facades\LibrenmsConfig;
 use App\View\SimpleTemplate;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
-use LibreNMS\Util\ProgressList;
-use SnmpQuery;
 
 class YamlDiscovery
 {
@@ -60,34 +54,6 @@ class YamlDiscovery
         }
 
         return $value;
-    }
-
-    /**
-     * @param  OS  $os  OS/device we are working on
-     * @param  array  $data  Array derived from YAML
-     * @return string
-     *
-     * @throws \LibreNMS\Exceptions\InvalidOidException
-     */
-    public static function computeNumericalOID(OS $os, array $data): string
-    {
-        d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
-        $search_mib = $os->getDiscovery()['mib'];
-        $mib_prefix_data_oid = Str::before($data['oid'], '::');
-        if (! empty($mib_prefix_data_oid) && empty(Str::before($data['value'], '::'))) {
-            // We should search value in this mib first, as it is explicitly specified
-            $search_mib = $mib_prefix_data_oid . ':' . $search_mib;
-        }
-
-        try {
-            $num_oid = Oid::of($data['value'])->toNumeric($search_mib);
-        } catch (\Exception $e) {
-            throw $e;
-        }
-
-        d_echo('Info: We found numerical oid for ' . $data['value'] . ': ' . $num_oid);
-
-        return $num_oid . '.{{ $index }}';
     }
 
     /**
@@ -118,7 +84,7 @@ class YamlDiscovery
             }
 
 //            if($pre_cache) dd($pre_cache, $def);
-            $value = (string) (new SimpleTemplate($def[$name] ?? '', $variables))->keepEmptyTemplates();
+            $value = (string) new SimpleTemplate($def[$name] ?? '', $variables)->keepEmptyTemplates();
 
             // search discovery data for values
             $template = new SimpleTemplate($value);
@@ -248,71 +214,6 @@ class YamlDiscovery
         return $default;
     }
 
-    public static function preCache(OS $os): array
-    {
-        // Pre-cache data for later use
-        $pre_cache = [];
-        $device = $os->getDeviceArray();
-
-        $pre_cache_file = base_path('includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php');
-        if (is_file($pre_cache_file)) {
-            $progress = ProgressList::start("Pre-cache {$device['os']}");
-            include $pre_cache_file;
-            $progress->end();
-            d_echo($pre_cache);
-        }
-
-        // TODO change to exclude os with pre-cache php file, but just exclude them by hand for now (like avtech)
-        if ($device['os'] == 'avtech') {
-            return $pre_cache;
-        }
-
-        $discovery_yaml = $os->getDiscovery();
-        if (! empty($discovery_yaml['modules'])) {
-            $progress = ProgressList::start('Caching data');
-            foreach ($discovery_yaml['modules'] as $module => $discovery_data) {
-                $progress->add($module);
-                foreach ($discovery_data as $key => $data_array) {
-                    // find the data array, we could already be at for simple modules
-                    if (isset($data_array['data'])) {
-                        $data_array = $data_array['data'];
-                    } elseif ($key !== 'data') {
-                        continue;
-                    }
-
-                    $saved_nobulk = LibrenmsConfig::getOsSetting($os->getName(), 'snmp_bulk', true);
-
-                    foreach ($data_array as $data) {
-                        foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
-                            if (! array_key_exists($oid, $pre_cache)) {
-                                if (isset($data['snmp_flags'])) {
-                                    $snmp_flag = Arr::wrap($data['snmp_flags']);
-                                } elseif (str_contains((string) $oid, '::')) {
-                                    $snmp_flag = ['-OteQUSab', '-Pu'];
-                                } else {
-                                    $snmp_flag = ['-OteQUsab', '-Pu'];
-                                }
-
-                                if (! isset($data['snmp_no_Ih_flag'])) {
-                                    $snmp_flag[] = '-Ih';
-                                }
-
-                                $pre_cache[$oid] ??= [];
-                                SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
-                                    ->bulk($data['snmp_bulk'] ?? true)
-                                    ->numericIndex()->options($snmp_flag)
-                                    ->walk($oid)->valuesByIndex($pre_cache[$oid]);
-                            }
-                        }
-                    }
-                }
-            }
-            $progress->end();
-        }
-
-        return $pre_cache;
-    }
-
     /**
      * Check to see if we should skip this discovery item
      *
@@ -364,12 +265,7 @@ class YamlDiscovery
         }
 
         $skip_value_gt = array_replace((array) ($group_options['skip_value_gt'] ?? []), (array) ($yaml_item_data['skip_value_gt'] ?? []));
-        foreach ($skip_value_gt as $skip_value) {
-            if ($value > $skip_value) {
-                return true;
-            }
-        }
 
-        return false;
+        return array_any($skip_value_gt, fn ($skip_value) => $value > $skip_value);
     }
 }

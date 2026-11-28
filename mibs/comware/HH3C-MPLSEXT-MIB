@@ -1,19 +1,24 @@
 -- =============================================================================
--- Copyright (c) 2004-2018 New H3C Tech.  Co.  , Ltd.  All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech.  Co.  , Ltd.  All rights reserved.
 --
 -- Description: Multiprotocol Label Switching MIB
 -- Reference:
--- Version: V1.4
+-- Version: V1.8
 -- History:
 --   V1.0 2013-06-13 Initial version Created by Neng Yan
 --   V1.1 2014-12-17 Modified by Neng Yan, Added hh3cMplsExtBfdTable
 --   V1.2 2015-06-16 Modified by Li Yun, Added hh3cMplsExtVpnStatsTable
 --   V1.3 2017-02-17 Modified by Liu Qingye, Added hh3cMplsExtVpnTable
 --   V1.4 2018-08-04 Modified by Lin jiang, Added hh3cMplsExtStaticLspTable
+--   V1.5 2022-07-18 Modified by Zhou wan, Added hh3cMplsExtNotifications
+--   V1.6 2022-09-14 Modified by Zhou wan, Modified hh3cMplsExtNotifications
+--   V1.7 2022-11-14 Modified by Zhou wan, Modified hh3cMplsExtStaticLspName
+--        2022-12-14 Modified by Zhou wan, Modified hh3cMplsExtNotifications
+--   V1.8 2023-03-14 Modified by Long lewen, Modified hh3cMplsExtNotifications
 -- =============================================================================
 HH3C-MPLSEXT-MIB DEFINITIONS ::= BEGIN
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     RowStatus, TruthValue, DisplayString
         FROM SNMPv2-TC
@@ -32,7 +37,7 @@ IMPORTS
 -- =============================================================================
 hh3cMplsExt MODULE-IDENTITY
     LAST-UPDATED
-        "201808041800Z"   -- Aug 04, 2018 at 18:00 GMT
+        "202303141400Z"   -- Mar 14, 2023 at 14:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -42,6 +47,26 @@ hh3cMplsExt MODULE-IDENTITY
          Zip:100085"
     DESCRIPTION
         "Multiprotocol Label Switching MIB"
+    REVISION
+        "202303141400Z"   -- Mar 14, 2023 at 14:00 GMT
+    DESCRIPTION
+        "Modified hh3cMplsExtNotifications."
+    REVISION
+        "202212141400Z"   -- Dec 14, 2022 at 14:00 GMT
+    DESCRIPTION
+        "Modified hh3cMplsExtNotifications."
+    REVISION
+        "202211141500Z"   -- Nov 14, 2022 at 15:00 GMT
+    DESCRIPTION
+        "Modified hh3cMplsExtStaticLspName."
+    REVISION
+        "202209141800Z"   -- Sep 14, 2022 at 18:00 GMT
+    DESCRIPTION
+        "Modified hh3cMplsExtNotifications."
+    REVISION
+        "202207181800Z"   -- July 18, 2022 at 18:00 GMT
+    DESCRIPTION
+        "Added hh3cMplsExtNotifications."
     REVISION
         "201808041800Z"   -- Aug 04, 2018 at 18:00 GMT
     DESCRIPTION
@@ -67,9 +92,11 @@ hh3cMplsExt MODULE-IDENTITY
 -- =============================================================================
 -- object definition begin
 -- =============================================================================
-hh3cMplsExtObjects      OBJECT IDENTIFIER ::= { hh3cMplsExt 1 }
+hh3cMplsExtNotifications  OBJECT IDENTIFIER ::= { hh3cMplsExt 0 }
 
-hh3cMplsExtScalarGroup  OBJECT IDENTIFIER ::= { hh3cMplsExtObjects 1 }
+hh3cMplsExtObjects        OBJECT IDENTIFIER ::= { hh3cMplsExt 1 }
+
+hh3cMplsExtScalarGroup    OBJECT IDENTIFIER ::= { hh3cMplsExtObjects 1 }
 
 hh3cMplsExtLsrID    OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..32))
@@ -86,6 +113,40 @@ hh3cMplsExtLdpStatus    OBJECT-TYPE
     DESCRIPTION
         "The global configuration of Label Distribution Protocol(LDP)."
     ::= { hh3cMplsExtScalarGroup 2 }
+
+hh3cMplsExtLabelInfo    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..127))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The information of MPLS(Multiprotocol Label Switching) Label."
+    ::= { hh3cMplsExtScalarGroup 3 }
+
+hh3cMplsExtTnlToVpnInfo    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..127))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The information of MPLS(Multiprotocol Label Switching)
+         Tunnel to Vpn."
+    ::= { hh3cMplsExtScalarGroup 4 }
+
+hh3cMplsExtDrvInfo    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..127))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The information of MPLS(Multiprotocol Label Switching) Drive."
+    ::= { hh3cMplsExtScalarGroup 5 }
+
+hh3cMplsExtLabelExtInfo    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..127))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The external information of MPLS(Multiprotocol Label Switching)
+        Label."
+    ::= { hh3cMplsExtScalarGroup 6 }
 
 -- =============================================================================
 -- hh3cMplsExtTable Definition
@@ -632,7 +693,7 @@ Hh3cMplsExtStaticLspEntry ::=
     }
 
 hh3cMplsExtStaticLspName   OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE (1..15))
+    SYNTAX      OCTET STRING (SIZE (1..67))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -710,6 +771,138 @@ hh3cMplsExtStaticLspOutIfIndex   OBJECT-TYPE
 
 -- =============================================================================
 -- End of hh3cMplsExtStaticLspTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- Notifications
+-- =============================================================================
+hh3cMplsExtLabThreExceed  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtLabelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the label usage exceeded
+       the upper threshold limit."
+    ::= { hh3cMplsExtNotifications 1 }
+
+hh3cMplsExtLabThreExceedClear  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtLabelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the label usage dropped to
+       below the lower threshold limit."
+    ::= { hh3cMplsExtNotifications 2 }
+
+hh3cMplsExtLabTotExceed  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtLabelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when all of the labels are
+       occupied by the application."
+    ::= { hh3cMplsExtNotifications 3 }
+
+hh3cMplsExtLabTotExceedClear  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtLabelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the label usage droppped to
+       a specified value."
+    ::= { hh3cMplsExtNotifications 4 }
+
+hh3cMplsExtTnlToVpnEvent  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtTnlToVpnInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the iterative tunnel changed."
+    ::= { hh3cMplsExtNotifications 5 }
+
+hh3cMplsExtResCountExceed   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtDrvInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the number of used MPLS resources
+       reach the maximum limit."
+    ::= { hh3cMplsExtNotifications 6 }
+
+hh3cMplsExtResCountExceedClear   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtDrvInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the number of used MPLS resources
+       lower than the maximum limit."
+    ::= { hh3cMplsExtNotifications 7 }
+
+hh3cMplsExtLabLayerExceed   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtDrvInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the layer number of label stack
+       greater than the maximum label depth of the device."
+    ::= { hh3cMplsExtNotifications 8 }
+
+hh3cMplsExtLabLayerExceedClear   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtDrvInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the lower number of label stack
+       lower than the maximum label depth of the device."
+    ::= { hh3cMplsExtNotifications 9 }
+
+hh3cMplsExtEntryResExceed   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtDrvInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the MPLS entry resources
+       are exhausted."
+    ::= { hh3cMplsExtNotifications 10 }
+
+hh3cMplsExtEntryResExceedClear   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtDrvInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the MPLS entry resources
+       are recovered."
+    ::= { hh3cMplsExtNotifications 11 }
+
+hh3cMplsExtSRLabelConflict    NOTIFICATION-TYPE
+    OBJECTS {
+      hh3cMplsExtLabelInfo,
+      hh3cMplsExtLabelExtInfo
+      }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the label has been assigned by
+      another protocol."
+    ::= { hh3cMplsExtNotifications 12 }
+
+hh3cMplsExtSRPrefixConflict    NOTIFICATION-TYPE
+    OBJECTS {
+      hh3cMplsExtLabelInfo,
+      hh3cMplsExtLabelExtInfo
+      }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the label has been used by
+      another prefix."
+    ::= { hh3cMplsExtNotifications 13 }
+
+hh3cMplsExtHardResRestore     NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtDrvInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the Hardware resources for MPLS
+      are restored."
+    ::= { hh3cMplsExtNotifications 14 }
+
+hh3cMplsExtHardResNotEnough     NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsExtDrvInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when No enough hardware resource
+      for MPLS."
+    ::= { hh3cMplsExtNotifications 15 }
+
+-- =============================================================================
+-- End of notifications.
 -- =============================================================================
 
 END

@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "neptune",
-                    "type": "network",
+                    "type": "optical",
                     "serial": null,
                     "icon": "ribbon.svg"
                 }

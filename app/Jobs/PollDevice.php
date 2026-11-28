@@ -10,6 +10,7 @@ use App\Events\PollingModule;
 use App\Exceptions\PollingFailedException;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Jobs\Concerns\DeviceJob;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -22,7 +23,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\ProcessType;
@@ -32,18 +32,17 @@ use LibreNMS\OS;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
-use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use Throwable;
 
 class PollDevice implements ShouldQueue, ShouldBeUnique
 {
+    use DeviceJob;
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private ?Device $device = null;
     public int $tries = 4; // 1 + backoff() steps
-    public int $uniqueFor = 3600; // held across retries
     public int $timeout = 600; // < queue retry_after
 
     private ?array $deviceArray = null;
@@ -62,14 +61,36 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
     ) {
     }
 
-    public function displayName(): string
+    /**
+     * Held while the job waits and runs (up to the timeout) and across retries (most of a poll interval).
+     * A lock left behind (the job was lost) holds up the device for no more than this.
+     */
+    public function uniqueFor(): int
     {
-        return "PollDevice:$this->device_id";
+        return $this->timeout + DispatchPollingWork::pollFrequency();
     }
 
-    public function uniqueId(): int
+    /**
+     * Each poller group has its own queue, worked by the nodes in that group
+     */
+    public static function queueFor(int $poller_group): string
+    {
+        return $poller_group ? "poll-$poller_group" : 'poll';
+    }
+
+    public function deviceId(): int
     {
         return $this->device_id;
+    }
+
+    /**
+     * Tags shown in Horizon
+     *
+     * @return string[]
+     */
+    public function tags(): array
+    {
+        return ['poll', "device:$this->device_id"];
     }
 
     /**
@@ -77,7 +98,10 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        $this->initDevice();
+        if (! $this->initDevice()) {
+            return; // deleted or moved to another poller group after it was queued
+        }
+
         $methodResults = new PerDeviceMethodResults($this->device);
         $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
@@ -135,7 +159,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
 
         DevicePolled::dispatch($this->device);
 
-        // retry down devices, last attempt succeeds so it stays out of failed_jobs
+        // retry down devices, the last attempt succeeds, a down device is not a failed job
         if (! $this->device->status && $this->job && ! $this->job instanceof SyncJob && $this->attempts() < $this->tries) {
             throw new PollingFailedException($this->device);
         }
@@ -201,27 +225,6 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
                 ModulePolled::dispatch($this->device, $module);
             }
         }
-    }
-
-    private function initDevice(): void
-    {
-        Cache::driver('device')->flush();
-        \DeviceCache::setPrimary($this->device_id);
-        $this->device = \DeviceCache::getPrimary();
-        $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;
-
-        $this->deviceArray = $this->device->toArray();
-        if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {
-            $this->deviceArray['os_group'] = $os_group;
-        }
-
-        Log::info(sprintf(<<<'EOH'
-Hostname:  %s %s
-ID:        %s
-OS:        %s
-IP:        %s
-
-EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
     }
 
     private function initRrdDirectory(): void

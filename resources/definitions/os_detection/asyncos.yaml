@@ -1,6 +1,6 @@
 os: asyncos
 text: 'Cisco AsyncOS'
-type: proxy
+type: security
 icon: cisco
 over:
     - { graph: device_bits, text: Traffic }

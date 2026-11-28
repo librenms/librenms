@@ -60,8 +60,8 @@ Valid data entry keys:
 ##### Custom Mempool Discovery and Polling
 
 For your own discovery or polling, implement the MempoolsDiscovery
-interface and the MempoolsPolling interface in the OS class.
-MempoolsPolling is optional. Without it, LibreNMS uses the standard
+interface and override the pollMempools method in the OS class.
+Overriding pollMempools is optional. Without it, LibreNMS uses the standard
 polling with the OIDs from the database.
 
 The OS class files are in `LibreNMS\OS`.
@@ -71,10 +71,8 @@ The OS class files are in `LibreNMS\OS`.
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
-use LibreNMS\Interfaces\Polling\MempoolsPolling;
-
-class Example extends \LibreNMS\OS implements MempoolsDiscovery, MempoolsPolling
+use Illuminate\Database\Eloquent\Collection;
+class Example extends \LibreNMS\OS
 {
     /**
      * Discover a Collection of Mempool models.
@@ -88,10 +86,10 @@ class Example extends \LibreNMS\OS implements MempoolsDiscovery, MempoolsPolling
     }
 
     /**
-     * @param \Illuminate\Support\Collection $mempools \App\Models\Mempool
-     * @return \Illuminate\Support\Collection \App\Models\Mempool
+     * @param \Illuminate\Database\Eloquent\Collection $mempools \App\Models\Mempool
+     * @return \Illuminate\Database\Eloquent\Collection the mempools that were polled
      */
-    public function pollMempools($mempools)
+    public function pollMempools(Collection $mempools): Collection
     {
         // TODO: Implement pollMempools() method.
     }

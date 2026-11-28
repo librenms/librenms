@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "Example Site",
                     "os": "prismasdwan",
-                    "type": "appliance",
+                    "type": "network",
                     "serial": null,
                     "icon": "panos.svg"
                 }

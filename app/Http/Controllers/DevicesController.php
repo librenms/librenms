@@ -71,7 +71,7 @@ class DevicesController extends Controller
                 $graph = array_merge($graphTemplate, ['device' => $device->device_id]);
 
                 return [
-                    'link' => Url::graphPageUrl($graph['type'], Arr::except($graph, ['height', 'width', 'legend', 'title'])),
+                    'link' => route('graphs', Arr::except($graph, ['height', 'width', 'legend', 'title'])),
                     'graphTag' => Url::lazyGraphTag($graph, 'tw:w-full tw:h-auto'),
                     'deviceLinkOptions' => ['device_id' => $device->device_id, 'params' => ['type' => $graph['type']]],
                 ];

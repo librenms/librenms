@@ -7,7 +7,7 @@ STORMSHIELD-IPSEC-STATS-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                                                  FROM STORMSHIELD-SMI-MIB;
 
    snsIPSECStats MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "202510280000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
         "Customer Support
@@ -20,12 +20,15 @@ STORMSHIELD-IPSEC-STATS-MIB DEFINITIONS ::= BEGIN
         E-mail: support@stormshield.eu
         http://www.stormshield.eu"
       DESCRIPTION   "stormshield IPSEC Statistics"
+      REVISION      "202510280000Z"
+      DESCRIPTION   "Addition of ESPStats"
       REVISION      "201702200000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 13 }
 
    snsIPSECStatsSPD         OBJECT IDENTIFIER ::= { snsIPSECStats 1 }
    snsIPSECStatsSAD         OBJECT IDENTIFIER ::= { snsIPSECStats 2 }
+   snsIPSECStatsESP         OBJECT IDENTIFIER ::= { snsIPSECStats 3 }
 
    -----------------------------------
    -- IPSEC SPD Statistics Group --
@@ -76,5 +79,23 @@ STORMSHIELD-IPSEC-STATS-MIB DEFINITIONS ::= BEGIN
       STATUS current
       DESCRIPTION "Number of dead security associations"
       ::= { snsIPSECStatsSAD 4 }
+
+   -----------------------------------
+   -- IPSEC ESP Statistics Group --
+   -----------------------------------
+
+   snsIPSECStatsESPReplayed OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of detected replayed ESP packets"
+      ::= { snsIPSECStatsESP 1 }
+
+   snsIPSECStatsESPDropped OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of dropped ESP packets"
+      ::= { snsIPSECStatsESP 2 }
 
 END

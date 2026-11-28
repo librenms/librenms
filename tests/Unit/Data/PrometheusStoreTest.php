@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Http as LaravelHttp;
@@ -76,5 +77,18 @@ final class PrometheusStoreTest extends TestCase
         LaravelHttp::assertSent(fn (\Illuminate\Http\Client\Request $request) => $request->method() == 'POST' &&
             $request->url() == 'http://fake:9999/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype' &&
             $request->body() == "ifIn 234234\nifOut 53453\n");
+    }
+
+    public function testMetricIdentityIsTheInstance(): void
+    {
+        LaravelHttp::fake([
+            '*' => LaravelHttp::response(),
+        ]);
+        \Log::shouldReceive('debug');
+
+        $metric = new MetricIdentity('vm.cpu', ['cluster' => 'pve-cluster', 'type' => 'qemu', 'id' => 100]);
+        app(Prometheus::class)->write($metric->measurement, ['usage' => 5], $metric->tags, ['device' => new Device(['hostname' => 'pve1']), 'metric' => $metric]);
+
+        LaravelHttp::assertSent(fn (\Illuminate\Http\Client\Request $request) => $request->url() == 'http://fake:9999/metrics/job/librenms/instance/pve-cluster/measurement/vm.cpu/cluster/pve-cluster/type/qemu/id/100');
     }
 }

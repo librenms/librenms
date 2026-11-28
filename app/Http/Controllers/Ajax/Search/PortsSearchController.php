@@ -7,7 +7,6 @@ use App\Models\Port;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Enum\IfOperStatus;
-use LibreNMS\Util\Url;
 
 class PortsSearchController extends GroupedSearchController
 {
@@ -46,9 +45,14 @@ class PortsSearchController extends GroupedSearchController
                     $port->ifOperStatus != IfOperStatus::Up => 'tw:border-l-red-600!',
                     default => 'tw:border-l-green-600!',
                 },
-                'url' => Url::portUrl($port),
+                'url' => route('device.port', ['device' => $port->device_id, 'port' => $port]),
             ]);
 
-        return [$ports->isEmpty() ? null : ['type' => 'ports', 'label' => __('search.ports'), 'results' => $ports]];
+        return [$ports->isEmpty() ? null : [
+            'type' => 'ports',
+            'label' => __('search.ports'),
+            'url' => route('ports', ['filter' => ['search' => ['contains' => $search]]]),
+            'results' => $ports,
+        ]];
     }
 }

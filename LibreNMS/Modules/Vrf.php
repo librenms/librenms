@@ -34,7 +34,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\VrfPolling;
@@ -123,7 +123,7 @@ class Vrf implements Module
     }
 
     /**
-     * OS implementations throw SnmpException when the device did not answer a query whose result must be known.
+     * OS implementations throw SnmpConnectionException when the device did not answer a query whose result must be known.
      * VRFs are left as they are then, removing them would remove their contexts and the data of every module.
      *
      * @param  callable(): Collection<int, VrfModel>  $fetch
@@ -137,7 +137,7 @@ class Vrf implements Module
 
         try {
             $vrfs = $fetch();
-        } catch (SnmpException $e) {
+        } catch (SnmpConnectionException $e) {
             Log::warning('Device did not answer, VRFs were not updated: ' . $e->getMessage());
 
             return;
@@ -169,7 +169,7 @@ class Vrf implements Module
 
         try {
             $this->syncPorts($device, $os->discoverVrfPorts($synced));
-        } catch (SnmpException $e) {
+        } catch (SnmpConnectionException $e) {
             Log::warning('Device did not answer, VRF interfaces were not updated: ' . $e->getMessage());
         }
     }

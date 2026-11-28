@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "Unknown",
                     "os": "ise",
-                    "type": "server",
+                    "type": "security",
                     "serial": "AAA9999Z999",
                     "icon": "cisco.svg"
                 }

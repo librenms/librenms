@@ -31,7 +31,8 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
+use LibreNMS\Exceptions\UnsupportedSnmpOption;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\VrfPolling;
 use LibreNMS\Modules\Vrf;
@@ -120,7 +121,7 @@ final class VrfTest extends DBTestCase
         $query->shouldReceive('next')->with('.1.3.6.1')->andReturn($response);
         $this->app->instance(SnmpQueryBuilder::class, $query);
 
-        return (new TestVrfModule([]))->checkDeviceContext('ctx-red');
+        return new TestVrfModule([])->checkDeviceContext('ctx-red');
     }
 
     public function testDisabledContextsAreNotCheckedOrWalked(): void
@@ -159,6 +160,16 @@ final class VrfTest extends DBTestCase
         $this->assertSame(['red' => ['ctx-red', true]], $this->contexts());
         $this->assertSame($vrfId, $this->device->vrfs()->value('vrf_id'));
         $this->assertSame($vrfId, $port->fresh()->ifVrf);
+    }
+
+    public function testDiscoveryPropagatesUnsupportedSnmpOptions(): void
+    {
+        $os = Mockery::mock(OS::class);
+        $os->shouldReceive('getDevice')->andReturn($this->device);
+        $os->shouldReceive('discoverVrfs')->andThrow(new UnsupportedSnmpOption('Unknown option'));
+
+        $this->expectException(UnsupportedSnmpOption::class);
+        (new Vrf)->discover($os);
     }
 
     public function testContextsAreWalkedUntilRepeatedFailures(): void
@@ -294,7 +305,7 @@ final class VrfTest extends DBTestCase
         $os->shouldReceive('pollVrfs')->andReturnUsing(fn (Collection $vrfs) => $vrfs);
         $os->shouldReceive('discoverVrfPorts')->andReturn(new Collection);
         /** @var OS $os */
-        (new TestVrfModule([]))->poll($os, Mockery::mock(DataStorageInterface::class));
+        new TestVrfModule([])->poll($os, Mockery::mock(DataStorageInterface::class));
 
         $this->assertSame(['blue' => [true, false], 'red' => [true, true]], $this->manualFlags());
         $this->assertSame(['blue' => ['ctx-blue', false], 'red' => ['red', false]], $this->contexts());
@@ -409,7 +420,7 @@ final class VrfTest extends DBTestCase
         $os->shouldReceive('getDevice')->andReturn($this->device);
         $os->shouldReceive('discoverVrfs')->andReturnUsing(function () use ($vrfs, $timeout) {
             if ($timeout) {
-                throw new SnmpException('Timeout: No Response from udp:192.0.2.1:161');
+                throw new SnmpConnectionException('Timeout: No Response from udp:192.0.2.1:161');
             }
 
             return collect($vrfs)->map(fn (array $vrf) => new VrfModel([

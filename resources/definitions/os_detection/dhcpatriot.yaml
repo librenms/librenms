@@ -1,5 +1,5 @@
 os: dhcpatriot
-type: server
+type: network
 group: unix
 text: 'DHCPatriot'
 ifXmcbc: true

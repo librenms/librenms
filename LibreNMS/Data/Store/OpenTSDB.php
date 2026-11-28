@@ -74,14 +74,14 @@ class OpenTSDB extends BaseDatastore
         }
 
         $timestamp = Carbon::now()->timestamp;
-        $tmp_tags = 'hostname=' . $this->getDevice($meta)->hostname;
-
-        foreach ($tags as $k => $v) {
-            $v = str_replace([' ', ',', '='], '_', $v);
+        $tmp_tags = [];
+        foreach ($this->seriesTags($tags, $meta) as $k => $v) {
+            $v = str_replace([' ', ',', '='], '_', (string) $v);
             if (! empty($v)) {
-                $tmp_tags = $tmp_tags . ' ' . $k . '=' . $v;
+                $tmp_tags[] = $k . '=' . $v;
             }
         }
+        $tmp_tags = implode(' ', $tmp_tags);
 
         if ($measurement == 'ports') {
             foreach ($fields as $k => $v) {

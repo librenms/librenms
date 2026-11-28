@@ -33,42 +33,20 @@ use LibreNMS\Enum\Severity;
 class Html
 {
     /**
-     * return icon and color for application state
+     * Icon classes (including a theme text color) and hover text for an application state.
+     * The icon is empty for an OK state.
      *
-     * @param  string  $app_state
-     * @return array
+     * @return array{icon: string, hover_text: string}
      */
-    public static function appStateIcon($app_state)
+    public static function appStateIcon(?string $app_state): array
     {
-        switch ($app_state) {
-            case 'OK':
-                $icon = '';
-                $color = '';
-                $hover_text = 'OK';
-                break;
-            case 'ERROR':
-                $icon = 'fa-close';
-                $color = '#cc1122';
-                $hover_text = 'Error';
-                break;
-            case 'LEGACY':
-                $icon = 'fa-warning';
-                $color = '#eebb00';
-                $hover_text = 'legacy Agent Script';
-                break;
-            case 'UNSUPPORTED':
-                $icon = 'fa-flash';
-                $color = '#ff9900';
-                $hover_text = 'Unsupported Agent Script Version';
-                break;
-            default:
-                $icon = 'fa-question';
-                $color = '#777777';
-                $hover_text = 'Unknown State';
-                break;
-        }
-
-        return ['icon' => $icon, 'color' => $color, 'hover_text' => $hover_text];
+        return match ($app_state) {
+            'OK' => ['icon' => '', 'hover_text' => 'OK'],
+            'ERROR' => ['icon' => 'fa-close text-danger', 'hover_text' => 'Error'],
+            'LEGACY' => ['icon' => 'fa-warning text-warning', 'hover_text' => 'legacy Agent Script'],
+            'UNSUPPORTED' => ['icon' => 'fa-flash text-warning', 'hover_text' => 'Unsupported Agent Script Version'],
+            default => ['icon' => 'fa-question text-muted', 'hover_text' => 'Unknown State'],
+        };
     }
 
     /**
@@ -123,9 +101,8 @@ class Html
             $graph_array_zoom['width'] = '400';
 
             $link_array = $graph_array;
-            $link_array['page'] = 'graphs';
             unset($link_array['height'], $link_array['width']);
-            $link = Url::generate($link_array);
+            $link = route('graphs', $link_array);
 
             $full_link = Url::overlibLink($link, Url::lazyGraphTag($graph_array), Url::graphTag($graph_array_zoom));
             $graph_data[] = $full_link;
@@ -169,13 +146,8 @@ class Html
         return implode('', $output);
     }
 
-    /**
-     * @param  int|string  $state
-     */
-    public static function powerStateLabel($state): array
+    public static function powerStateLabel(int $state): array
     {
-        $state = is_string($state) ? PowerState::STATES[$state] : $state;
-
         return match ($state) {
             PowerState::OFF => ['OFF', 'label-default'],
             PowerState::ON => ['ON', 'label-success'],
@@ -184,9 +156,12 @@ class Html
         };
     }
 
-    public static function severityToLabel(Severity $severity, string $text = '', string $title = '', string $class = 'label'): string
+    /**
+     * Return the bootstrap label class for this severity.
+     */
+    public static function severityClass(Severity $severity): string
     {
-        $state_label = match ($severity) {
+        return match ($severity) {
             Severity::Ok => 'label-success',
             Severity::Info => 'label-info',
             Severity::Notice => 'label-primary',
@@ -194,11 +169,14 @@ class Html
             Severity::Error => 'label-danger',
             default => 'label-default',
         };
+    }
 
+    public static function severityToLabel(Severity $severity, string $text = '', string $title = '', string $class = 'label'): string
+    {
         if ($title) {
             $title = " title=\"$title\"";
         }
 
-        return "<span class=\"$class $state_label\"$title>$text</span>";
+        return "<span class=\"$class " . self::severityClass($severity) . "\"$title>$text</span>";
     }
 }

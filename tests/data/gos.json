@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "gos",
-                    "type": "appliance",
+                    "type": "security",
                     "serial": null,
                     "icon": "gos.svg"
                 }

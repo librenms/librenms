@@ -42,12 +42,15 @@ use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\AlcatelMacAddressMib;
 use LibreNMS\Util\Mac;
 use SnmpQuery;
 
 class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
-    private const PORTS_NAC_STR_MAX = 50;
+    private const int PORTS_NAC_STR_MAX = 50;
+
+    use AlcatelMacAddressMib;
 
     public function discoverVlans(): Collection
     {
@@ -66,17 +69,22 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
     public function discoverVlanPorts(Collection $vlans): Collection
     {
-        if (($QBridgeMibPorts = parent::discoverVlanPorts($vlans))->isNotEmpty()) {
-            return $QBridgeMibPorts;
+        $ports = parent::discoverVlanPorts($vlans);
+        $missingVlans = $vlans->pluck('vlan_vlan')->diff($ports->pluck('vlan'));
+
+        if ($missingVlans->isEmpty()) {
+            return $ports;
         }
 
-        return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
+        $vendorPorts = SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
             ->mapTable(fn ($data, $vpaVlanNumber, $vpaIfIndex = null) => new PortVlan([
                 'vlan' => $vpaVlanNumber,
                 'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
                 'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
                 'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0,
             ]));
+
+        return $ports->concat($vendorPorts->filter(fn (PortVlan $port) => $missingVlans->contains($port->vlan)));
     }
 
     public function pollNac(): Collection
@@ -397,5 +405,12 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     private function limitString(string $value): string
     {
         return substr($value, 0, self::PORTS_NAC_STR_MAX);
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdb = $this->alcatelDispositionFdb();
+
+        return $fdb->isNotEmpty() ? $fdb : parent::discoverFdbTable();
     }
 }

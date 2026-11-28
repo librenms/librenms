@@ -35,6 +35,7 @@ use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
+use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Sla;
@@ -229,7 +230,7 @@ class Vrp extends OS implements
             $descr = empty($entry['entPhysicalName']) ? ($entry['hwEntityBomEnDesc'] ?? null) : $entry['entPhysicalName'];
 
             if ($size != 0 && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'vrp',
                     'mempool_class' => 'system',
@@ -237,7 +238,7 @@ class Vrp extends OS implements
                     'mempool_descr' => substr("$descr Memory", 0, 64),
                     'mempool_perc_oid' => ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.$index",
                     'mempool_perc_warn' => 90,
-                ]))->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
+                ])->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
             }
         }
 
@@ -840,5 +841,40 @@ class Vrp extends OS implements
         $key = "$instance|$address";
         $sessions[$key] ??= ['instance' => $instance, 'address' => $address, 'row' => []];
         $sessions[$key]['row'] += $row;
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $ifIndexes = [];
+
+        // indexed by MAC address, VLAN number and VSI name (may be empty)
+        foreach (SnmpQuery::walk('HUAWEI-L2MAM-MIB::hwDynFdbPort')->table(1) as $mac => $data) {
+            foreach ($data['HUAWEI-L2MAM-MIB::hwDynFdbPort'] ?? [] as $vlan => $ports) {
+                $ifIndexes[$vlan][$mac] = Arr::first((array) $ports);
+            }
+        }
+
+        // Static (sticky) mac addresses are not stored in the same table.
+        foreach (SnmpQuery::walk('HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex')->table(10) as $vlan => $data) {
+            foreach ($data[0][0][0] ?? [] as $mac => $query) {
+                $ifIndex = Arr::first((array) ($query['showall'][0][0][0][0]['HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex'] ?? null));
+                if ($ifIndex) {
+                    $ifIndexes[$vlan][$mac] = $ifIndex;
+                }
+            }
+        }
+
+        $fdb = [];
+        foreach ($ifIndexes as $vlan => $macs) {
+            foreach (array_filter($macs) as $mac => $ifIndex) {
+                $fdb[] = new PortsFdb([
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
+                    'mac_address' => Mac::parse((string) $mac)->hex(),
+                    'vlan' => (int) $vlan ?: null,
+                ]);
+            }
+        }
+
+        return empty($fdb) ? parent::discoverFdbTable() : new Collection($fdb);
     }
 }

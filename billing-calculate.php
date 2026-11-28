@@ -15,7 +15,6 @@ use LibreNMS\Billing;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
-$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('frd');

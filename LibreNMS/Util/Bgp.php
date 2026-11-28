@@ -34,11 +34,11 @@ class Bgp
     public const AS_TRANS = 23456;
 
     /** InetAddressType to [index length, address length], the z types carry a 4 octet zone */
-    private const ADDRESS_LENGTHS = [1 => [4, 4], 2 => [16, 16], 3 => [8, 4], 4 => [20, 16]];
+    private const array ADDRESS_LENGTHS = [1 => [4, 4], 2 => [16, 16], 3 => [8, 4], 4 => [20, 16]];
 
-    private const AFI = [1 => 'ipv4', 2 => 'ipv6', 25 => 'l2vpn'];
+    private const array AFI = [1 => 'ipv4', 2 => 'ipv6', 25 => 'l2vpn'];
 
-    private const SAFI = [
+    private const array SAFI = [
         1 => 'unicast',
         2 => 'multicast',
         3 => 'unicastAndMulticast',
@@ -52,7 +52,7 @@ class Bgp
         133 => 'flow',
     ];
 
-    private const STATES = ['idle', 'connect', 'active', 'opensent', 'openconfirm', 'established'];
+    private const array STATES = ['idle', 'connect', 'active', 'opensent', 'openconfirm', 'established'];
 
     public static function state(?string $state): string
     {

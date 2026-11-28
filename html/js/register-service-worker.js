@@ -12,7 +12,7 @@ if ('serviceWorker' in navigator) {
 
                     if (Notification.permission === "granted") {
                         // Get the server's public key
-                        const response = await fetch('./push/key');
+                        const response = await fetch(route('push.key'));
                         const vapidPublicKey = await response.text();
                         const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
 
@@ -32,7 +32,7 @@ if ('serviceWorker' in navigator) {
 
             if (localStorage.getItem('notifications') === 'disabled' || Notification.permission === "denied") {
                 // disabled by user remove the subscription
-                fetch('./push/unregister', {
+                fetch(route('push.unregister'), {
                     method: 'post',
                     headers: {
                         'Accept': 'application/json',
@@ -46,7 +46,7 @@ if ('serviceWorker' in navigator) {
 
             } else {
                 // Send the subscription details to the server
-                fetch('./push/register', {
+                fetch(route('push.register'), {
                     method: 'post',
                     headers: {
                         'Accept': 'application/json',

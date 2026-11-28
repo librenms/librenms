@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Device;
 use App\Actions\Device\DiscoverPollingMethod;
 use App\Actions\Device\ResolvePollingMethodSecret;
 use App\Actions\Device\SetDeviceAvailability;
+use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\SavePollingMethodRequest;
 use App\Models\Device;
@@ -20,8 +21,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Interfaces\RemovesMethodData;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Util\Module;
 
 class EditPollingController
 {
@@ -112,7 +115,7 @@ class EditPollingController
             'icon' => $definition->icon(),
             ...PollingMethodSecretForm::make($method, $secrets),
             'settings_fields' => $definition->settingsFields($method->defaults($device), secretTypeVar: 'currentSecretType'),
-            'settings' => [...array_fill_keys(array_keys($definition->fields()), ''), ...$row->settings ?? []],
+            'settings' => $definition->formValues($row->settings ?? []),
             'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
             'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description, 'secret_type' => $row->secret->typeName()] : null,
             'default_secret_description' => $method->secretTypes() ? Secret::defaultDescription($type, $device->hostname) : null,
@@ -166,6 +169,7 @@ class EditPollingController
 
         $pollingMethod->delete();
         $device->unsetRelation('pollingMethods');
+        $this->removeMethodData($device, $type);
 
         $setDeviceAvailability->execute($device);
 
@@ -256,6 +260,20 @@ class EditPollingController
         $toast->success($message);
 
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
+    }
+
+    /**
+     * Modules delete the data of a removed method, nothing else would: without the method they may not run again.
+     */
+    private function removeMethodData(Device $device, PollingMethodType $type): void
+    {
+        foreach (array_keys(LibrenmsConfig::get('poller_modules', []) + LibrenmsConfig::get('discovery_modules', [])) as $name) {
+            $module = Module::fromName($name);
+
+            if ($module instanceof RemovesMethodData) {
+                $module->removeMethodData($device, $type);
+            }
+        }
     }
 
     private function reachabilityFailedResponse(

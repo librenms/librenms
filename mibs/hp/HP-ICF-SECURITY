@@ -10,13 +10,12 @@
                FROM SNMPv2-CONF
            hpicfObjectModules, icfSecurity
                FROM HP-ICF-OID
-           InetAddress, InetAddressType, InetAddressPrefixLength
+           InetAddress, InetAddressType
                FROM INET-ADDRESS-MIB;
 
        icfSecurityMib MODULE-IDENTITY
-            LAST-UPDATED "200710010903Z"  -- October 01, 2007
-            ORGANIZATION "Hewlett Packard Company,
-                          Network Infrastructure Solutions"
+            LAST-UPDATED "200803050900Z"  -- March 05, 2008
+            ORGANIZATION "HP Networking"
             CONTACT-INFO "Hewlett Packard Company
                           8000 Foothills Blvd.
                           Roseville, CA 95747"
@@ -24,6 +23,9 @@
                          the SNMPv1 authorization configuration for
                          devices in the HP Integrated Communication
                          Facility product line."
+
+            REVISION     "200803050900Z"  -- March 05, 2008
+            DESCRIPTION  "Added icfAuthIPMgrAccessMethod."
 
             REVISION     "200710010903Z"  -- October 01, 2007
             DESCRIPTION  "Deprecated icfAuthIPMgrAddress and icfAuthIPMgrMask."
@@ -539,7 +541,8 @@
                 icfAuthIPMgrInetAddrType     InetAddressType,
                 icfAuthIPMgrInetAddress      InetAddress,
                 icfAuthIPMgrInetAddrMaskType InetAddressType,
-                icfAuthIPMgrInetAddrMask     InetAddress
+                icfAuthIPMgrInetAddrMask     InetAddress,
+                icfAuthIPMgrAccessMethod     INTEGER
            }
 
        icfAuthIPMgrIndex OBJECT-TYPE
@@ -632,6 +635,23 @@
                         hold the version neutral IP address Mask."
            ::= { icfAuthIPMgrEntry 9 }
 
+       icfAuthIPMgrAccessMethod OBJECT-TYPE
+           SYNTAX      INTEGER {
+                            all(1),
+                            ssh(2),
+                            telnet(3),
+                            web(4),
+                            snmp(5),
+                            tftp(6)
+                        }
+           MAX-ACCESS  read-create
+           STATUS      current 
+           DESCRIPTION "This object defines the access method for a
+                        given manager.  The different access methods are
+                        all, ssh, telnet, web, snmp, tftp"
+           DEFVAL      { 1 }
+           ::= { icfAuthIPMgrEntry 10 }
+
        -- Conformance information
 
        icfSecurityConformance
@@ -676,6 +696,41 @@
 
            ::= { icfSecurityCompliances 2 }
 
+       icfAuthIPMgrCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                  "A compliance statement for granting or denying
+                  access to specific IP addresses for HTTP, telnet,
+                  and TFTP."
+           MODULE
+
+               GROUP    icfAuthIPMgrGroup
+               DESCRIPTION
+                       "A collection of objects for granting or denying
+                       access to specific IP addresses for HTTP, telnet,
+                       and TFTP.
+                       This Group object has been deprecated and a new 
+                       group object has been defined with name 
+                       icfAuthIPMgrInetGroup."
+
+           ::= { icfSecurityCompliances 3 }
+
+
+       icfAuthIPMgrCompliance1 MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                  "A compliance statement for granting or denying
+                  access to specific IP addresses for HTTP, telnet,
+                  and TFTP."
+           MODULE
+
+               GROUP    icfAuthIPMgrInetGroup
+               DESCRIPTION
+                       "A collection of objects for granting or denying
+                       access to specific IP addresses for HTTP, telnet,
+                       and TFTP."
+
+           ::= { icfSecurityCompliances 4 }
 
        -- units of conformance
 
@@ -745,7 +800,8 @@
            OBJECTS     { icfAuthIPMgrInetAddrType, 
                          icfAuthIPMgrInetAddress,
                          icfAuthIPMgrInetAddrMaskType,
-                         icfAuthIPMgrInetAddrMask
+                         icfAuthIPMgrInetAddrMask,
+                         icfAuthIPMgrAccessMethod
                        }
            STATUS      current
            DESCRIPTION "A collection of objects for granting or denying
@@ -753,4 +809,3 @@
                        and TFTP." 
            ::= { icfSecurityGroups 15 }
        END
-

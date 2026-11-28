@@ -23,7 +23,7 @@
                                 <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_filter') }}</a></li>
                                 <li><a href="{{ $bareLink }}"><i class="fa fa-regular @if($bare) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_header') }}</a></li>
                                 @can('port.delete')
-                                <li><a href="#" @click.prevent="purgeDeleted()">
+                                <li><a href="#" @click.prevent="purge('all')">
                                     <i x-show="!loading" class="fa fa-trash fa-lg fa-fw icon-theme" aria-hidden="true"></i>
                                     <i x-show="loading" class="fa fa-refresh fa-spin fa-lg fa-fw icon-theme" aria-hidden="true"></i>
                                     <span x-text="loading ? '{{ __('port.processing') }}' : '{{ __('port.purge') }}'"></span>
@@ -49,7 +49,7 @@
         function portPurge() {
             return {
                 loading: false,
-                async purgeDeleted() {
+                async purge(target) {
                     if (this.loading) return; // Prevent double-clicks
                     this.loading = true;
 
@@ -59,7 +59,7 @@
                     try {
                         const response = await fetch(url, {
                             method: 'DELETE',
-                            body: JSON.stringify({ purge: 'all' }),
+                            body: JSON.stringify({ purge: target }),
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': token,
@@ -68,7 +68,8 @@
                         });
 
                         if (response.ok) {
-                            toastr.success(@js(__('port.purged_message')), @js(__('port.purged')));
+                            toastr.success(target === 'all' ? @js(__('port.purged_message')) : @js(__('port.purged_port_message')), @js(__('port.purged')));
+                            $('#ports').bootgrid('reload');
                         } else {
                             toastr.error(@js(__('port.server_error')), @js(__('port.purge_failed')));
                         }

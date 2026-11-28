@@ -31,7 +31,17 @@ class Service extends DeviceRelatedModel
         'service_name',
     ];
 
+    public function displayName(): string
+    {
+        return $this->service_name ?: $this->service_type;
+    }
+
     // ---- Query Scopes ----
+
+    protected function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('service_type')->orderBy('service_name')->orderBy('service_id');
+    }
 
     /**
      * @param  Builder  $query
@@ -51,11 +61,7 @@ class Service extends DeviceRelatedModel
      */
     public function scopeIsOk($query)
     {
-        return $query->where([
-            ['service_ignore', '=', 0],
-            ['service_disabled', '=', 0],
-            ['service_status', '=', 0],
-        ]);
+        return $this->scopeIsActive($query)->where('service_status', 0);
     }
 
     /**
@@ -64,11 +70,7 @@ class Service extends DeviceRelatedModel
      */
     public function scopeIsCritical($query)
     {
-        return $query->where([
-            ['service_ignore', '=', 0],
-            ['service_disabled', '=', 0],
-            ['service_status', '=', 2],
-        ]);
+        return $this->scopeIsActive($query)->where('service_status', 2);
     }
 
     /**
@@ -77,11 +79,7 @@ class Service extends DeviceRelatedModel
      */
     public function scopeIsWarning($query)
     {
-        return $query->where([
-            ['service_ignore', '=', 0],
-            ['service_disabled', '=', 0],
-            ['service_status', '=', 1],
-        ]);
+        return $this->scopeIsActive($query)->where('service_status', 1);
     }
 
     /**

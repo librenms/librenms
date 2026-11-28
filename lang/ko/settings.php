@@ -876,10 +876,6 @@ return [
             'description' => 'Libvirt 활성화',
             'help' => '장비의 가상 머신을 보여주는 libvirt 페이지를 활성화합니다.',
         ],
-        'enable_proxmox' => [
-            'description' => 'Proxmox 활성화',
-            'help' => '장비의 가상 머신을 보여주는 Proxmox 페이지를 활성화합니다.',
-        ],
         'enable_pseudowires' => [
             'description' => '수도 회선 활성화',
             'help' => '장비의 수도 회선을 보여주는 페이지를 활성화합니다.',

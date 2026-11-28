@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-DEVICE-IF-MIB definitions
 --
---  Copyright (c) 2006, Colubris Networks, Inc.
+--  Copyright (c) 2006, Hewlett-Packard Development Company, L.P. 
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Colubris Device Interface MIB file.
@@ -15,7 +16,7 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
     Integer32, Counter32, Counter64, IpAddress
         FROM    SNMPv2-SMI
-    DisplayString, MacAddress
+    DisplayString, MacAddress, TruthValue
         FROM    SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM    SNMPv2-CONF
@@ -27,7 +28,7 @@ IMPORTS
 
 
 colubrisDeviceIfMIB MODULE-IDENTITY
-    LAST-UPDATED    "200607050000Z"
+    LAST-UPDATED    "200901140000Z"
     ORGANIZATION    "Colubris Networks, Inc."
     CONTACT-INFO    "Colubris Networks
                      Postal: 200 West Street Ste 300
@@ -48,6 +49,7 @@ colubrisDeviceIfMIBObjects OBJECT IDENTIFIER ::= { colubrisDeviceIfMIB 1 }
 -- colubris Device Interface groups
 coDeviceIfStatusGroup OBJECT IDENTIFIER ::= { colubrisDeviceIfMIBObjects 1 }
 coDeviceIfStatsGroup  OBJECT IDENTIFIER ::= { colubrisDeviceIfMIBObjects 2 }
+coDeviceIfFdbGroup    OBJECT IDENTIFIER ::= { colubrisDeviceIfMIBObjects 3 }
 
 -- The Device Interface Status Group
 coDeviceIfStatusTable OBJECT-TYPE
@@ -62,8 +64,9 @@ coDeviceIfStatusEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "An entry in the coDeviceIfStatusTable.
-                 coDevDisIndex - Uniquely identifies a device ion the
-                                 MultiService Controller.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 controller.
+
                  coDevIfStaIfIndex - Uniquely identifies an interface on
                                      the device."
     INDEX       { coDevDisIndex, coDevIfStaIfIndex }
@@ -78,7 +81,8 @@ CoDeviceIfStatusEntry ::= SEQUENCE
     coDevIfStaIpAddress              IpAddress,
     coDevIfStaNetworkMask            IpAddress,
     coDevIfStaMACAddress             MacAddress,
-    coDevIfStaState                  INTEGER
+    coDevIfStaState                  INTEGER,
+    coDevIfStaPowerForwardingStatus  TruthValue
 }
 
 coDevIfStaIfIndex OBJECT-TYPE
@@ -152,6 +156,14 @@ coDevIfStaState OBJECT-TYPE
     DESCRIPTION "The current state of the interface."
     ::= { coDeviceIfStatusEntry 8 }
 
+coDevIfStaPowerForwardingStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When True indicates that power forwarding is
+                 enabled on this Ethernet port."
+    ::= { coDeviceIfStatusEntry 9 }
+
 -- The Device Interface Stats Group
 coDeviceIfStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF CoDeviceIfStatsEntry
@@ -165,8 +177,9 @@ coDeviceIfStatsEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "An entry in the coDeviceIfStatsTable.
-                 coDevDisIndex - Uniquely identify a device in the
-                                 MultiService Controller.
+                 coDevDisIndex - Uniquely identify a device on the
+                                 controller.
+
                  coDevIfStaIfIndex - Uniquely identify an interface on
                                      the device."
     AUGMENTS    { coDeviceIfStatusEntry }
@@ -230,6 +243,71 @@ coDevIfStsTxErrors OBJECT-TYPE
                  transmitted because of errors."
     ::= { coDeviceIfStatsEntry 6 }
 
+-- The Device Interface FDB Group
+coDeviceIfFdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceIfFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table contains the network forwarding databases."
+    ::= { coDeviceIfFdbGroup 1 }
+
+coDeviceIfFdbEntry OBJECT-TYPE
+    SYNTAX      CoDeviceIfFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceIfFdbTable.
+                 coDevDisIndex - Uniquely identifies a device ion the
+                                 controller.
+
+                 coDevIfStaIfIndex - Uniquely identifies an interface on
+                                     the device.
+
+                 coDevIfFdbMacIndex - Uniquely identifies a remote
+                                      device connected to an interface
+                                      on the device."
+    INDEX       { coDevDisIndex, coDevIfStaIfIndex, coDevIfFdbMacIndex }
+    ::= { coDeviceIfFdbTable 1 }
+
+CoDeviceIfFdbEntry ::= SEQUENCE
+{
+    coDevIfFdbMacIndex    Integer32,
+    coDevIfFdbMACAddress  MacAddress,
+    coDevIfFdbAuthorized  TruthValue,
+    coDevIfFdbAgeing      Integer32
+}
+
+coDevIfFdbMacIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the index of a remote device connected to
+                 an interface on the device."
+    ::= { coDeviceIfFdbEntry 1 }
+
+coDevIfFdbMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The MAC address of the remote device."
+    ::= { coDeviceIfFdbEntry 2 }
+
+coDevIfFdbAuthorized OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When True, indicates that traffic coming from this
+                 remote device is allowed."
+    ::= { coDeviceIfFdbEntry 3 }
+
+coDevIfFdbAgeing OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "msec"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the elapsed time when when the last frame was 
+                 received for the remote device."
+    ::= { coDeviceIfFdbEntry 4 }
+
 
 -- Device Interface notifications
 colubrisDeviceIfMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisDeviceIfMIB 2 }
@@ -249,7 +327,8 @@ colubrisDeviceIfMIBCompliance MODULE-COMPLIANCE
     MODULE      MANDATORY-GROUPS
                     {
                         colubrisDeviceIfStatusMIBGroup,
-                        colubrisDeviceIfStatsMIBGroup
+                        colubrisDeviceIfStatsMIBGroup,
+                        colubrisDeviceIfFdbMIBGroup
                     }
     ::= { colubrisDeviceIfMIBCompliances 1 }
 
@@ -262,14 +341,14 @@ colubrisDeviceIfStatusMIBGroup OBJECT-GROUP
                     coDevIfStaIpAddress,
                     coDevIfStaNetworkMask,
                     coDevIfStaMACAddress,
-                    coDevIfStaState
+                    coDevIfStaState,
+                    coDevIfStaPowerForwardingStatus
                 }
     STATUS      current
     DESCRIPTION "A collection of objects for the device Interface
                  Status group."
     ::= { colubrisDeviceIfMIBGroups 1 }
 
--- units of conformance
 colubrisDeviceIfStatsMIBGroup OBJECT-GROUP
     OBJECTS     {
                     coDevIfStsRxBytes,
@@ -283,5 +362,16 @@ colubrisDeviceIfStatsMIBGroup OBJECT-GROUP
     DESCRIPTION "A collection of objects for the device Interface
                  Stats group."
     ::= { colubrisDeviceIfMIBGroups 2 }
+
+colubrisDeviceIfFdbMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevIfFdbMACAddress,
+                    coDevIfFdbAuthorized,
+                    coDevIfFdbAgeing
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the device Interface
+                 FDB group."
+    ::= { colubrisDeviceIfMIBGroups 3 }
 
 END

@@ -30,7 +30,7 @@ use Exception;
 
 class LdapMissingException extends AuthenticationException
 {
-    private const DEFAULT_MESSAGE = 'PHP does not support LDAP, please install or enable the PHP LDAP extension';
+    private const string DEFAULT_MESSAGE = 'PHP does not support LDAP, please install or enable the PHP LDAP extension';
 
     public function __construct(
         string $message = self::DEFAULT_MESSAGE,

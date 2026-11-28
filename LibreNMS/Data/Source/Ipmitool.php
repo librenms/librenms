@@ -57,8 +57,8 @@ class Ipmitool
             return null;
         }
 
-        $ipmi = $config ?? $device->polling()->ipmi();
-        if (! $ipmi->hostname) {
+        $ipmi = $config ?? $device->polling()->get(PollingMethodType::Ipmi);
+        if (! $ipmi instanceof IpmiConfig || ! $ipmi->hostname) {
             return null;
         }
 

@@ -88,7 +88,11 @@ class ArpSearchTest extends TestCase
             ->assertJsonPath('groups.0.type', 'arp_tables');
 
         $url = $response->json('groups.0.results.0.url');
-        $this->assertStringContainsString('/device/' . $device->device_id . '/ports/view=nd', $url);
+        $this->assertSame('/device/' . $device->device_id . '/ports', parse_url($url, PHP_URL_PATH));
+        $this->assertSame('view=nd', parse_url($url, PHP_URL_QUERY));
+
+        $this->get($url . '&perPage=32')
+            ->assertSee($ipv6);
     }
 
     public function test_search_arp_subtitle_shows_device_and_port(): void

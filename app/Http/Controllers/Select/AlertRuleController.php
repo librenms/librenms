@@ -3,23 +3,32 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Alert;
-use App\Models\AlertLog;
+use App\Models\AlertFault;
 use App\Models\AlertRule;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\AlertState;
 
 /**
  * @extends SelectController<AlertRule>
  */
 class AlertRuleController extends SelectController
 {
+    protected ?string $idField = 'id';
+    protected ?string $textField = 'name';
+
+    /** @return array{device: string} */
+    protected function rules(): array
+    {
+        return ['device' => 'sometimes|integer|min:1'];
+    }
+
     /**
      * @return list<string>
      */
     protected function searchFields(Request $request): array
     {
-        return ['alert_rules.name'];
+        return ['name'];
     }
 
     /**
@@ -27,26 +36,16 @@ class AlertRuleController extends SelectController
      */
     public function baseQuery(Request $request): Builder
     {
-        // used by both the faults and alert history filters
-        abort_unless($request->user()->can('viewAny', Alert::class) || $request->user()->can('viewAny', AlertLog::class), 403);
+        $this->authorize('viewAny', Alert::class);
 
-        // rule names often contain customer or site names, only list rules on devices the user can access
+        $faults = AlertFault::hasAccess($request->user())
+            ->open()
+            ->onEnabledDevicesAndRules()
+            ->where('state', '!=', AlertState::RECOVERED)
+            ->when($request->integer('device'), fn ($query, $deviceId) => $query->where('device_id', $deviceId));
+
         return AlertRule::query()
-            ->hasAccess($request->user())
-            ->select(['alert_rules.id', 'alert_rules.name'])
-            ->distinct()
-            ->orderBy('alert_rules.name');
-    }
-
-    /**
-     * @param  AlertRule  $model
-     * @return array{id: int|string, text: string, icon?: string}
-     */
-    public function formatItem(Model $model): array
-    {
-        return [
-            'id' => $model->id,
-            'text' => (string) $model->name,
-        ];
+            ->whereExists($faults->selectRaw('1')->whereColumn('rule_id', 'alert_rules.id')->toBase())
+            ->orderBy('name');
     }
 }

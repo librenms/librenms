@@ -1,14 +1,16 @@
 -- =============================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: flexe interface mib
 -- Reference: Extension of RFC 1213 and RFC 2233
--- Version: V1.1
+-- Version: V1.2
 -- History:
 --   V1.0 2018-08-06
 --        Initial Version by mazhixing
 --   V1.1 2019-4-3
 --        Modify nodename by mazhixing
+--   V1.2 2022-03-28
+--        Added hh3cFlexEGroupFMMismatch, hh3cFlexEGroupFMMismatchRecover by zhangjindong.
 -- =============================================================
 HH3C-FLEXE-MIB DEFINITIONS ::= BEGIN
 
@@ -25,7 +27,7 @@ IMPORTS
 
 
 hh3cFlexE  MODULE-IDENTITY
-        LAST-UPDATED    "201904031936Z"
+        LAST-UPDATED    "202203280000Z"
         ORGANIZATION
             "New H3C Technologies Co., Ltd."
         CONTACT-INFO
@@ -37,6 +39,9 @@ hh3cFlexE  MODULE-IDENTITY
         DESCRIPTION
              "This MIB provides FlexE interface information that is
              excluded by RFC 1213 and RFC 2233"
+        REVISION        "202203280000Z"
+        DESCRIPTION
+                "Added hh3cFlexEGroupFMMismatch and hh3cFlexEGroupFMMismatchRecover."
         REVISION        "201904031936Z"
         DESCRIPTION
                 "Modify trapnode name"
@@ -614,5 +619,33 @@ hh3cFlexEGroupFaultAlarmRecover NOTIFICATION-TYPE
     DESCRIPTION
         "The notification is generated when the fault on the first group member recovers."
     ::= { hh3cFlexETrapPrex 24 }
+
+hh3cFlexEGroupFMMismatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFlexEFrameIndex,
+            hh3cFlexESlotIndex,
+            hh3cFlexESubslotIndex,
+            hh3cFlexEGroupID
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the FEC modes of the FlexE physical interfaces
+         in the FlexE group are inconsistent."
+    ::= { hh3cFlexETrapPrex 25 }
+
+hh3cFlexEGroupFMMismatchRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFlexEFrameIndex,
+            hh3cFlexESlotIndex,
+            hh3cFlexESubslotIndex,
+            hh3cFlexEGroupID
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the FEC mode of the FlexE physical interfaces
+         in the FlexE group is consistent."
+    ::= { hh3cFlexETrapPrex 26 }
 
 END

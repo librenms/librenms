@@ -1,3 +1,14 @@
+-- *****************************************************************************
+-- draft-ietf-disman-event-mib-v2-01.txt
+--
+-- Copyright (c) The Internet Society (2001).
+-- Copyright (c) 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+--
+-- Juniper Networks edits to this MIB:                                ** JUNI **
+--   03/10/03    kwc    Fixed typos and SMIv2 conformance issues.
+-- *****************************************************************************
+
 DISMAN-EVENT-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -6,8 +17,7 @@ IMPORTS
     NOTIFICATION-TYPE, Counter32,
     Gauge32, mib-2, zeroDotZero         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, RowStatus,
-    TruthValue                FROM SNMPv2-TC
-
+    TruthValue, StorageType   FROM SNMPv2-TC                       -- ** JUNI **
     MODULE-COMPLIANCE, OBJECT-GROUP,
     NOTIFICATION-GROUP             FROM SNMPv2-CONF
     sysUpTime                 FROM SNMPv2-MIB
@@ -15,7 +25,7 @@ IMPORTS
     SnmpAdminString           FROM SNMP-FRAMEWORK-MIB;
 
 dismanEventMIB MODULE-IDENTITY
-    LAST-UPDATED "200010160000Z"            -- 16 October 2000
+    LAST-UPDATED "200111140000Z"            -- 14 November 2001
     ORGANIZATION "IETF Distributed Management Working Group"
     CONTACT-INFO "Ramanathan Kavasseri
                   Cisco Systems, Inc.
@@ -27,6 +37,10 @@ dismanEventMIB MODULE-IDENTITY
      "The MIB module for defining event triggers and actions
      for network management purposes."
 -- Revision History
+
+       REVISION     "200111140000Z"            -- 14 November 2001
+       DESCRIPTION  "Updated the DESCRIPTION clauses of mteEventEntryStatus,
+                    mteTriggerEnabled and mteTriggerEntryStatus."
 
        REVISION     "200010160000Z"            -- 16 October 2000
        DESCRIPTION  "This is the initial version of this MIB.
@@ -45,7 +59,6 @@ mteEvent              OBJECT IDENTIFIER ::= { dismanEventMIBObjects 4 }
 --
 -- Textual Conventions
 --
-
 FailureReason ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -56,7 +69,6 @@ FailureReason ::= TEXTUAL-CONVENTION
         to problems in sending the request.  The existence of a
         particular error code here does not imply that all
         implementations are capable of sensing that error and
-
         returning that code.
 
         The second group, numbered greater than 0, are copied
@@ -76,6 +88,7 @@ FailureReason ::= TEXTUAL-CONVENTION
                                 as not as expected
         sampleOverrun           another sample attempt occurred before
                                 the previous one completed"
+
     SYNTAX      INTEGER { localResourceLack(-1),
                           badDestination(-2),
                           destinationUnreachable(-3),
@@ -102,7 +115,6 @@ FailureReason ::= TEXTUAL-CONVENTION
                           notWritable(17),
                           inconsistentName(18) }
 --
-
 -- Resource Control Section
 --
 
@@ -199,7 +211,6 @@ mteTriggerFailures OBJECT-TYPE
         "The number of times an attempt to check for a trigger
         condition has failed.  This counts individually for each
         attempt in a group of targets or each attempt for a
-
         wildcarded object."
     ::= { mteTrigger 1 }
 
@@ -240,7 +251,8 @@ MteTriggerEntry ::= SEQUENCE {
     mteTriggerObjectsOwner              SnmpAdminString,
     mteTriggerObjects                   SnmpAdminString,
     mteTriggerEnabled                   TruthValue,
-    mteTriggerEntryStatus               RowStatus
+    mteTriggerEntryStatus               RowStatus,
+    mteTriggerEntryStorageType          StorageType
 }
 
 mteOwner OBJECT-TYPE
@@ -296,7 +308,6 @@ mteTriggerTest OBJECT-TYPE
         become false and come back to true.
 
         For 'threshold' the test works as described below for
-
         mteTriggerThresholdStartup, mteTriggerThresholdRising, and
         mteTriggerThresholdFalling.
 
@@ -345,7 +356,6 @@ mteTriggerValueID OBJECT-TYPE
         This may be wildcarded by truncating all or part of the
         instance portion, in which case the value is obtained
         as if with a GetNext function, checking multiple values
-
         if they exist.  If such wildcarding is applied,
         mteTriggerValueIDWildcard must be 'true' and if not it must
         be 'false'.
@@ -394,7 +404,6 @@ mteTriggerTargetTag OBJECT-TYPE
         Describing SNMP Management Frameworks.
 
         Otherwise access rights are checked according to the security
-
         parameters resulting from the tag."
     DEFVAL { ''H }
     ::= { mteTriggerEntry 8 }
@@ -453,7 +462,6 @@ mteTriggerFrequency OBJECT-TYPE
         If the next sample begins before the previous one completed the
         system may either attempt to make the check or treat this as an
         error condition with the error 'sampleOverrun'.
-
         A frequency of 0 indicates instantaneous recognition of the
         condition.  This is not possible in many cases, but may
         be supported in cases where it makes sense and the system is
@@ -501,7 +509,17 @@ mteTriggerEnabled OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A control to allow a trigger to be configured but not used.
-        When the value is 'false' the trigger is not sampled."
+        When the value is 'false' the trigger is not sampled.
+
+        Whenever the value goes from 'false' to 'true', the trigger
+        is treated as being initialized.  That is, no history is kept
+        of any trigger sample values from previous times when this
+        control may have been enabled.
+
+        If this object is set to 'true' when its value
+        is already 'true', the operation has no effect;
+        that is, the trigger is not re-initialized, and
+        there is no error."
     DEFVAL { false }
     ::= { mteTriggerEntry 14 }
 
@@ -512,8 +530,21 @@ mteTriggerEntryStatus OBJECT-TYPE
     DESCRIPTION
         "The control that allows creation and deletion of entries.
         Once made active an entry may not be modified except to
-        delete it."
+        modify the value of mteTriggerEnabled or to delete the
+        entry."
     ::= { mteTriggerEntry 15 }
+
+mteTriggerEntryStorageType OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "The storage type for this conceptual row.
+                 Conceptual rows having the value 'permanent' need not
+                 allow write-access to any columnar objects in the row,
+                 except for mteTriggerEnabled.
+                "
+    DEFVAL      { nonVolatile }
+    ::= { mteTriggerEntry 16 }
 
 --
 -- Trigger Delta Table
@@ -566,7 +597,6 @@ mteTriggerDeltaDiscontinuityID OBJECT-TYPE
 
         If the object identified is not accessible the sample attempt
         is in error, with the error code as from an SNMP request.
-
         Bad object identifiers or a mismatch between truncating the
         identifier and the value of mteDeltaDiscontinuityIDWildcard
         result in operation as one would expect when providing the
@@ -587,7 +617,6 @@ mteTriggerDeltaDiscontinuityIDWildcard OBJECT-TYPE
         indicating wildcard. Note that the value of this object will
         be the same as that of the corresponding instance of
         mteTriggerValueIDWildcard when the corresponding
-
         mteTriggerSampleType is 'deltaValue'."
     DEFVAL { false }
     ::= { mteTriggerDeltaEntry 2 }
@@ -1022,7 +1051,6 @@ mteTriggerThresholdObjects OBJECT-TYPE
         this test.
 
         A list of objects may also be added based on the overall
-
         trigger, the event or other settings in mteTriggerTest.
 
         A length of 0 indicates no additional objects."
@@ -1148,7 +1176,8 @@ MteObjectsEntry ::= SEQUENCE {
     mteObjectsIndex                     Unsigned32,
     mteObjectsID                        OBJECT IDENTIFIER,
     mteObjectsIDWildcard                TruthValue,
-    mteObjectsEntryStatus               RowStatus
+    mteObjectsEntryStatus               RowStatus,
+    mteObjectsEntryStorageType          StorageType                -- ** JUNI **
     }
 
 mteObjectsName OBJECT-TYPE
@@ -1198,7 +1227,6 @@ mteObjectsID OBJECT-TYPE
         in obtaining the mteTriggerValueID that fired.  If such
         wildcarding is applied, mteObjectsIDWildcard must be
         'true' and if not it must be 'false'.
-
         Each instance that fills the wildcard is independent of any
         additional instances, that is, wildcarded objects operate
         as if there were a separate table entry for each instance
@@ -1226,6 +1254,17 @@ mteObjectsEntryStatus OBJECT-TYPE
         Once made active an entry MAY not be modified except to
         delete it."
     ::= { mteObjectsEntry 5 }
+
+mteObjectsEntryStorageType OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "The storage type for this conceptual row.
+                 Conceptual rows having the value 'permanent' need not
+                 allow write-access to any columnar objects in the row.
+                "
+    DEFVAL      { nonVolatile }
+    ::= { mteObjectsEntry 6 }                                      -- ** JUNI **
 
 --
 -- Event Section
@@ -1271,7 +1310,8 @@ MteEventEntry ::= SEQUENCE {
     mteEventComment                     SnmpAdminString,
     mteEventActions                     BITS,
     mteEventEnabled                     TruthValue,
-    mteEventEntryStatus                 RowStatus
+    mteEventEntryStatus                 RowStatus,
+    mteEventEntryStorageType            StorageType
     }
 
 mteEventName OBJECT-TYPE
@@ -1314,7 +1354,6 @@ mteEventEnabled OBJECT-TYPE
     DESCRIPTION
         "A control to allow an event to be configured but not used.
         When the value is 'false' the event does not execute even if
-
         triggered."
     DEFVAL { false }
     ::= { mteEventEntry 4 }
@@ -1326,8 +1365,20 @@ mteEventEntryStatus OBJECT-TYPE
     DESCRIPTION
         "The control that allows creation and deletion of entries.
         Once made active an entry MAY not be modified except to
-        delete it."
+        modify the value of mteEventEnabled or to delete the entry."
     ::= { mteEventEntry 5 }
+
+mteEventEntryStorageType OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "The storage type for this conceptual row.
+                 Conceptual rows having the value 'permanent' need not
+                 allow write-access to any columnar objects in the row.
+                "
+    DEFVAL      { nonVolatile }
+    ::= { mteEventEntry 6 }
+
 
 --
 -- Event Notification Table
@@ -1365,7 +1416,7 @@ mteEventNotification OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The object identifier from the NOTIFICATION-TYPE for the
-        notification to use if metEventActions has 'notification' set."
+        notification to use if mteEventActions has 'notification' set."
     DEFVAL { zeroDotZero }
     ::= { mteEventNotificationEntry 1 }
 
@@ -1738,6 +1789,7 @@ dismanEventMIBCompliance MODULE-COMPLIANCE
                         "Write access is not required, thus allowing
                         the system not to implement wildcarding."
 
+
                 OBJECT mteObjectsIDWildcard
                 MIN-ACCESS  read-only
                 DESCRIPTION
@@ -1749,6 +1801,7 @@ dismanEventMIBCompliance MODULE-COMPLIANCE
                 DESCRIPTION
                         "Write access is not required, thus allowing
                         the system not to implement wildcarding."
+
         ::= { dismanEventMIBCompliances 1 }
 
 -- Units of Conformance
@@ -1769,6 +1822,7 @@ dismanEventResourceGroup OBJECT-GROUP
 dismanEventTriggerGroup OBJECT-GROUP
         OBJECTS {
                 mteTriggerFailures,
+
                 mteTriggerComment,
                 mteTriggerTest,
                 mteTriggerSampleType,
@@ -1782,6 +1836,8 @@ dismanEventTriggerGroup OBJECT-GROUP
                 mteTriggerObjects,
                 mteTriggerEnabled,
                 mteTriggerEntryStatus,
+                mteTriggerEntryStorageType,                        -- ** JUNI **
+
                 mteTriggerDeltaDiscontinuityID,
                 mteTriggerDeltaDiscontinuityIDWildcard,
                 mteTriggerDeltaDiscontinuityIDType,
@@ -1791,6 +1847,7 @@ dismanEventTriggerGroup OBJECT-GROUP
                 mteTriggerExistenceObjects,
                 mteTriggerExistenceEventOwner,
                 mteTriggerExistenceEvent,
+
                 mteTriggerBooleanComparison,
                 mteTriggerBooleanValue,
                 mteTriggerBooleanStartup,
@@ -1798,9 +1855,11 @@ dismanEventTriggerGroup OBJECT-GROUP
                 mteTriggerBooleanObjects,
                 mteTriggerBooleanEventOwner,
                 mteTriggerBooleanEvent,
+
                 mteTriggerThresholdStartup,
                 mteTriggerThresholdObjectsOwner,
                 mteTriggerThresholdObjects,
+
                 mteTriggerThresholdRising,
                 mteTriggerThresholdFalling,
                 mteTriggerThresholdDeltaRising,
@@ -1823,7 +1882,8 @@ dismanEventObjectsGroup OBJECT-GROUP
         OBJECTS {
                 mteObjectsID,
                 mteObjectsIDWildcard,
-                mteObjectsEntryStatus
+                mteObjectsEntryStatus,                             -- ** JUNI **
+                mteObjectsEntryStorageType                         -- ** JUNI **
         }
         STATUS current
         DESCRIPTION
@@ -1833,13 +1893,17 @@ dismanEventObjectsGroup OBJECT-GROUP
 dismanEventEventGroup OBJECT-GROUP
         OBJECTS {
                 mteEventFailures,
+
                 mteEventComment,
                 mteEventActions,
                 mteEventEnabled,
                 mteEventEntryStatus,
+                mteEventEntryStorageType,                          -- ** JUNI **
+
                 mteEventNotification,
                 mteEventNotificationObjectsOwner,
                 mteEventNotificationObjects,
+
                 mteEventSetObject,
                 mteEventSetObjectWildcard,
                 mteEventSetValue,

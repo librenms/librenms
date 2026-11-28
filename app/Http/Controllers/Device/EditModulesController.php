@@ -33,7 +33,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Util\Module;
+use LibreNMS\Util\ModuleList;
 
 class EditModulesController
 {
@@ -42,7 +44,7 @@ class EditModulesController
     /**
      * @var array<string, array{config: string, attrib: string}>
      */
-    private const TYPES = [
+    private const array TYPES = [
         'polling' => ['config' => 'poller_modules', 'attrib' => 'poll_'],
         'discovery' => ['config' => 'discovery_modules', 'attrib' => 'discover_'],
     ];
@@ -53,6 +55,7 @@ class EditModulesController
 
         $attribs = $device->getAttribs();
         $toggleable = $this->toggleable($device);
+        $moduleList = new ModuleList;
         $modules = [];
 
         foreach (self::TYPES as $type => ['config' => $configKey, 'attrib' => $attribPrefix]) {
@@ -65,6 +68,7 @@ class EditModulesController
                 $modules[$module][$type] = [
                     'global' => (bool) $globalEnabled,
                     'os' => $osEnabled,
+                    'method' => $moduleList->methodSetting($module, $device),
                     'device' => $deviceEnabled,
                 ];
             }
@@ -112,9 +116,11 @@ class EditModulesController
         }
 
         // return the effective module status
+        $moduleList = new ModuleList;
+
         return response()->json([
-            'discovery' => (bool) $device->getAttrib('discover_' . $module, LibrenmsConfig::getCombined($device->os, 'discovery_modules')[$module] ?? false),
-            'polling' => (bool) $device->getAttrib('poll_' . $module, LibrenmsConfig::getCombined($device->os, 'poller_modules')[$module] ?? false),
+            'discovery' => $moduleList->moduleStatus(ProcessType::Discovery, $module, $device)->isEnabled(),
+            'polling' => $moduleList->moduleStatus(ProcessType::Poller, $module, $device)->isEnabled(),
         ]);
     }
 

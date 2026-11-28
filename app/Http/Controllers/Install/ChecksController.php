@@ -81,13 +81,7 @@ class ChecksController extends InstallationController implements InstallerStep
             return true;
         }
 
-        foreach ($this->versionResults() as $result) {
-            if (! $result['ok']) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($this->versionResults(), fn ($result) => $result['ok']);
     }
 
     public function enabled(): bool

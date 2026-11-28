@@ -30,23 +30,23 @@ the extend script as that user.
 
 !!! example
     In this example, `snmpd` runs as `Debian-snmp` and the extend is for
-    proxmox. These commands must run without an error:
+    unbound. These commands must run without an error:
 
     ```bash
-    sudo -u Debian-snmp /usr/local/bin/proxmox
+    sudo -u Debian-snmp /etc/snmp/unbound
     ```
 
     If a command fails, use sudo with the extend command.
     For the example above, add this line to the sudoers file:
 
     ```bash
-    Debian-snmp ALL = NOPASSWD: /usr/local/bin/proxmox
+    Debian-snmp ALL = NOPASSWD: /etc/snmp/unbound
     ```
 
-    Then add sudo to the extend command. For proxmox, the result is:
+    Then add sudo to the extend command. For unbound, the result is:
 
     ```bash
-    extend proxmox /usr/bin/sudo /usr/local/bin/proxmox
+    extend unbound /usr/bin/sudo /etc/snmp/unbound
     ```
 
 ### Restart snmpd
@@ -178,8 +178,6 @@ LibreNMS during discovery and polling.
 ## Agent
 
 The unix-agent does not have a discovery module, only a poller
-module. That poller module is always disabled by default. It needs to
-need a manual enable with the agent. LibreNMS
-automatically enabled by the unix-agent poller module. It is better to
+module. Adding the Unix Agent polling method to a device enables it. It is better to
 ensure that your application is enabled for monitoring. You can check
 by following the steps under the `SNMP Extend` heading.

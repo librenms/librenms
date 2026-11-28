@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "wti-console",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": "01882810230169",
                     "icon": "wti.svg"
                 }

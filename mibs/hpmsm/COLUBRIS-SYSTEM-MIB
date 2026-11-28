@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-SYSTEM-MIB definitions
 --
---  Copyright (c) 2004, Colubris Networks, Inc.
+--  (c) Copyright 2003-2010,2012 Hewlett-Packard Development Company, L.P.
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Generic system information for Colubris Networks devices.
@@ -30,7 +31,7 @@ IMPORTS
 
 
 colubrisSystemMIB  MODULE-IDENTITY
-    LAST-UPDATED    "200703200000Z"
+    LAST-UPDATED    "201401230000Z"
     ORGANIZATION    "Colubris Networks, Inc."
     CONTACT-INFO    "Colubris Networks
                      Postal: 200 West Street Ste 300
@@ -53,13 +54,14 @@ systemInfo  OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 1 }
 systemTime  OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 2 }
 adminAccess OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 3 }
 heartbeat   OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 4 }
+managementConsole  OBJECT IDENTIFIER ::= { colubrisSystemMIBObjects 5 }
 
 -- system information group
 systemProductName OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Colubris Networks product name for the device."
+    DESCRIPTION "HP product name for the device."
     ::= { systemInfo 1 }
 
 systemFirmwareRevision OBJECT-TYPE
@@ -129,8 +131,8 @@ systemProductFlavor OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "The product flavor can extends or alter the
-                 functionality of a Colubris product."
+    DESCRIPTION "The product flavor can extend or alter the
+                 functionality of a HP product."
     ::= { systemInfo 10 }
 
 systemDeviceIdentification OBJECT-TYPE
@@ -139,6 +141,41 @@ systemDeviceIdentification OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Manufacturing Ethernet base MAC address."
     ::= { systemInfo 11 }
+
+systemFirmwareBuildDate OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Build date of the device firmware in the format YYYY/MM/DD."
+    ::= { systemInfo 12 }
+
+systemControllerMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none (1), -- not a controller
+                    alone (2), -- Controller is not part of a team
+                    member (3), -- Controller is part of a team
+                    manager (4), -- Controller is managing the team
+                    candidate (5) -- Controller is actively looking to join a team
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the current controller mode."
+    ::= { systemInfo 13 }
+
+systemCDPOperState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When True indicates that CDP support is enabled."
+    ::= { systemInfo 14 }
+
+systemLLDPOperState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When True indicates that the LLDP agent is started."
+    ::= { systemInfo 15 }
 
 
 -- system time group
@@ -170,14 +207,16 @@ systemTimeLostWhenRebooting OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Indicates if the system time is lost after rebooting or not.
-                   'true': Indicates that the system time has been lost,
+
+                   'true': Indicates that the system time has been lost.
+
                    'false': Indicates that the system time has been kept."
     ::= { systemTime 2 }
 
 systemTimeDSTOn OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Specifies if the system time need to be adjusted to compensate
                  for daylight savings.
 
@@ -192,7 +231,7 @@ systemDate OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Specifies the current GMT system date when 
                 systemTimeUpdateMode attribute is set to 'manual' mode.
-                Reading this attributes will return the current date.
+                Reading this attribute will return the current date.
 
                 Specify year (1995-3000), month (01-12), and day (01-31)
                 in the format YYYY/MM/DD. The '/' character is mandatory
@@ -229,7 +268,7 @@ systemTimeServerTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "A table containing the list of SNTP time servers that can
-                 be used to synchronize the device system time. In tabular
+                 be used to synchronize the system time. In tabular
                  form to allow multiple instances on an agent."
     ::= { systemTime 7 }
 
@@ -278,8 +317,8 @@ adminAccessAuthenMode OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Specifies if administrator authentication is performed
-                 locally or via an AAA server. You must have configured an 
-                 AAA profile and the adminAccessAuthenProfileIndex attribute 
+                 locally or via a RADIUS server. You must have configured a 
+                 RADIUS profile and the adminAccessAuthenProfileIndex attribute 
                  before you can select a profile or an error will be returned."
     ::= { adminAccess 1 }
 
@@ -287,19 +326,19 @@ adminAccessAuthenProfileIndex OBJECT-TYPE
     SYNTAX      ColubrisProfileIndexOrZero
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies the AAA profile to be used in order to
+    DESCRIPTION "Specifies the RADIUS profile to be used in order to
                  authenticate the administrator. This parameter
                  only applies when the adminAccessAuthenMode
                  is set to 'profile'. When the special value zero is 
-                 specified, no AAA server profile is selected."
+                 specified, no RADIUS server profile is selected."
     ::= { adminAccess 2 }
 
 adminAccessMaxLoginAttempts OBJECT-TYPE
     SYNTAX      Integer32 (1..32767)
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies the number of successive unsuccessful authentications
-                 that must occur to generate an
+    DESCRIPTION "Specifies the number of successive unsuccessful 
+                 authentications that must occur to generate an
                  adminAccessAuthFailureNotification event."
     ::= { adminAccess 3 }
 
@@ -338,9 +377,10 @@ adminAccessInfo OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION "Contains various information about the administrator.
-                 This parameter is used in the adminAccessAuthFailureNotification
-                 event to return the administrator status to a management system."
+    DESCRIPTION "Contains various information about the administrator. This
+                 parameter is used in the adminAccessAuthFailureNotification 
+                 event to return the administrator status to a management 
+                 system."
     ::= { adminAccess 7 }
 
 adminAccessProfileTable OBJECT-TYPE
@@ -398,11 +438,11 @@ adminAccessLogoutNotificationEnabled OBJECT-TYPE
     SYNTAX      ColubrisNotificationEnable
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies if an adminAccessLogoutNotification event is generated
-                 after an administrator logs out from the web interface."
+    DESCRIPTION "Specifies if an adminAccessLogoutNotification event is 
+                 generated after an administrator logs out from the web
+                 interface."
     DEFVAL      { enable }
     ::= { adminAccess 9 }
-
 
 -- heartbeat group
 heartbeatPeriod OBJECT-TYPE
@@ -422,6 +462,22 @@ heartbeatNotificationEnabled OBJECT-TYPE
                  generated."
     DEFVAL      { enable }
     ::= { heartbeat 2 }
+
+-- managementconsole group
+adminAccessManagementConsole OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies Management Console value, it could be an IP
+                 address or a hostname."
+    ::= { managementConsole 1 }
+
+adminAccessManagementConsoleEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "When True Management Console is enabled."
+    ::= { managementConsole 2 }
 
 
 -- system notification
@@ -507,7 +563,8 @@ timeServerFailure NOTIFICATION-TYPE
                     systemTimeServerAddress
                 }
     STATUS      current
-    DESCRIPTION "Sent when a time server of the system time table is unreachable."
+    DESCRIPTION "Sent when a time server in the system time table is 
+                 unreachable."
   --#SUMMARY "Get time failed from time server %s"
   --#ARGUMENTS { 0 }
   --#SEVERITY INFORMATIONAL
@@ -523,7 +580,7 @@ colubrisSystemMIBGroups         OBJECT IDENTIFIER ::= { colubrisSystemMIBConform
 
 -- compliance statements
 colubrisSystemMIBCompliance MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "The compliance statement for entities which implement the
                  Colubris Networks System MIB."
     MODULE      MANDATORY-GROUPS
@@ -536,6 +593,30 @@ colubrisSystemMIBCompliance MODULE-COMPLIANCE
                     }
     ::= { colubrisSystemMIBCompliances 1 }
 
+colubrisSystemMIBComplianceDeprecated MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION "The compliance statement for deprecated entities which implement the
+                 Colubris Networks System MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisSystemMIBDeprecatedGroup
+                    }
+    ::= { colubrisSystemMIBCompliances 2 }
+
+colubrisSystemMIBCompliance2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement the
+                 Colubris Networks System MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisSystemMIBGroup,
+                        colubrisSystemNotificationGroup,
+                        colubrisAdminAccessProfileGroup,
+                        colubrisAdminAccessNotificationGroup,
+                        colubrisTimeNotificationGroup,
+                        colubrisAdminAccessManagementConsoleGroup
+                    }
+    ::= { colubrisSystemMIBCompliances 3 }
 
 -- units of conformance
 colubrisSystemMIBGroup OBJECT-GROUP
@@ -551,9 +632,12 @@ colubrisSystemMIBGroup OBJECT-GROUP
                     systemWanPortIpAddress,
                     systemProductFlavor,
                     systemDeviceIdentification,
+                    systemFirmwareBuildDate,
+                    systemControllerMode,
+                    systemCDPOperState,
+                    systemLLDPOperState,
                     systemTimeUpdateMode,
                     systemTimeLostWhenRebooting,
-                    systemTimeDSTOn,
                     systemDate,
                     systemTimeOfDay,
                     systemTimeZone,
@@ -610,5 +694,23 @@ colubrisTimeNotificationGroup NOTIFICATION-GROUP
     STATUS      current
     DESCRIPTION "A collection of supported notifications"
     ::= { colubrisSystemMIBGroups 5 }
+
+colubrisSystemMIBDeprecatedGroup OBJECT-GROUP
+    OBJECTS     {
+                    systemTimeDSTOn
+                }
+    STATUS      deprecated
+    DESCRIPTION "A collection of deprecated objects providing the System MIB capability."
+    ::= { colubrisSystemMIBGroups 6 }
+
+colubrisAdminAccessManagementConsoleGroup OBJECT-GROUP
+    OBJECTS     {
+                    adminAccessManagementConsole,
+                    adminAccessManagementConsoleEnabled
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for providing management console access
+                 Configuration capability."
+    ::= { colubrisSystemMIBGroups 7 }
 
 END

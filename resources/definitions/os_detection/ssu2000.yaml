@@ -1,6 +1,6 @@
 os: ssu2000
 text: 'Microsemi Synchronization Supply Unit'
-type: appliance
+type: timing
 icon: microsemi
 mib_dir: microsemi
 discovery:

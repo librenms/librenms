@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-QOS-MIB  : Ubiquoss QOS MIB
 --
@@ -1607,29 +1608,11 @@ ubiQosMIBGroups  		OBJECT IDENTIFIER		::= { ubiQosMIBConformance 2 }
 
 -- units of conformance
 
-	ubiQosMIBClassGroup OBJECT-GROUP
-    	OBJECTS         {
-                    	}
-    	STATUS          current
-    	DESCRIPTION
-        	""
-    	::= { ubiQosMIBGroups 1 }
+	ubiQosMIBClassGroup OBJECT IDENTIFIER ::= { ubiQosMIBGroups 1 }
 
-	ubiQosMIBPolicyGroup NOTIFICATION-GROUP
-   		NOTIFICATIONS    { 
-   		 }
-    	STATUS          current
-    	DESCRIPTION
-        	""
-    	::= { ubiQosMIBGroups 2 }    
+	ubiQosMIBPolicyGroup OBJECT IDENTIFIER ::= { ubiQosMIBGroups 2 }    
  
-	ubiQosMIBQosMapGroup OBJECT-GROUP
-    	OBJECTS         { 
-    					}
-    	STATUS          current
-    	DESCRIPTION
-        	""
-    	::= { ubiQosMIBGroups 3 }
+	ubiQosMIBQosMapGroup OBJECT IDENTIFIER ::= { ubiQosMIBGroups 3 }
 	
 END
 

@@ -8,7 +8,6 @@ use App\Models\Traits\Filterable;
 use App\Observers\DeviceObserver;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
-use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Cache\DeviceMaintenanceCache;
 use LibreNMS\Enum\DeviceStatus;
@@ -44,7 +44,7 @@ use LibreNMS\Util\Url;
 #[ObservedBy([DeviceObserver::class])]
 class Device extends BaseModel
 {
-    use PivotEventTrait, HasFactory, Filterable;
+    use HasFactory, Filterable;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -376,12 +376,13 @@ class Device extends BaseModel
     }
 
     /**
-     * Update the max_depth field based on parents
+     * Update the max_depth field based on parents, then update children if it changed
      * Performs SQL query, so make sure all parents are saved first
      *
-     * @param  int  $exclude  exclude a device_id from being considered (used for deleting)
+     * @param  int|null  $exclude  exclude a device_id from being considered as parent
+     * @param  int[]  $visited  device_ids already updated on this path, to stop on dependency loops
      */
-    public function updateMaxDepth($exclude = null)
+    public function updateMaxDepth($exclude = null, array $visited = []): void
     {
         // optimize for memory instead of time
         $query = $this->parents()->getQuery();
@@ -401,7 +402,16 @@ class Device extends BaseModel
             $this->max_depth = $parents_max_depth + 1;
         }
 
+        $changed = $this->isDirty('max_depth');
         $this->save();
+
+        if ($changed) {
+            $visited[] = $this->device_id;
+            $this->children()
+                ->whereNotIn('devices.device_id', $visited)
+                ->get()
+                ->each(fn (Device $child) => $child->updateMaxDepth(null, $visited));
+        }
     }
 
     /**
@@ -414,7 +424,7 @@ class Device extends BaseModel
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
             $this->max_depth = 1; // has children
-        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
+        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0 && $this->children()->count() === 0) {
             $this->max_depth = 0; // no children or parents
         }
 
@@ -674,6 +684,8 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
+        $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
+
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
@@ -685,6 +697,8 @@ class Device extends BaseModel
 
     public function scopeNotInDeviceGroup($query, $deviceGroup)
     {
+        $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
+
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
@@ -843,11 +857,12 @@ class Device extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Device, $this>
+     * @return BelongsToMany<Device, $this, DeviceRelationship>
      */
     public function children(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id')
+            ->using(DeviceRelationship::class);
     }
 
     /**
@@ -856,6 +871,14 @@ class Device extends BaseModel
     public function components(): HasMany
     {
         return $this->hasMany(Component::class, 'device_id');
+    }
+
+    /**
+     * @return HasMany<Customoid, $this>
+     */
+    public function customoids(): HasMany
+    {
+        return $this->hasMany(Customoid::class, 'device_id');
     }
 
     /**
@@ -1134,11 +1157,12 @@ class Device extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Device, $this>
+     * @return BelongsToMany<Device, $this, DeviceRelationship>
      */
     public function parents(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id')
+            ->using(DeviceRelationship::class);
     }
 
     /**

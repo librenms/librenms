@@ -42,7 +42,7 @@ class PackagesTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'packages']))
+            ->get(route('device.packages', ['device' => $device]))
             ->assertOk()
             ->assertSee('nginx-core')
             ->assertSee('1.24.0-1ubuntu1')
@@ -60,7 +60,7 @@ class PackagesTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'packages']))
+            ->get(route('device.packages', ['device' => $device]))
             ->assertForbidden();
     }
 }

@@ -19,6 +19,7 @@ class Qos extends Component
      */
     public function __construct(
         public Collection $qosItems,
+        public int $deviceId,
         public ?int $show = null,
         public ?int $portId = null,
         public ?int $parentId = null,

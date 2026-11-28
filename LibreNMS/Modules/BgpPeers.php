@@ -40,7 +40,7 @@ use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Module;
@@ -57,7 +57,7 @@ class BgpPeers implements Module
     use RequiresPollingMethod;
 
     /** Values for columns that are required, but may not be reported by every table */
-    private const PEER_DEFAULTS = [
+    private const array PEER_DEFAULTS = [
         'bgpPeerState' => 'idle',
         'bgpPeerAdminStatus' => 'stop',
         'bgpLocalAddr' => '0.0.0.0',
@@ -88,7 +88,7 @@ class BgpPeers implements Module
 
         try {
             [$peers, $addressFamilies] = $this->fetch($os);
-        } catch (SnmpException $e) {
+        } catch (SnmpConnectionException $e) {
             Log::warning('Device did not answer, BGP sessions were not updated: ' . $e->getMessage());
 
             return;
@@ -99,7 +99,7 @@ class BgpPeers implements Module
         Log::info('Local AS: ' . ($device->bgpLocalAs ?? 'none'));
 
         $peers->each(function (BgpPeer $peer): void {
-            $peer->fill(array_merge(self::PEER_DEFAULTS, $peer->getAttributes()));
+            $peer->fill(array_diff_key(self::PEER_DEFAULTS, $peer->getAttributes()));
             $peer->astext = AutonomousSystem::get($peer->bgpPeerRemoteAs)->name();
         });
         $addressFamilies->each(fn (BgpPeerCbgp $family) => $family->forceFill(array_merge(BgpPeerCbgp::emptyCounters(), $family->getAttributes())));
@@ -135,7 +135,7 @@ class BgpPeers implements Module
 
         try {
             [$polledPeers, $polledFamilies] = $this->fetch($os, $device->bgpPeersCbgp()->exists());
-        } catch (SnmpException $e) {
+        } catch (SnmpConnectionException $e) {
             Log::warning('Device did not answer, BGP sessions were not polled: ' . $e->getMessage());
 
             return;
@@ -239,7 +239,7 @@ class BgpPeers implements Module
      *
      * @return array{0: Collection<int, BgpPeer>, 1: Collection<int, BgpPeerCbgp>}
      *
-     * @throws SnmpException
+     * @throws SnmpConnectionException
      */
     private function fetch(OS $os, bool $addressFamilies = true): array
     {

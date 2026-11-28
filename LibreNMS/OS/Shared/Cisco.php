@@ -38,10 +38,12 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\MacAccounting;
 use App\Models\Mempool;
+use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Processor;
 use App\Models\Qos;
+use App\Models\Sensor;
 use App\Models\Sla;
 use App\Models\Storage;
 use App\Models\Transceiver;
@@ -68,6 +70,7 @@ use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\CiscoCdpMib;
+use LibreNMS\OS\Traits\CiscoEntitySensorMib;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Bgp;
@@ -96,6 +99,7 @@ class Cisco extends OS implements
     VlanPortDiscovery
 {
     use CiscoCdpMib;
+    use CiscoEntitySensorMib;
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
     }
@@ -105,6 +109,11 @@ class Cisco extends OS implements
 
     private Collection $qosIdxToParent;
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
+
+    public function discoverSensors(): Collection
+    {
+        return $this->withCiscoEntitySensors(parent::discoverSensors());
+    }
 
     public function discoverOS(Device $device): void
     {
@@ -191,15 +200,15 @@ class Cisco extends OS implements
         /** @var Collection<Mempool> $mempools */
         $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
+        $entPhysicalName = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck();
 
         foreach (Arr::wrap($cemp) as $index => $entry) {
             if (is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == 'true') {
                 [$entPhysicalIndex] = explode('.', (string) $index);
-                $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
                 $descr = ucwords((isset($entPhysicalName[$entPhysicalIndex]) ? "{$entPhysicalName[$entPhysicalIndex]} - " : '') . $entry['cempMemPoolName']);
                 $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
 
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'entPhysicalIndex' => $entPhysicalIndex,
                     'mempool_type' => 'cemp',
@@ -211,7 +220,7 @@ class Cisco extends OS implements
                     'mempool_perc_warn' => 90,
                     'mempool_largestfree' => $entry['cempMemPoolHCLargestFree'] ?? $entry['cempMemPoolLargestFree'] ?? null,
                     'mempool_lowestfree' => $entry['cempMemPoolHCLowestFree'] ?? $entry['cempMemPoolLowestFree'] ?? null,
-                ]))->fillUsage($entry['cempMemPoolHCUsed'] ?? $entry['cempMemPoolUsed'], null, $entry['cempMemPoolHCFree'] ?? $entry['cempMemPoolFree']));
+                ])->fillUsage($entry['cempMemPoolHCUsed'] ?? $entry['cempMemPoolUsed'], null, $entry['cempMemPoolHCFree'] ?? $entry['cempMemPoolFree']));
             }
         }
 
@@ -222,7 +231,7 @@ class Cisco extends OS implements
         $cmp = snmpwalk_cache_oid($this->getDeviceArray(), 'ciscoMemoryPool', [], 'CISCO-MEMORY-POOL-MIB');
         foreach (Arr::wrap($cmp) as $index => $entry) {
             if (is_numeric($entry['ciscoMemoryPoolUsed']) && is_numeric($index)) {
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'cmp',
                     'mempool_class' => 'system',
@@ -232,7 +241,7 @@ class Cisco extends OS implements
                     'mempool_free_oid' => ".1.3.6.1.4.1.9.9.48.1.1.1.6.$index",
                     'mempool_perc_warn' => 90,
                     'mempool_largestfree' => $entry['ciscoMemoryPoolLargestFree'] ?? null,
-                ]))->fillUsage($entry['ciscoMemoryPoolUsed'], null, $entry['ciscoMemoryPoolFree']));
+                ])->fillUsage($entry['ciscoMemoryPoolUsed'], null, $entry['ciscoMemoryPoolFree']));
             }
         }
 
@@ -240,28 +249,26 @@ class Cisco extends OS implements
             return $mempools;
         }
 
-        $cpm = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
+        $cpm = SnmpQuery::cache()->walk('CISCO-PROCESS-MIB::cpmCPUTotalTable')->table(1);
 
-        $count = 0;
-        foreach (Arr::wrap($cpm) as $index => $entry) {
-            $count++;
-            if (isset($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
-                $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
+        foreach ($cpm as $index => $entry) {
+            if (isset($entry['CISCO-PROCESS-MIB::cpmCPUMemoryFree']) && is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUMemoryFree'])) {
+                $cpu = $entPhysicalName[$entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
 
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'cpm',
                     'mempool_class' => 'system',
                     'mempool_precision' => 1024,
                     'mempool_descr' => "$cpu Memory",
-                    'mempool_used_oid' => empty($entry['cpmCPUMemoryHCUsed']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.12.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.17.$index",
-                    'mempool_free_oid' => empty($entry['cpmCPUMemoryHCFree']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.13.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.19.$index",
+                    'mempool_used_oid' => empty($entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCUsed']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.12.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.17.$index",
+                    'mempool_free_oid' => empty($entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCFree']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.13.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.19.$index",
                     'mempool_perc_warn' => 90,
-                    'mempool_lowestfree' => $entry['cpmCPUMemoryHCLowest'] ?? $entry['cpmCPUMemoryLowest'] ?? null,
-                ]))->fillUsage(
-                    empty($entry['cpmCPUMemoryHCUsed']) ? $entry['cpmCPUMemoryUsed'] : $entry['cpmCPUMemoryHCUsed'],
+                    'mempool_lowestfree' => $entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCLowest'] ?? $entry['CISCO-PROCESS-MIB::cpmCPUMemoryLowest'] ?? null,
+                ])->fillUsage(
+                    empty($entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCUsed']) ? $entry['CISCO-PROCESS-MIB::cpmCPUMemoryUsed'] : $entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCUsed'],
                     null,
-                    empty($entry['cpmCPUMemoryHCFree']) ? $entry['cpmCPUMemoryFree'] : $entry['cpmCPUMemoryHCFree']
+                    empty($entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCFree']) ? $entry['CISCO-PROCESS-MIB::cpmCPUMemoryFree'] : $entry['CISCO-PROCESS-MIB::cpmCPUMemoryHCFree']
                 ));
             }
         }
@@ -341,34 +348,34 @@ class Cisco extends OS implements
             return $processors;
         }
 
-        $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
-        $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
+        $processors_data = SnmpQuery::cache()->walk('CISCO-PROCESS-MIB::cpmCPUTotalTable')->table(1);
+        $processors_data = SnmpQuery::walk('CISCO-PROCESS-MIB::cpmCoreTable')->table(1, $processors_data);
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
             $descr = null;
 
-            if (is_numeric($entry['cpmCPUTotal5minRev'])) {
+            if (is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUTotal5minRev'] ?? null)) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.' . $index;
-                $usage = $entry['cpmCPUTotal5minRev'];
-            } elseif (is_numeric($entry['cpmCPUTotal5min'])) {
+                $usage = $entry['CISCO-PROCESS-MIB::cpmCPUTotal5minRev'];
+            } elseif (is_numeric($entry['CISCO-PROCESS-MIB::cpmCPUTotal5min'] ?? null)) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.' . $index;
-                $usage = $entry['cpmCPUTotal5min'];
+                $usage = $entry['CISCO-PROCESS-MIB::cpmCPUTotal5min'];
             } else {
                 continue; // skip bad data
             }
 
-            if (isset($entry['cpmCPUTotalPhysicalIndex'])) {
-                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']] ?? null;
+            if (isset($entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex'])) {
+                $descr = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck()[$entry['CISCO-PROCESS-MIB::cpmCPUTotalPhysicalIndex']] ?? null;
             }
 
             if (empty($descr)) {
                 $descr = "Processor $index";
             }
 
-            if (isset($entry['cpmCore5min']) && is_array($entry['cpmCore5min'])) {
+            if (isset($entry['CISCO-PROCESS-MIB::cpmCore5min']) && is_array($entry['CISCO-PROCESS-MIB::cpmCore5min'])) {
                 // This CPU has data per individual core
-                foreach ($entry['cpmCore5min'] as $core_index => $core_usage) {
+                foreach ($entry['CISCO-PROCESS-MIB::cpmCore5min'] as $core_index => $core_usage) {
                     $processors[] = new Processor([
                         'processor_type' => 'cpm',
                         'processor_oid' => ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.$index.$core_index",
@@ -420,7 +427,7 @@ class Cisco extends OS implements
             }
 
             $entQfpPhysicalIndex = explode('.', substr($qfp_usage_oid, strlen('.1.3.6.1.4.1.9.9.715.1.1.6.1.14.')))[0];
-            $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex] ?? null;
+            $qfp_descr = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck()[$entQfpPhysicalIndex] ?? null;
 
             $processors[] = new Processor([
                 'processor_type' => 'qfp',
@@ -515,14 +522,14 @@ class Cisco extends OS implements
                 }
                 $descr .= ':';
 
-                return (new Storage([
+                return new Storage([
                     'type' => 'cisco-flash',
                     'storage_descr' => $descr,
                     'storage_index' => $index,
                     'storage_type' => 'FlashMemory',
                     'storage_free_oid' => $free_oid,
                     'storage_units' => 1,
-                ]))->fillUsage(total: $size, free: $free);
+                ])->fillUsage(total: $size, free: $free);
             });
     }
 
@@ -1024,6 +1031,39 @@ class Cisco extends OS implements
             ->filter(); // Remove null values from ignored VLANs
     }
 
+    /**
+     * Cisco devices report a separate BRIDGE-MIB per VLAN, each in its own SNMP context.
+     */
+    public function discoverFdbTable(): Collection
+    {
+        $fdb = [];
+        $ignore_vlans = (array) LibrenmsConfig::getOsSetting($this->getName(), 'ignore_vlans');
+
+        foreach (SnmpQuery::walk('CISCO-VTP-MIB::vtpVlanState')->table(2) as $vtpVlans) {
+            foreach ($vtpVlans as $vlan => $data) {
+                // only operational VLANs, 1002-1005 are reserved for fddi and token ring
+                if (($data['CISCO-VTP-MIB::vtpVlanState'] ?? null) != 1 || ($vlan >= 1002 && $vlan <= 1005) || in_array($vlan, $ignore_vlans)) {
+                    continue;
+                }
+
+                $ifIndexes = $this->bridgePortIfIndexes((string) $vlan);
+
+                foreach ($this->dot1dTpFdbPorts((string) $vlan) as $mac => $bridgePort) {
+                    $port_id = PortCache::getIdFromIfIndex($ifIndexes[$bridgePort] ?? null, $this->getDeviceId());
+                    if ($port_id) {
+                        $fdb[] = new PortsFdb([
+                            'port_id' => $port_id,
+                            'mac_address' => Mac::parse((string) $mac)->hex(),
+                            'vlan' => $vlan,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return empty($fdb) ? parent::discoverFdbTable() : new Collection($fdb);
+    }
+
     public function discoverVlanPorts(Collection $vlans): Collection
     {
         $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
@@ -1362,5 +1402,305 @@ class Cisco extends OS implements
         }
 
         return $families;
+    }
+
+    protected function discoverOsSensors(): Collection
+    {
+        return parent::discoverOsSensors()
+            ->merge($this->discoverCiscoCountSensors())
+            ->merge($this->discoverCiscoStateSensors())
+            ->merge($this->discoverCiscoTemperatureSensors());
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    private function discoverCiscoCountSensors(): Collection
+    {
+        $sensors = new Collection;
+
+        foreach ([
+            ['CISCO-WAN-3G-MIB::c3gGsmNumberOfNearbyCell', '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.5', 'Nearby cells'],
+            ['CISCO-WAN-CELL-EXT-MIB::cwceLteCurrOperatingBand', '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.6', 'Cellular operating band'],
+        ] as [$oid, $numOid, $descr]) {
+            foreach (SnmpQuery::walk($oid)->pluck() as $index => $value) {
+                $sensors->push($this->ciscoSensor('count', "$numOid.$index", $index, explode('::', $oid)[1], $this->ciscoEntityName($index) . " - $descr", $value));
+            }
+        }
+
+        return $sensors;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    private function discoverCiscoTemperatureSensors(): Collection
+    {
+        $sensors = new Collection;
+
+        $data = SnmpQuery::hideMib()->enumStrings()->walk('CISCO-ENVMON-MIB::ciscoEnvMonTemperatureStatusTable')->valuesByIndex();
+        foreach ($data as $index => $entry) {
+            if (isset($entry['ciscoEnvMonTemperatureStatusValue']) && ($entry['ciscoEnvMonTemperatureState'] ?? null) != 'notPresent' && ! empty($entry['ciscoEnvMonTemperatureStatusDescr'])) {
+                $sensors->push($this->ciscoSensor('temperature', ".1.3.6.1.4.1.9.9.13.1.3.1.3.$index", $index, 'cisco', ucwords((string) $entry['ciscoEnvMonTemperatureStatusDescr']), $entry['ciscoEnvMonTemperatureStatusValue'], [
+                    'sensor_limit' => $entry['ciscoEnvMonTemperatureThreshold'] ?? null,
+                ]));
+            }
+        }
+
+        foreach (SnmpQuery::walk('CISCO-WAN-3G-MIB::c3gModemTemperature')->pluck() as $index => $value) {
+            $sensors->push($this->ciscoSensor('temperature', ".1.3.6.1.4.1.9.9.661.1.1.1.12.$index", $index, 'cisco', $this->ciscoEntityName($index), $value));
+        }
+
+        return $sensors;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    private function discoverCiscoStateSensors(): Collection
+    {
+        $sensors = new Collection;
+        $stack = ['CISCO-STACKWISE-MIB::cswGlobals', 'CISCO-STACKWISE-MIB::cswSwitchRole', 'CISCO-STACKWISE-MIB::cswSwitchState', 'CISCO-STACKWISE-MIB::cswStackPortOperStatus'];
+        // some 15.x switches report stacking when they are not stacked
+        $skipStack = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value() == 'false'
+            && count(SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values()) <= 1;
+        $switchRole = 0;
+        $switchState = 0;
+
+        foreach ([
+            // oid, numeric oid, state name, description (a column or text)
+            ['CISCO-WAN-3G-MIB::c3gModemStatus', '.1.3.6.1.4.1.9.9.661.1.3.1.1.6', 'c3gModemStatus', 'Modem status'],
+            ['CISCO-WAN-3G-MIB::c3gGsmCurrentBand', '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.3', 'c3gGsmCurrentBand', 'Current band'],
+            ['CISCO-WAN-3G-MIB::c3gGsmPacketService', '.1.3.6.1.4.1.9.9.661.1.3.2.1.5', 'c3gGsmPacketService', 'Packet service'],
+            ['CISCO-WAN-3G-MIB::c3gGsmCurrentRoamingStatus', '.1.3.6.1.4.1.9.9.661.1.3.2.1.6', 'c3gGsmCurrentRoamingStatus', 'Roaming status'],
+            ['CISCO-WAN-3G-MIB::c3gGsmSimStatus', '.1.3.6.1.4.1.9.9.661.1.3.5.1.1.2', 'c3gGsmSimStatus', 'SIM status'],
+            ['CISCO-ENVMON-MIB::ciscoEnvMonVoltageStatusTable', '.1.3.6.1.4.1.9.9.13.1.2.1.7', 'ciscoEnvMonVoltageState', 'ciscoEnvMonVoltageStatusDescr'],
+            ['CISCO-ENVMON-MIB::ciscoEnvMonTemperatureStatusTable', '.1.3.6.1.4.1.9.9.13.1.3.1.6', 'ciscoEnvMonTemperatureState', 'ciscoEnvMonTemperatureStatusDescr'],
+            ['CISCO-ENVMON-MIB::ciscoEnvMonFanStatusTable', '.1.3.6.1.4.1.9.9.13.1.4.1.3', 'ciscoEnvMonFanState', 'ciscoEnvMonFanStatusDescr'],
+            ['CISCO-ENVMON-MIB::ciscoEnvMonSupplyStatusTable', '.1.3.6.1.4.1.9.9.13.1.5.1.3', 'ciscoEnvMonSupplyState', 'ciscoEnvMonSupplyStatusDescr'],
+            ['CISCO-ENTITY-FRU-CONTROL-MIB::cefcFRUPowerStatusTable', '.1.3.6.1.4.1.9.9.117.1.1.2.1.2', 'cefcFRUPowerOperStatus', 'Sensor Name'],
+            ['CISCO-RF-MIB::cRFStatusUnitState', '.1.3.6.1.4.1.9.9.176.1.1.2', 'cRFStatusUnitState', 'VSS Device State'],
+            ['CISCO-RF-MIB::cRFStatusPeerUnitState', '.1.3.6.1.4.1.9.9.176.1.1.4', 'cRFStatusPeerUnitState', 'VSS Peer State'],
+            ['CISCO-RF-MIB::cRFCfgRedundancyOperMode', '.1.3.6.1.4.1.9.9.176.1.2.16', 'cRFCfgRedundancyOperMode', 'VSS Mode'],
+            ['CISCO-STACKWISE-MIB::cswGlobals', '.1.3.6.1.4.1.9.9.500.1.1.3', 'cswRingRedundant', 'Stack Ring - Redundant'],
+            ['CISCO-STACKWISE-MIB::cswSwitchRole', '.1.3.6.1.4.1.9.9.500.1.2.1.1.3', 'cswSwitchRole', 'Stack Role - Switch#'],
+            ['CISCO-STACKWISE-MIB::cswSwitchState', '.1.3.6.1.4.1.9.9.500.1.2.1.1.6', 'cswSwitchState', 'Stack State - Switch#'],
+            ['CISCO-STACKWISE-MIB::cswStackPortOperStatus', '.1.3.6.1.4.1.9.9.500.1.2.2.1.1', 'cswStackPortOperStatus', 'Stack Port Status - '],
+            ['CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB::crepSegmentComplete', '.1.3.6.1.4.1.9.9.601.1.3.1.1.4', 'crepSegmentComplete', 'REP State - Segment '],
+        ] as [$oid, $numOid, $state, $descr]) {
+            if ($skipStack && in_array($oid, $stack)) {
+                continue;
+            }
+
+            $data = SnmpQuery::hideMib()->walk($oid)->valuesByIndex();
+            if (empty($data)) {
+                continue;
+            }
+
+            // a single switch, skip this table and the stacking tables
+            if (($data[0][$state] ?? null) == 'nonRedundant' || ($data[0]['cswMaxSwitchNum'] ?? null) == '1') {
+                $skipStack = true;
+                continue;
+            }
+
+            // StackWise Virtual always reports false for cswRingRedundant, it has no meaning there
+            if (($data[0]['cswRingRedundant'] ?? null) == 2 && SnmpQuery::get('ENTITY-MIB::entPhysicalName.1')->value() == 'Virtual Stack') {
+                continue;
+            }
+
+            foreach ($data as $index => $entry) {
+                if ($state == 'ciscoEnvMonTemperatureState' && empty($entry[$descr])) {
+                    continue;
+                }
+
+                $group = null;
+                $name = match ($state) {
+                    'cRFStatusUnitState', 'cRFStatusPeerUnitState', 'cRFCfgRedundancyOperMode', 'cswRingRedundant' => $descr,
+                    'cswSwitchRole' => $descr . ++$switchRole,
+                    'cswSwitchState' => $descr . ++$switchState,
+                    // stack ports may not be in the ports table, fall back to the device's own name
+                    'cswStackPortOperStatus' => $descr . (PortCache::getByIfIndex($index, $this->getDeviceId())?->ifDescr ?: SnmpQuery::get("IF-MIB::ifDescr.$index")->value()),
+                    'cefcFRUPowerOperStatus' => $this->ciscoEntityName($index),
+                    'c3gModemStatus', 'c3gGsmCurrentBand', 'c3gGsmPacketService', 'c3gGsmCurrentRoamingStatus', 'c3gGsmSimStatus' => $descr,
+                    'crepSegmentComplete' => $descr . $index,
+                    default => ucwords($entry[$descr] ?? 'State'),
+                };
+                if (str_starts_with($state, 'c3g')) {
+                    $group = $this->ciscoEntityName($index);
+                }
+
+                $sensors->push($this->ciscoSensor('state', "$numOid.$index", $index, $state, trim((string) $name), $entry[$state] ?? null, [
+                    'entPhysicalIndex' => $index,
+                    'group' => $group,
+                ])->withStates(self::ciscoStates($state)));
+            }
+        }
+
+        return $sensors;
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function ciscoSensor(string $class, string $oid, int|string $index, string $type, string $descr, mixed $value, array $attributes = []): Sensor
+    {
+        return new Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => $class,
+            'sensor_oid' => $oid,
+            'sensor_index' => $index,
+            'sensor_type' => $type,
+            'sensor_descr' => $descr,
+            'sensor_divisor' => 1,
+            'sensor_multiplier' => 1,
+            'sensor_current' => $value,
+            'entPhysicalIndex' => $index,
+            'rrd_type' => 'GAUGE',
+            ...$attributes,
+        ]);
+    }
+
+    private function ciscoEntityName(int|string $index): string
+    {
+        return (string) (SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck()[$index] ?? '');
+    }
+
+    /**
+     * @return list<array{value: int, generic: int, descr: string}>
+     */
+    private static function ciscoStates(string $state): array
+    {
+        return match ($state) {
+            'cRFStatusUnitState','cRFStatusPeerUnitState' => [
+                ['value' => 1, 'generic' => 3, 'descr' => 'notKnown'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'disabled'],
+                ['value' => 3, 'generic' => 1, 'descr' => 'initialization'],
+                ['value' => 4, 'generic' => 1, 'descr' => 'negotiation'],
+                ['value' => 5, 'generic' => 1, 'descr' => 'standbyCold'],
+                ['value' => 6, 'generic' => 1, 'descr' => 'standbyColdConfig'],
+                ['value' => 7, 'generic' => 1, 'descr' => 'standbyColdFileSys'],
+                ['value' => 8, 'generic' => 1, 'descr' => 'standbyColdBulk'],
+                ['value' => 9, 'generic' => 0, 'descr' => 'standbyHot'],
+                ['value' => 10, 'generic' => 1, 'descr' => 'activeFast'],
+                ['value' => 11, 'generic' => 1, 'descr' => 'activeDrain'],
+                ['value' => 12, 'generic' => 1, 'descr' => 'activePreconfig'],
+                ['value' => 13, 'generic' => 1, 'descr' => 'activePostconfig'],
+                ['value' => 14, 'generic' => 0, 'descr' => 'active'],
+                ['value' => 15, 'generic' => 1, 'descr' => 'activeExtraload'],
+                ['value' => 16, 'generic' => 1, 'descr' => 'activeHandback'],
+            ],
+            'cRFCfgRedundancyOperMode' => [
+                ['value' => 1, 'generic' => 0, 'descr' => 'nonRedundant'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'staticLoadShareNonRedundant'],
+                ['value' => 3, 'generic' => 0, 'descr' => 'dynamicLoadShareNonRedundant'],
+                ['value' => 4, 'generic' => 0, 'descr' => 'staticLoadShareRedundant'],
+                ['value' => 5, 'generic' => 0, 'descr' => 'dynamicLoadShareRedundant'],
+                ['value' => 6, 'generic' => 0, 'descr' => 'coldStandbyRedundant'],
+                ['value' => 7, 'generic' => 0, 'descr' => 'warmStandbyRedundant'],
+                ['value' => 8, 'generic' => 0, 'descr' => 'hotStandbyRedundant'],
+            ],
+            'cswRingRedundant' => [
+                ['value' => 1, 'generic' => 0, 'descr' => 'true'],
+                ['value' => 2, 'generic' => 2, 'descr' => 'false'],
+            ],
+            'cswSwitchRole' => [
+                ['value' => 1, 'generic' => 0, 'descr' => 'master'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'member'],
+                ['value' => 3, 'generic' => 0, 'descr' => 'notMember'],
+                ['value' => 4, 'generic' => 0, 'descr' => 'standby'],
+            ],
+            'cswSwitchState' => [
+                ['value' => 1, 'generic' => 1, 'descr' => 'waiting'],
+                ['value' => 2, 'generic' => 1, 'descr' => 'progressing'],
+                ['value' => 3, 'generic' => 1, 'descr' => 'added'],
+                ['value' => 4, 'generic' => 0, 'descr' => 'ready'],
+                ['value' => 5, 'generic' => 2, 'descr' => 'sdmMismatch'],
+                ['value' => 6, 'generic' => 2, 'descr' => 'verMismatch'],
+                ['value' => 7, 'generic' => 2, 'descr' => 'featureMismatch'],
+                ['value' => 8, 'generic' => 2, 'descr' => 'newMasterInit'],
+                ['value' => 9, 'generic' => 1, 'descr' => 'provisioned'],
+                ['value' => 10, 'generic' => 2, 'descr' => 'invalid'],
+                ['value' => 11, 'generic' => 1, 'descr' => 'removed'],
+            ],
+            'cefcFRUPowerOperStatus' => [
+                ['value' => 1, 'generic' => 2, 'descr' => 'off (other)'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'on'],
+                ['value' => 3, 'generic' => 1, 'descr' => 'off (admin)'],
+                ['value' => 4, 'generic' => 2, 'descr' => 'off (denied)'],
+                ['value' => 5, 'generic' => 2, 'descr' => 'off (environmental)'],
+                ['value' => 6, 'generic' => 2, 'descr' => 'off (temperature)'],
+                ['value' => 7, 'generic' => 2, 'descr' => 'off (fan)'],
+                ['value' => 8, 'generic' => 2, 'descr' => 'failed'],
+                ['value' => 9, 'generic' => 1, 'descr' => 'on (fan failed)'],
+                ['value' => 10, 'generic' => 2, 'descr' => 'off (cooling)'],
+                ['value' => 11, 'generic' => 2, 'descr' => 'off (connector rating)'],
+                ['value' => 12, 'generic' => 1, 'descr' => 'on (no inline power)'],
+            ],
+            'c3gModemStatus' => [
+                ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 2, 'descr' => 'offline'],
+                ['value' => 3, 'generic' => 0, 'descr' => 'online'],
+                ['value' => 4, 'generic' => 1, 'descr' => 'low power mode'],
+            ],
+            'c3gGsmCurrentBand' => [
+                ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 2, 'descr' => 'invalid'],
+                ['value' => 3, 'generic' => 3, 'descr' => 'none'],
+                ['value' => 4, 'generic' => 0, 'descr' => 'gsm850'],
+                ['value' => 5, 'generic' => 0, 'descr' => 'gsm900'],
+                ['value' => 6, 'generic' => 0, 'descr' => 'gsm1800'],
+                ['value' => 7, 'generic' => 0, 'descr' => 'gsm1900'],
+                ['value' => 8, 'generic' => 0, 'descr' => 'wcdma800'],
+                ['value' => 9, 'generic' => 0, 'descr' => 'wcdma850'],
+                ['value' => 10, 'generic' => 0, 'descr' => 'wcdma1900'],
+                ['value' => 11, 'generic' => 0, 'descr' => 'wcdma2100'],
+                ['value' => 12, 'generic' => 0, 'descr' => 'lte band'],
+            ],
+            'c3gGsmPacketService' => [
+                ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 1, 'descr' => 'none'],
+                ['value' => 3, 'generic' => 0, 'descr' => 'gprs'],
+                ['value' => 4, 'generic' => 0, 'descr' => 'edge'],
+                ['value' => 5, 'generic' => 0, 'descr' => 'umts wcdma'],
+                ['value' => 6, 'generic' => 0, 'descr' => 'hsdpa'],
+                ['value' => 7, 'generic' => 0, 'descr' => 'hsupa'],
+                ['value' => 8, 'generic' => 0, 'descr' => 'hspa'],
+                ['value' => 9, 'generic' => 0, 'descr' => 'hspa plus'],
+                ['value' => 10, 'generic' => 0, 'descr' => 'lte'],
+            ],
+            'c3gGsmCurrentRoamingStatus' => [
+                ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'roaming'],
+                ['value' => 3, 'generic' => 0, 'descr' => 'home'],
+            ],
+            'c3gGsmSimStatus' => [
+                ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'ok'],
+                ['value' => 3, 'generic' => 0, 'descr' => 'not inserted'],
+                ['value' => 4, 'generic' => 1, 'descr' => 'removed'],
+                ['value' => 5, 'generic' => 2, 'descr' => 'initFailure'],
+                ['value' => 6, 'generic' => 2, 'descr' => 'generalFailure'],
+                ['value' => 7, 'generic' => 2, 'descr' => 'locked'],
+                ['value' => 8, 'generic' => 2, 'descr' => 'chv1Blocked'],
+                ['value' => 9, 'generic' => 2, 'descr' => 'chv2Blocked'],
+                ['value' => 10, 'generic' => 2, 'descr' => 'chv1Rejected'],
+                ['value' => 11, 'generic' => 2, 'descr' => 'wcchv2Rejecteddma2100'],
+                ['value' => 12, 'generic' => 2, 'descr' => 'mepLocked'],
+                ['value' => 13, 'generic' => 2, 'descr' => 'networkRejected'],
+            ],
+            'crepSegmentComplete' => [
+                ['value' => 0, 'generic' => 3, 'descr' => 'unknown'],
+                ['value' => 1, 'generic' => 0, 'descr' => 'complete'],
+                ['value' => 2, 'generic' => 2, 'descr' => 'incomplete'],
+            ],
+            default => [
+                ['value' => 1, 'generic' => 0, 'descr' => 'normal'],
+                ['value' => 2, 'generic' => 1, 'descr' => 'warning'],
+                ['value' => 3, 'generic' => 2, 'descr' => 'critical'],
+                ['value' => 4, 'generic' => 3, 'descr' => 'shutdown'],
+                ['value' => 5, 'generic' => 3, 'descr' => 'notPresent'],
+                ['value' => 6, 'generic' => 2, 'descr' => 'notFunctioning'],
+            ],
+        };
     }
 }

@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "boschcpp",
-                    "type": "camera",
+                    "type": "surveillance",
                     "serial": "044291027417360011",
                     "icon": "bosch.svg"
                 }

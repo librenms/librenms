@@ -1,6 +1,6 @@
 os: juniper-mss
 text: 'Juniper MSS'
-type: appliance
+type: wireless
 icon: junos
 mib_dir: juniper
 over:

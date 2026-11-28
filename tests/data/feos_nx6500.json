@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "feos",
-                    "type": "appliance",
+                    "type": "security",
                     "serial": "<private>",
                     "icon": "trellix.svg"
                 }

@@ -12,7 +12,7 @@
                     "features": "9.3.3.0 (vsft)",
                     "location": "<private>",
                     "os": "zenitel-vsdevice",
-                    "type": "appliance",
+                    "type": "voice",
                     "serial": null,
                     "icon": "zenitel.svg"
                 }

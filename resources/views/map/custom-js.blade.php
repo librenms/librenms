@@ -523,7 +523,6 @@
                 this.isDestroyed = false;
 
                 custommap.baseUrl = this.baseUrl;
-                visPopups.baseUrl = this.baseUrl;
                 this.init();
             }
 
@@ -552,36 +551,32 @@
                     .done(function (data) {
                         if (self.isDestroyed) return;
 
+                        // Collect all changes and apply them in a single call per DataSet.
+                        // Every DataSet operation emits an event that (with physics disabled)
+                        // triggers a synchronous full redraw of the network, so per-item
+                        // updates froze the browser for seconds on maps with hundreds of items.
+                        var nodeUpdates = [];
+                        var edgeUpdates = [];
+                        var nodeRemovals = [];
+                        var edgeRemovals = [];
+
                         // Add/update nodes
                         if (data.nodes) {
                             $.each(data.nodes, function (nodeid, node) {
-                                var node_cfg = custommap.getNodeCfg(nodeid, node, self.screenshot, self.customImageBase);
-                                if (self.networkNodes.get(nodeid)) {
-                                    self.networkNodes.update(node_cfg);
-                                } else {
-                                    self.networkNodes.add([node_cfg]);
-                                }
+                                nodeUpdates.push(custommap.getNodeCfg(nodeid, node, self.screenshot, self.customImageBase));
                             });
                         }
 
                         // Add/update edges
                         if (data.edges) {
                             $.each(data.edges, function (edgeid, edge) {
-                                var mid = custommap.getEdgeMidCfg(edgeid, edge, self.screenshot);
-                                var edge1 = custommap.getEdgeCfg(edgeid, edge, "from", self.reverseArrows);
-                                var edge2 = custommap.getEdgeCfg(edgeid, edge, "to", self.reverseArrows);
+                                nodeUpdates.push(custommap.getEdgeMidCfg(edgeid, edge, self.screenshot));
+                                edgeUpdates.push(custommap.getEdgeCfg(edgeid, edge, "from", self.reverseArrows));
+                                edgeUpdates.push(custommap.getEdgeCfg(edgeid, edge, "to", self.reverseArrows));
                                 if (edge.port_id) {
                                     self.edgePortMap[edgeid] = { device_id: edge.device_id, port_id: edge.port_id };
                                 } else {
                                     delete self.edgePortMap[edgeid];
-                                }
-                                if (self.networkNodes.get(mid.id)) {
-                                    self.networkNodes.update(mid);
-                                    self.networkEdges.update(edge1);
-                                    self.networkEdges.update(edge2);
-                                } else {
-                                    self.networkNodes.add([mid]);
-                                    self.networkEdges.add([edge1, edge2]);
                                 }
                             });
                         }
@@ -591,17 +586,22 @@
                             if (nodeid.endsWith('_mid')) {
                                 var edgeid = nodeid.split("_")[0];
                                 if (!data.edges || !(edgeid in data.edges)) {
-                                    self.networkNodes.remove(edgeid + "_mid");
-                                    self.networkEdges.remove(edgeid + "_to");
-                                    self.networkEdges.remove(edgeid + "_from");
+                                    nodeRemovals.push(edgeid + "_mid");
+                                    edgeRemovals.push(edgeid + "_to", edgeid + "_from");
                                     delete self.edgePortMap[edgeid];
                                 }
                             } else if (!nodeid.startsWith('legend_')) {
                                 if (!data.nodes || !(nodeid in data.nodes)) {
-                                    self.networkNodes.remove(nodeid);
+                                    nodeRemovals.push(nodeid);
                                 }
                             }
                         });
+
+                        // update() adds missing items and updates existing ones
+                        if (nodeUpdates.length) self.networkNodes.update(nodeUpdates);
+                        if (edgeUpdates.length) self.networkEdges.update(edgeUpdates);
+                        if (nodeRemovals.length) self.networkNodes.remove(nodeRemovals);
+                        if (edgeRemovals.length) self.networkEdges.remove(edgeRemovals);
 
                         // Redraw legend
                         if (self.legend && self.legend.steps !== undefined) {
@@ -664,13 +664,13 @@
                 var container = document.getElementById(this.elementId);
 
                 visPopups.attach(this.network, {
-                    devicePath: function (nodeId) {
+                    deviceUrl: function (nodeId) {
                         var node = self.networkNodes.get(nodeId);
-                        return node && node.device_id ? '/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d' : null;
+                        return node && node.device_id ? route('device.popup', {device: node.device_id, type: 'device_bits', from: ['-1d', '-7d']}) : null;
                     },
-                    portPath: function (edgeId) {
+                    portUrl: function (edgeId) {
                         var portData = self.edgePortMap[String(edgeId).split('_')[0]];
-                        return portData ? '/port/' + portData.port_id + '/popup?from=-1d' : null;
+                        return portData ? route('port.popup', {port: portData.port_id, from: '-1d'}) : null;
                     },
                 });
 
@@ -688,7 +688,7 @@
                             window.location.href = route('maps.custom.show', {map: node.linked_map_id});
                             return;
                         } else if (node.device_id) {
-                            window.location.href = (self.baseUrl || '') + "device/" + node.device_id;
+                            window.location.href = route('device.overview', {device: node.device_id});
                             return;
                         } else if (node_id.endsWith('_mid')) {
                             edge_id = node_id.split("_")[0];
@@ -698,7 +698,7 @@
                     }
 
                     if (edge_id && (edge_id in self.edgePortMap)) {
-                        window.location.href = (self.baseUrl || '') + 'device/device=' + self.edgePortMap[edge_id].device_id + '/tab=port/port=' + self.edgePortMap[edge_id].port_id + '/';
+                        window.location.href = route('device.port', {device: self.edgePortMap[edge_id].device_id, port: self.edgePortMap[edge_id].port_id});
                     }
                 });
 
@@ -722,17 +722,17 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-server',
                                 label: "{{ __('View Device') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id; }
+                                action: function () { window.location.href = route('device.overview', {device: node.device_id}); }
                             });
                             menuItems.push({
                                 icon: 'fa-solid fa-network-wired',
                                 label: "{{ __('View Ports') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/tab=ports/'; }
+                                action: function () { window.location.href = route('device.ports', {device: node.device_id}); }
                             });
                             menuItems.push({
                                 icon: 'fa-solid fa-chart-area',
                                 label: "{{ __('View Graphs') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/tab=graphs/'; }
+                                action: function () { window.location.href = route('device.graphs', {device: node.device_id}); }
                             });
                             if (node.label) {
                                 menuItems.push({
@@ -762,7 +762,7 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-network-wired',
                                 label: "{{ __('View Port') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/device=' + portData.device_id + '/tab=port/port=' + portData.port_id + '/'; }
+                                action: function () { window.location.href = route('device.port', {device: portData.device_id, port: portData.port_id}); }
                             });
                         }
                     }

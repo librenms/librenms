@@ -27,7 +27,6 @@
 namespace App\View\Components\Device;
 
 use App\Facades\DeviceCache;
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Closure;
@@ -35,6 +34,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\View\Component;
 use LibreNMS\Enum\DeviceStatus;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Util\Graph;
 
 class Page extends Component
@@ -57,7 +57,7 @@ class Page extends Component
         $this->pagetitle = $subtitle ? ($device->display . ': ' . $subtitle) : $device->display;
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $this->awaitingDiscovery = ! $device->disabled && $device->last_discovered === null;
-        $this->isEditPage = request()->routeIs('device.edit*') || str_replace('tab=', '', (string) request()->route('tab')) === 'edit';
+        $this->isEditPage = request()->routeIs('device.edit*');
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
         $this->populateTypeFields();
     }
@@ -94,12 +94,9 @@ class Page extends Component
 
     private function populateTypeFields(): void
     {
-        foreach (LibrenmsConfig::get('device_types', []) as $type) {
-            if (isset($type['type']) && $type['type'] == $this->device->type) {
-                $this->typeIcon = $type['icon'] ?? null;
-                $this->typeText = $type['text'] ?? $this->device->type;
-                break;
-            }
+        $this->typeIcon = DeviceType::icons()[$this->device->type] ?? null;
+        if ($this->typeIcon) {
+            $this->typeText = DeviceType::labelFor($this->device->type);
         }
     }
 

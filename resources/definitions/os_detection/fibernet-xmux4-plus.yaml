@@ -1,6 +1,6 @@
 os: fibernet-xmux4-plus
 text: 'Fibernet XMUX 4+'
-type: network
+type: optical
 icon: fibernet
 discovery:
     -

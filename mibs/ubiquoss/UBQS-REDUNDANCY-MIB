@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP; trailing comma in IMPORTS; trailing comma before })
 -- *****************************************************************
 -- UBQS-REDUNDANCY-MIB  : Ubiquoss Redundancy MIB file
 --
@@ -14,7 +15,7 @@ UBQS-REDUNDANCY-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
-    NOTIFICATION-TYPE,
+    NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION,
     DisplayString,
@@ -26,7 +27,7 @@ IMPORTS
         FROM UBQS-SMI
     InetAddress, 
     InetAddressType,
-    InetAddressPrefixLength, 
+    InetAddressPrefixLength 
     	FROM INET-ADDRESS-MIB
     InterfaceIndex,
     InterfaceIndexOrZero
@@ -129,7 +130,7 @@ ubiRedundancyMIBConformance				OBJECT IDENTIFIER	 	::= { ubiRedundancyMIB 4 }
                                                           
 	ubiRedundancyConnectionStateNotification NOTIFICATION-TYPE
     	OBJECTS     { 
-    					ubiRedundancyConnectionState,
+    					ubiRedundancyConnectionState
     	}
     	STATUS          current
     	DESCRIPTION
@@ -139,7 +140,7 @@ ubiRedundancyMIBConformance				OBJECT IDENTIFIER	 	::= { ubiRedundancyMIB 4 }
    	
    	ubiRedundancySyncNotification NOTIFICATION-TYPE
     	OBJECTS     { 
-    					ubiRedundancySyncState,
+    					ubiRedundancySyncState
     	}
     	STATUS          current
     	DESCRIPTION
@@ -150,7 +151,7 @@ ubiRedundancyMIBConformance				OBJECT IDENTIFIER	 	::= { ubiRedundancyMIB 4 }
    		
 	ubiRedundancySyncStateChangeNotification NOTIFICATION-TYPE
     	OBJECTS     { 
-    					ubiRedundancySyncState,
+    					ubiRedundancySyncState
     	}
     	STATUS          current
     	DESCRIPTION
@@ -220,7 +221,7 @@ ubiRedundancy					OBJECT IDENTIFIER		::= { ubiRedundancyObjects 1 }
 	UbiRedundancyEntry ::= SEQUENCE {        
 		ubiRedundancyIsActivePreferred				TruthValue,          
 		ubiRedundancyState							RedundancyState,
-		ubiRedundancyConnectionState				INTEGER, 
+		ubiRedundancyConnectionState				INTEGER 
        }
 
  	ubiRedundancyIsActivePreferred OBJECT-TYPE
@@ -287,7 +288,7 @@ ubiRedundancy					OBJECT IDENTIFIER		::= { ubiRedundancyObjects 1 }
 	UbiRedundancySyncEntry ::= SEQUENCE {        
 		ubiRedundancySyncState					INTEGER,
 		ubiRedundancySyncNotificationEnabled	TruthValue,
-		ubiRedundancySyncStateChangeNotificationEnabled	TruthValue,
+		ubiRedundancySyncStateChangeNotificationEnabled	TruthValue
 		}
 	
 	ubiRedundancySyncState OBJECT-TYPE
@@ -692,31 +693,10 @@ ubiRedundancyMIBGroups  OBJECT IDENTIFIER			::= { ubiRedundancyMIBConformance 2 
 
 -- units of conformance
 
-	ubiRedundancyMIBRedundancyGroup OBJECT-GROUP
-    	OBJECTS         {
-                    	}
-    	STATUS          current
-    	DESCRIPTION
-        	"The collection of objects which are used to get the
-        	operational state and redundancy state of the modules"
-    	::= { ubiRedundancyMIBGroups 1 }
+	ubiRedundancyMIBRedundancyGroup OBJECT IDENTIFIER ::= { ubiRedundancyMIBGroups 1 }
     	
-    ubiRedundancyMIBSwitchoverGroup OBJECT-GROUP
-    	OBJECTS         {
-                    	}
-    	STATUS          current
-    	DESCRIPTION
-        	"The collection of objects which are used to get the
-        	operational state and redundancy state of the modules"
-    	::= { ubiRedundancyMIBGroups 2 }
+    ubiRedundancyMIBSwitchoverGroup OBJECT IDENTIFIER ::= { ubiRedundancyMIBGroups 2 }
 
-	ubiRedundancyMIBNotificationGroup OBJECT-GROUP
-    	OBJECTS         {
-                    	}
-        STATUS          current
-    	DESCRIPTION
-        	"The collection of objects which are 
-        	used to send a notification."
-    	::= { ubiRedundancyMIBGroups 3 }    
+	ubiRedundancyMIBNotificationGroup OBJECT IDENTIFIER ::= { ubiRedundancyMIBGroups 3 }    
 
 END

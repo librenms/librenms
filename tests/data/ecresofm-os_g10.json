@@ -12,7 +12,7 @@
                     "features": "IP,MPX_IN,RDS_STATIC,COMM_PACK,AUDIO_INPUT,S-FM,ACTIVATION",
                     "location": "Stodlafjall Main",
                     "os": "ecresofm-os",
-                    "type": "appliance",
+                    "type": "audiovisual",
                     "serial": "E1002042",
                     "icon": "worldcastsystems.png"
                 }

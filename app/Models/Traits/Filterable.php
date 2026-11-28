@@ -3,6 +3,7 @@
 namespace App\Models\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -126,7 +127,9 @@ trait Filterable
     }
 
     /**
-     * @param  Builder<static>  $query
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $query
      * @param  string  $field
      * @param  scalar|scalar[]  $value
      * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
@@ -220,9 +223,10 @@ trait Filterable
                 'bail',
                 'array',
                 function ($attribute, $value, $fail): void {
-                    $operator = array_key_first($value);
-                    if (! isset(static::$operatorMap[$operator])) {
-                        $fail("The operator '$operator' is not supported.");
+                    foreach (array_keys($value) as $operator) {
+                        if (! isset(static::$operatorMap[$operator])) {
+                            $fail("The operator '$operator' is not supported.");
+                        }
                     }
                 },
             ],

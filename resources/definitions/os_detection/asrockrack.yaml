@@ -1,6 +1,6 @@
 os: asrockrack
 text: 'ASRock Rack BMC'
-type: appliance
+type: management
 icon: asrockrack
 mib_dir: asrockrack
 snmp_bulk: false

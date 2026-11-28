@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-SLD-MIB
 --   
@@ -308,15 +309,6 @@ ubiSldMIBGroups  	 	OBJECT IDENTIFIER			::= { ubiSldMIBConformance 2 }
     	::= { ubiSldMIBCompliances 1 }
 
 
-	ubiSldGroup OBJECT-GROUP
-    	OBJECTS         {    
-				
-        }   
-
-    	STATUS          current
-    	DESCRIPTION
-        	"A collection of objects containing
-        	information about self loop detect."
-    	::= { ubiSldMIBGroups 1 }
+	ubiSldGroup OBJECT IDENTIFIER ::= { ubiSldMIBGroups 1 }
     	
 END

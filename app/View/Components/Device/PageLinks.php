@@ -64,13 +64,15 @@ class PageLinks extends Component
         if (Gate::allows('update', $device)) {
             // check if metric has more specific edit page
             $path = \Request::path();
-            if (preg_match('#health/metric=(\w+)#', $path, $matches)) {
-                if ($this->editTabUrl($device, $matches[1])) {
-                    $currentTab = $matches[1];
-                } elseif ($this->editTabUrl($device, $matches[1] . 's')) {
-                    $currentTab = $matches[1] . 's';
+            $metric = request()->routeIs('device.health') ? (string) request()->query('metric') : '';
+            if ($metric !== '') {
+                if ($this->editTabUrl($device, $metric)) {
+                    $currentTab = $metric;
+                } elseif ($this->editTabUrl($device, $metric . 's')) {
+                    $currentTab = $metric . 's';
                 }
-            } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
+            } elseif ((request()->routeIs('device.ports') && request()->query('view') === 'transceivers')
+                || preg_match('#device/\d+/ports/transceivers#', $path)) {
                 $currentTab = 'transceivers';
             }
 
@@ -142,7 +144,7 @@ class PageLinks extends Component
         if (Gate::allows('debug', \App\Models\Device::class)) {
             $device_links['capture'] = [
                 'icon' => 'fa-bug',
-                'url' => route('device', [$device->device_id, 'capture']),
+                'url' => route('device.capture', ['device' => $device]),
                 'title' => __('Capture'),
                 'external' => false,
             ];
@@ -151,21 +153,10 @@ class PageLinks extends Component
         return $device_links;
     }
 
-    /**
-     * The edit page for a device tab, migrated pages have a route, legacy pages a file
-     */
     private function editTabUrl(Device $device, string $tab): ?string
     {
-        if ($tab === '') {
-            return null;
-        }
-
         if (Route::has("device.edit.$tab")) {
             return route("device.edit.$tab", $device->device_id);
-        }
-
-        if (is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"))) {
-            return route('device', [$device->device_id, "edit/section=$tab"]);
         }
 
         return null;

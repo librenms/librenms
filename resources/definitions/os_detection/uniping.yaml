@@ -1,6 +1,6 @@
 os: uniping
 text: UniPing
-type: environmental
+type: environment
 icon: netping
 group: netping
 snmp_bulk: false

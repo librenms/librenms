@@ -27,6 +27,7 @@
 namespace App\Http\ViewComposers;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Alert;
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
 use App\Models\Bill;
@@ -49,10 +50,10 @@ use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Plugins\Hooks\MenuEntryHook;
 use LibreNMS\Plugins;
@@ -91,7 +92,7 @@ class MenuComposer
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
         $vars['package_count'] = Package::hasAccess($user)->count();
 
-        $configDeviceTypes = Arr::keyBy(LibrenmsConfig::get('device_types'), 'type');
+        $deviceTypeIcons = DeviceType::icons();
         $vars['device_types'] = Device::hasAccess($user)
             ->select('type')
             ->distinct()
@@ -99,7 +100,7 @@ class MenuComposer
             ->orderBy('type')
             ->pluck('type')
             ->keyBy(fn ($type) => $type)
-            ->map(fn ($type) => $configDeviceTypes[$type]['icon'] ?? 'angle-double-right');
+            ->map(fn ($type) => $deviceTypeIcons[$type] ?? 'angle-double-right');
         $vars['no_devices_added'] = ! Device::hasAccess($user)->exists();
 
         $vars['locations'] = (LibrenmsConfig::get('show_locations') && LibrenmsConfig::get('show_locations_dropdown')) ?
@@ -285,14 +286,15 @@ class MenuComposer
         $vars['routing_menu'] = $routing_menu;
 
         // Alert menu
-        $alert_counts = AlertRule::selectRaw('severity, COUNT(*) as count')
+        $alert_counts = $user->can('viewAny', Alert::class) ? AlertRule::selectRaw('severity, COUNT(*) as count')
             ->isActive()
-            ->hasAccess($user)
+            ->when($user->cannot('viewAll', Alert::class), fn ($query) => $query
+                ->whereIn('alerts.device_id', Device::hasAccess($user)->select('devices.device_id')))
             ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
             ->where('devices.disabled', '=', '0')
             ->where('devices.ignore', '=', '0')
             ->groupBy('severity')
-            ->pluck('count', 'severity');
+            ->pluck('count', 'severity') : collect();
         $vars['alert_count'] = $alert_counts->sum();
 
         if ($alert_counts->has('critical')) {

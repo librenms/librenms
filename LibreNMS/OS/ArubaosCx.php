@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 use App\Facades\PortCache;
 use App\Models\PortsNac;
 use App\Models\Transceiver;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
@@ -94,5 +95,32 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling, TransceiverDiscovery
                 'entity_physical_index' => $ifIndex,
             ]);
         });
+    }
+
+    /**
+     * VSF states are polled as strings
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $states = [
+            // arubaWiredVsfv2OperStatus
+            'no_split' => 0,
+            'fragment_active' => 1,
+            'fragment_inactive' => 2,
+            // arubaWiredVsfv2MemberTable
+            'not_present' => 10,
+            'booting' => 11,
+            'ready' => 12,
+            'version_mismatch' => 13,
+            'communication_failure' => 14,
+            'in_other_fragment' => 15,
+        ];
+        $values = parent::pollSensors($sensors);
+
+        foreach ($sensors->where('sensor_class', 'state')->whereIn('sensor_type', ['arubaWiredVsfv2OperStatus', 'arubaWiredVsfv2MemberTable']) as $sensor) {
+            $values[$sensor->sensor_id] = $states[$values[$sensor->sensor_id] ?? ''] ?? $values[$sensor->sensor_id] ?? null;
+        }
+
+        return array_filter($values, fn ($value) => $value !== null);
     }
 }

@@ -1,0 +1,602 @@
+openapi: 3.1.0
+info:
+  title: LibreNMS API v1
+  version: 1.0.0-beta
+  license:
+    name: GNU General Public License v3.0 or later
+    identifier: GPL-3.0-or-later
+  description: |
+    The v1 API is in beta and may change. Enable it under Settings → API → API v1 (Beta).
+    Responses follow JSON:API 1.1 and use `application/vnd.api+json`.
+
+    Create a personal access token on the API Tokens page. Requests inherit the
+    permissions of the token's user, including access to individual devices and ports.
+
+    On collection endpoints, use `filter[field]=value` for equality or
+    `filter[field][operator]=value` to choose an operator. The supported operators are
+    `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `contains`, `not_contains`, `starts_with`,
+    `ends_with`, `is_empty`, `is_not_empty`, `in`, and `not_in`. Use comma-separated
+    values for `in` and `not_in`. Boolean filters take `true` or `false` and support
+    `eq`, `neq`, `in`, and `not_in`.
+externalDocs:
+  description: API v1 guide
+  url: https://docs.librenms.org/API/v1/
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+tags:
+  - name: System
+    description: Readiness and application information.
+  - name: Devices
+    description: Monitored devices and their relationships.
+  - name: Ports
+    description: Monitored interfaces and their relationships.
+paths:
+  /health:
+    get:
+      tags: [System]
+      operationId: getHealth
+      summary: Check API readiness
+      description: Public readiness probe limited to 60 requests per minute per client.
+      security: []
+      responses:
+        '200':
+          description: The API is ready.
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/HealthDocument'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '406': { $ref: '#/components/responses/NotAcceptable' }
+        '429':
+          description: The per-client rate limit was exceeded.
+          headers:
+            Retry-After:
+              description: Seconds before the client can retry.
+              schema: { type: integer }
+          content:
+            application/vnd.api+json:
+              schema: { $ref: '#/components/schemas/ErrorDocument' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /system:
+    get:
+      tags: [System]
+      operationId: getSystem
+      summary: Show application information
+      description: Returns the LibreNMS version and row counts visible to the token's user.
+      responses:
+        '200':
+          description: Application information and counts.
+          content:
+            application/vnd.api+json:
+              schema: { $ref: '#/components/schemas/SystemDocument' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '406': { $ref: '#/components/responses/NotAcceptable' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /devices:
+    get:
+      tags: [Devices]
+      operationId: listDevices
+      summary: List devices
+      description: |
+        Returns the devices visible to the token's user. Supported filter fields are
+        `id`, `search`, `displayName`, `hostname`, `systemName`, `isUp`, `deviceType`,
+        `os`, `osVersion`, `osFeatures`, `hardware`, `isEnabled`, `isIgnored`, and
+        `isAlertingEnabled`.
+      parameters:
+        - $ref: '#/components/parameters/DeviceFields'
+        - $ref: '#/components/parameters/DeviceSort'
+        - $ref: '#/components/parameters/SearchContains'
+        - $ref: '#/components/parameters/FilterOs'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: A page of devices.
+          content:
+            application/vnd.api+json:
+              schema: { $ref: '#/components/schemas/DeviceCollection' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '406': { $ref: '#/components/responses/NotAcceptable' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /devices/{device}:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    get:
+      tags: [Devices]
+      operationId: getDevice
+      summary: Show a device
+      parameters:
+        - $ref: '#/components/parameters/DeviceFields'
+      responses: &deviceResponses
+        '200':
+          description: A single device.
+          content:
+            application/vnd.api+json:
+              schema: { $ref: '#/components/schemas/DeviceDocument' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '406': { $ref: '#/components/responses/NotAcceptable' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /devices/{device}/ports:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    get:
+      tags: [Devices]
+      operationId: listDevicePorts
+      summary: List a device's ports
+      description: &portCollectionDescription |
+        Returns the ports visible to the token's user. Supported filter fields are
+        `id`, `search`, `device`, `name`, `description`, `ifIndex`, `ifDescr`,
+        `interfaceType`, `administrativeStatus`, `operationalStatus`, `speed`, `duplex`,
+        `mtu`, `macAddress`, `vlan`, `isEnabled`, `isIgnored`, and `isDeleted`.
+      parameters: &portCollectionParameters
+        - $ref: '#/components/parameters/PortFields'
+        - $ref: '#/components/parameters/DeviceFields'
+        - $ref: '#/components/parameters/IncludeDevice'
+        - $ref: '#/components/parameters/PortSort'
+        - $ref: '#/components/parameters/SearchContains'
+        - $ref: '#/components/parameters/FilterDevice'
+        - $ref: '#/components/parameters/FilterPortName'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+      responses: &portCollectionResponses
+        '200':
+          description: A page of ports.
+          content:
+            application/vnd.api+json:
+              schema: { $ref: '#/components/schemas/PortCollection' }
+              example:
+                jsonapi: { version: '1.1' }
+                data:
+                  - type: ports
+                    id: '12'
+                    attributes: { name: eth0, operationalStatus: up }
+                    relationships:
+                      device:
+                        data: { type: devices, id: '3' }
+                        links: { related: 'https://librenms.example.com/api/v1/ports/12/device' }
+                    links: { self: 'https://librenms.example.com/api/v1/ports/12' }
+                included:
+                  - type: devices
+                    id: '3'
+                    attributes: { hostname: core1.example.com }
+                    links: { self: 'https://librenms.example.com/api/v1/devices/3' }
+                links:
+                  self: 'https://librenms.example.com/api/v1/ports?include=device'
+                  first: 'https://librenms.example.com/api/v1/ports?include=device&page%5Bnumber%5D=1&page%5Bsize%5D=50'
+                  last: 'https://librenms.example.com/api/v1/ports?include=device&page%5Bnumber%5D=1&page%5Bsize%5D=50'
+                  prev: null
+                  next: null
+                meta:
+                  page: { currentPage: 1, lastPage: 1, perPage: 50, total: 1 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '406': { $ref: '#/components/responses/NotAcceptable' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /ports:
+    get:
+      tags: [Ports]
+      operationId: listPorts
+      summary: List ports
+      description: *portCollectionDescription
+      parameters: *portCollectionParameters
+      responses: *portCollectionResponses
+  /ports/{port}:
+    parameters:
+      - $ref: '#/components/parameters/PortId'
+    get:
+      tags: [Ports]
+      operationId: getPort
+      summary: Show a port
+      parameters:
+        - $ref: '#/components/parameters/PortFields'
+        - $ref: '#/components/parameters/DeviceFields'
+        - $ref: '#/components/parameters/IncludeDevice'
+      responses:
+        '200':
+          description: A single port.
+          content:
+            application/vnd.api+json:
+              schema: { $ref: '#/components/schemas/PortDocument' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '406': { $ref: '#/components/responses/NotAcceptable' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /ports/{port}/device:
+    parameters:
+      - $ref: '#/components/parameters/PortId'
+    get:
+      tags: [Ports]
+      operationId: getPortDevice
+      summary: Show a port's device
+      description: Requires permission to view both the port and its device.
+      parameters:
+        - $ref: '#/components/parameters/DeviceFields'
+      responses: *deviceResponses
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: A LibreNMS personal access token with the API Access permission.
+  # Keep optional values visible in Scalar without adding them to every test request.
+  parameters:
+    DeviceId:
+      name: device
+      in: path
+      required: true
+      description: Numeric device ID.
+      schema: { type: integer, minimum: 1 }
+    PortId:
+      name: port
+      in: path
+      required: true
+      description: Numeric port ID.
+      schema: { type: integer, minimum: 1 }
+    PageNumber:
+      name: page[number]
+      in: query
+      description: Page number, starting at 1.
+      schema: { type: integer, minimum: 1, default: 1 }
+      examples:
+        default: { value: 2, x-disabled: true }
+    PageSize:
+      name: page[size]
+      in: query
+      description: Maximum number of resources per page.
+      schema: { type: integer, minimum: 1, maximum: 500, default: 50 }
+      examples:
+        default: { value: 100, x-disabled: true }
+    DeviceFields:
+      name: fields[devices]
+      in: query
+      description: Comma-separated names of device attributes and relationships to return.
+      schema: { type: string }
+      examples:
+        default: { value: 'hostname,os', x-disabled: true }
+    PortFields:
+      name: fields[ports]
+      in: query
+      description: Comma-separated names of port attributes and relationships to return.
+      schema: { type: string }
+      examples:
+        default: { value: 'name,operationalStatus,device', x-disabled: true }
+    IncludeDevice:
+      name: include
+      in: query
+      description: Add each related device to the top-level included list when the token's user can view it.
+      schema: { type: string, enum: [device] }
+      examples:
+        default: { value: device, x-disabled: true }
+    DeviceSort:
+      name: sort
+      in: query
+      description: |
+        Comma-separated sort fields, with a leading minus for descending order.
+        Supported fields are `displayName`, `hostname`, `systemName`, `uptime`,
+        `deviceType`, `os`, `lastPolledAt`, and `createdAt`. The device ID breaks ties.
+      schema: { type: string }
+      examples:
+        default: { value: 'os,-hostname', x-disabled: true }
+    PortSort:
+      name: sort
+      in: query
+      description: |
+        Comma-separated sort fields, with a leading minus for descending order.
+        Supported fields are `name`, `description`, `ifIndex`, `ifDescr`, `interfaceType`,
+        `administrativeStatus`, `operationalStatus`, and `speed`. The port ID breaks ties.
+      schema: { type: string }
+      examples:
+        default: { value: '-speed,name', x-disabled: true }
+    SearchContains:
+      name: filter[search][contains]
+      in: query
+      description: Match a substring across searchable fields.
+      schema: { type: string, maxLength: 255 }
+      examples:
+        default: { value: core, x-disabled: true }
+    FilterOs:
+      name: filter[os]
+      in: query
+      description: Match an operating system exactly.
+      schema: { type: string, maxLength: 255 }
+      example: ios
+    FilterDevice:
+      name: filter[device]
+      in: query
+      description: Match a port's device ID exactly.
+      schema: { type: integer, minimum: 1 }
+      examples:
+        default: { value: 3, x-disabled: true }
+    FilterPortName:
+      name: filter[name][eq]
+      in: query
+      description: Match an interface name exactly.
+      schema: { type: string, maxLength: 255 }
+      examples:
+        default: { value: eth0, x-disabled: true }
+  responses:
+    BadRequest:
+      description: An unsupported or invalid query parameter.
+      content:
+        application/vnd.api+json:
+          schema: { $ref: '#/components/schemas/ErrorDocument' }
+          example:
+            jsonapi: { version: '1.1' }
+            errors:
+              - status: '400'
+                title: Bad Request
+                detail: 'Unsupported sort: invalid'
+                source: { parameter: sort }
+    Unauthorized:
+      description: A valid bearer token is required.
+      content: &errorContent
+        application/vnd.api+json:
+          schema: { $ref: '#/components/schemas/ErrorDocument' }
+    Forbidden:
+      description: The token's user lacks API access or permission for this operation.
+      content: *errorContent
+    NotFound:
+      description: The requested resource could not be found or API v1 is disabled.
+      content: *errorContent
+    NotAcceptable:
+      description: The Accept header requests the JSON:API media type only with unsupported parameters.
+      content: *errorContent
+    Unavailable:
+      description: A required service is unavailable.
+      content: *errorContent
+  schemas:
+    JsonApiVersion:
+      type: object
+      required: [version]
+      properties:
+        version: { type: string, const: '1.1' }
+    SelfLinks:
+      type: object
+      required: [self]
+      properties:
+        self: { type: string, format: uri }
+    RelatedLinks:
+      type: object
+      required: [related]
+      properties:
+        related: { type: string, format: uri }
+    ResourceId:
+      type: string
+      pattern: '^[0-9]+$'
+    NullableDateTime:
+      type: [string, 'null']
+      format: date-time
+    SingleDocument:
+      type: object
+      required: [jsonapi, links, data]
+      properties:
+        jsonapi: { $ref: '#/components/schemas/JsonApiVersion' }
+        links: { $ref: '#/components/schemas/SelfLinks' }
+    DeviceDocument:
+      allOf:
+        - $ref: '#/components/schemas/SingleDocument'
+        - type: object
+          properties:
+            data: { $ref: '#/components/schemas/Device' }
+    PortDocument:
+      allOf:
+        - $ref: '#/components/schemas/SingleDocument'
+        - type: object
+          properties:
+            data: { $ref: '#/components/schemas/Port' }
+            included: { $ref: '#/components/schemas/IncludedDevices' }
+    CollectionDocument:
+      type: object
+      required: [jsonapi, links, meta, data]
+      properties:
+        jsonapi: { $ref: '#/components/schemas/JsonApiVersion' }
+        links:
+          type: object
+          required: [self, first, last, prev, next]
+          properties:
+            self: { type: string, format: uri }
+            first: { type: string, format: uri }
+            last: { type: string, format: uri }
+            prev: { type: [string, 'null'], format: uri }
+            next: { type: [string, 'null'], format: uri }
+        meta:
+          type: object
+          required: [page]
+          properties:
+            page:
+              type: object
+              required: [currentPage, lastPage, perPage, total]
+              properties:
+                currentPage: { type: integer, minimum: 1 }
+                lastPage: { type: integer, minimum: 1 }
+                perPage: { type: integer, minimum: 1, maximum: 500 }
+                total: { type: integer, minimum: 0 }
+    DeviceCollection:
+      allOf:
+        - $ref: '#/components/schemas/CollectionDocument'
+        - type: object
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/Device' }
+    PortCollection:
+      allOf:
+        - $ref: '#/components/schemas/CollectionDocument'
+        - type: object
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/Port' }
+            included: { $ref: '#/components/schemas/IncludedDevices' }
+    IncludedDevices:
+      type: array
+      description: Related devices included on request and visible to the token's user.
+      items: { $ref: '#/components/schemas/Device' }
+    Device:
+      type: object
+      required: [type, id, links]
+      properties:
+        type: { type: string, const: devices }
+        id: { $ref: '#/components/schemas/ResourceId' }
+        links: { $ref: '#/components/schemas/SelfLinks' }
+        attributes:
+          type: object
+          description: Attributes can be omitted through sparse fieldsets.
+          properties:
+            displayName: { type: [string, 'null'], description: Name shown in the web UI. }
+            hostname: { type: string, description: Hostname or IP used to reach the device. }
+            ipAddress: { type: [string, 'null'], description: Resolved IPv4 or IPv6 address. }
+            description: { type: [string, 'null'] }
+            notes: { type: [string, 'null'] }
+            systemName: { type: [string, 'null'] }
+            systemDescription: { type: [string, 'null'] }
+            systemContact: { type: [string, 'null'] }
+            sysObjectID: { type: [string, 'null'], description: SNMP object identifier of the device model. }
+            isUp: { type: boolean }
+            statusReason: { type: string }
+            uptime: { type: [integer, 'null'], description: Uptime in seconds. }
+            deviceType: { type: string }
+            os: { type: [string, 'null'] }
+            osVersion: { type: [string, 'null'] }
+            osFeatures: { type: [string, 'null'] }
+            hardware: { type: [string, 'null'] }
+            serialNumber: { type: [string, 'null'] }
+            bgpLocalAs: { type: [integer, 'null'] }
+            isEnabled: { type: boolean }
+            isIgnored: { type: boolean }
+            isStatusIgnored: { type: boolean }
+            isAlertingEnabled: { type: boolean }
+            lastPolledAt: { $ref: '#/components/schemas/NullableDateTime' }
+            lastPollDuration: { type: [number, 'null'], description: Duration in seconds. }
+            lastDiscoveredAt: { $ref: '#/components/schemas/NullableDateTime' }
+            lastDiscoveryDuration: { type: [number, 'null'], description: Duration in seconds. }
+            createdAt: { $ref: '#/components/schemas/NullableDateTime' }
+        relationships:
+          type: object
+          properties:
+            ports:
+              type: object
+              required: [links]
+              properties:
+                links: { $ref: '#/components/schemas/RelatedLinks' }
+    Port:
+      type: object
+      required: [type, id, links]
+      properties:
+        type: { type: string, const: ports }
+        id: { $ref: '#/components/schemas/ResourceId' }
+        links: { $ref: '#/components/schemas/SelfLinks' }
+        attributes:
+          type: object
+          description: Attributes can be omitted through sparse fieldsets.
+          properties:
+            label: { type: string, description: Name shown in the web UI. }
+            name: { type: [string, 'null'], description: Interface name. }
+            description: { type: [string, 'null'], description: Interface alias. }
+            ifIndex: { type: [integer, 'null'], description: SNMP interface index. }
+            ifDescr: { type: [string, 'null'], description: Interface description reported by the device. }
+            interfaceType: { type: [string, 'null'], description: IANA interface type. }
+            administrativeStatus: { $ref: '#/components/schemas/InterfaceStatus' }
+            operationalStatus: { $ref: '#/components/schemas/InterfaceStatus' }
+            speed: { type: [integer, 'null'], description: Speed in bits per second. }
+            duplex: { type: [string, 'null'] }
+            mtu: { type: [integer, 'null'], description: MTU in bytes. }
+            macAddress: { type: [string, 'null'] }
+            vlan: { type: [string, 'null'], description: Access or native VLAN. }
+            trunkEncapsulation: { type: [string, 'null'] }
+            isEnabled: { type: boolean }
+            isIgnored: { type: boolean }
+            isDeleted: { type: boolean }
+            lastPolledAt: { $ref: '#/components/schemas/NullableDateTime' }
+        relationships:
+          type: object
+          properties:
+            device:
+              type: object
+              required: [links]
+              properties:
+                links: { $ref: '#/components/schemas/RelatedLinks' }
+                data:
+                  description: Related device identifier when the relationship is requested, or null for an orphaned port.
+                  type: [object, 'null']
+                  required: [type, id]
+                  properties:
+                    type: { type: string, const: devices }
+                    id: { $ref: '#/components/schemas/ResourceId' }
+    InterfaceStatus:
+      type: [string, 'null']
+      enum: [up, down, testing, unknown, dormant, notPresent, lowerLayerDown, null]
+    MetaDocument:
+      type: object
+      required: [jsonapi, links, meta]
+      properties:
+        jsonapi: { $ref: '#/components/schemas/JsonApiVersion' }
+        links: { $ref: '#/components/schemas/SelfLinks' }
+    HealthDocument:
+      allOf:
+        - $ref: '#/components/schemas/MetaDocument'
+        - type: object
+          properties:
+            meta:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, const: healthy }
+    SystemDocument:
+      allOf:
+        - $ref: '#/components/schemas/MetaDocument'
+        - type: object
+          properties:
+            meta:
+              type: object
+              required: [application, statistics]
+              properties:
+                application:
+                  type: object
+                  required: [name, version]
+                  properties:
+                    name: { type: string, const: LibreNMS }
+                    version: { type: string }
+                statistics:
+                  type: object
+                  required: [devices, ports, sensors]
+                  properties:
+                    devices: { type: integer, minimum: 0 }
+                    ports: { type: integer, minimum: 0 }
+                    sensors: { type: integer, minimum: 0 }
+    ErrorDocument:
+      type: object
+      required: [jsonapi, errors]
+      properties:
+        jsonapi: { $ref: '#/components/schemas/JsonApiVersion' }
+        errors:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [status, title, detail]
+            properties:
+              status: { type: string, pattern: '^[45][0-9]{2}$' }
+              title: { type: string }
+              detail: { type: string }
+              source:
+                type: object
+                properties:
+                  parameter: { type: string, description: Name of an invalid query parameter. }
+                  pointer: { type: string, description: JSON Pointer to an invalid request document member. }

@@ -49,7 +49,7 @@ class FullscreenMapController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect('fullscreenmap');
+            return redirect()->route('maps.fullscreen');
         }
 
         $group_id = $request->integer('group');
@@ -73,7 +73,6 @@ class FullscreenMapController extends Controller
         }
 
         $data = [
-            'map_engine' => LibrenmsConfig::get('map.engine', 'leaflet'),
             'map_provider' => LibrenmsConfig::get('geoloc.engine', 'openstreetmap'),
             'map_api_key' => LibrenmsConfig::get('geoloc.api_key', ''),
             'show_netmap' => LibrenmsConfig::get('network_map_show_on_worldmap', false),

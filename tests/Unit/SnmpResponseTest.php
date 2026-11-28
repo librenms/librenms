@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Unit;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Tests\TestCase;
 
 final class SnmpResponseTest extends TestCase
@@ -512,11 +512,12 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
 
     public function testConnectionError(): void
     {
-        $this->assertTrue((new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161.\n", 1))->hasConnectionError());
-        $this->assertTrue((new SnmpResponse([], 'snmpget(): No response from 192.0.2.1', 1))->hasConnectionError(), 'php-snmp');
-        $this->assertTrue((new SnmpResponse([], "snmpwalk: Unknown user name\n", 1))->hasConnectionError());
-        $this->assertFalse((new SnmpResponse(['IF-MIB::ifDescr.1' => 'No Such Object available on this agent at this OID']))->hasConnectionError(), 'No data is not an error');
-        $this->assertFalse((new SnmpResponse([], "TEST-MIB::foo: Unknown Object Identifier\n", 1))->hasConnectionError());
+        $this->assertTrue(new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161.\n", 1)->hasConnectionError());
+        $this->assertTrue(new SnmpResponse([], 'snmpget(): No response from 192.0.2.1', 1)->hasConnectionError(), 'php-snmp');
+        $this->assertTrue(new SnmpResponse([], "snmpbulkwalk: Timeout\n", 1)->hasConnectionError(), 'v3 engine id discovery');
+        $this->assertTrue(new SnmpResponse([], "snmpwalk: Unknown user name\n", 1)->hasConnectionError());
+        $this->assertFalse(new SnmpResponse(['IF-MIB::ifDescr.1' => 'No Such Object available on this agent at this OID'])->hasConnectionError(), 'No data is not an error');
+        $this->assertFalse(new SnmpResponse([], "TEST-MIB::foo: Unknown Object Identifier\n", 1)->hasConnectionError());
     }
 
     public function testThrowIfConnectionError(): void
@@ -524,7 +525,7 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = new SnmpResponse(['IF-MIB::ifDescr.1' => 'lo']);
         $this->assertSame($response, $response->throwIfConnectionError());
 
-        $this->expectException(SnmpException::class);
-        (new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161.\n", 1))->throwIfConnectionError();
+        $this->expectException(SnmpConnectionException::class);
+        new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161.\n", 1)->throwIfConnectionError();
     }
 }

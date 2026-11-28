@@ -63,6 +63,9 @@ final class TestConfigCommands extends InMemoryDbTestCase
         // os config highlighting
         $this->assertCliSets('os.ios.config_highlighting', 'cisco-config');
 
+        // os name containing digits
+        $this->assertCliSets('os.airos-af60.polling.selected_ports', true);
+
         // os array
         $this->assertCliSets('os.netonix.bad_iftype', ['ethernet', 'psuedowire']);
 
@@ -174,5 +177,19 @@ final class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(0);
 
         $this->assertNull(LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
+    }
+
+    public function testCustomDeviceTypeSetting(): void
+    {
+        $this->artisan('config:set', ['setting' => 'device_types.my_type', 'value' => 'star'])
+            ->assertExitCode(0);
+
+        $this->assertEquals('star', LibrenmsConfig::get('device_types.my_type'));
+        $this->assertEquals('star', LibrenmsConfig::get('device_types')['my_type']);
+        $this->assertEquals('network-wired', LibrenmsConfig::get('device_types.network'));
+
+        // Test validation rejects non-string values
+        $this->artisan('config:set', ['setting' => 'device_types.my_type', 'value' => '["invalid"]'])
+            ->assertExitCode(2);
     }
 }

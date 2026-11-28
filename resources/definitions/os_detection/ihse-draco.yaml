@@ -1,6 +1,6 @@
 os: ihse-draco
 text: 'IHSE Draco tera'
-type: appliance
+type: management
 over:
     - { graph: device_temperature, text: 'Matrix Temperature' }
     - { graph: device_state, text: 'Device Status' }

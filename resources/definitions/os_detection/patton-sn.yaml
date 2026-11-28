@@ -1,7 +1,7 @@
 os: patton-sn
 group: patton
 text: 'Patton SmartNode'
-type: network
+type: voice
 icon: patton
 over:
     - { graph: device_processor, text: 'Processor Usage' }

@@ -92,8 +92,15 @@ return [
                 'fix' => 'Either comment out or delete $config[\'rrdtool_version\'] = \':version\'; from your config.php file',
                 'ok' => 'rrdtool version ok',
             ],
+            'CheckRrdBackend' => [
+                'fail_extension' => 'The rrd.backend setting is php-rrd, but the php-rrd extension is not loaded.',
+                'fix_backend' => 'lnms config:set rrd.backend rrdtool',
+                'ok' => 'RRD backend configuration ok',
+            ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket does not exist. The rrdcached connectivity test failed.',
+                'fail_socket_connect' => 'Cannot connect to rrdcached socket :socket as user :user: :error',
+                'fix_socket_connect' => 'Make sure rrdcached is running and the group :group can read and write the socket: rrdcached options "-s :group -m 0660" before -l (SOCKGROUP and SOCKMODE on Debian and Ubuntu)',
                 'fail_port' => 'Cannot connect to rrdcached server :server on port :port',
                 'ok' => 'Connected to rrdcached',
             ],
@@ -190,6 +197,10 @@ return [
                 'not_detected' => 'Dispatcher Service not detected',
                 'warn' => 'The Dispatcher Service was used, but not recently',
             ],
+            'CheckLegacySensorIncludes' => [
+                'warn' => 'Legacy sensor include files are deprecated and support for them will be removed.',
+                'fix' => 'Convert them to YAML sensor discovery, or to sensor code in the PHP class of the OS when YAML is not possible, then delete them. See https://docs.librenms.org/Developing/os/Health-Information/',
+            ],
             'CheckLocking' => [
                 'fail' => 'Caching server issue: :message',
                 'ok' => 'Locks are functional',
@@ -201,6 +212,22 @@ return [
                 'ok' => 'Python poller wrapper is polling',
                 'nodes_down' => 'Some poller nodes did not check in recently',
                 'not_detected' => 'Python wrapper cron entry is not present',
+            ],
+            'CheckQueuePolling' => [
+                'dispatch_stopped' => 'Polling work was last dispatched :time, check that the scheduler and the queue workers are running',
+                'not_dispatched' => 'Polling work has not been dispatched in the last hour, check that the scheduler and the queue workers are running',
+                'ok' => 'Polling work is being dispatched to the queue workers',
+                'overdue' => 'Some devices have not been polled in over twice the polling interval',
+                'overdue_fix' => 'Check Overdue Devices on the Pollers > Queues page, it shows whether a poll job is holding up each device',
+            ],
+            'CheckQueueWorkers' => [
+                'behind' => 'Some queues are not keeping up, add workers or worker nodes for them',
+                'nodes_down' => 'Some queue worker nodes did not check in recently',
+                'not_running' => 'Queue workers are not running on any node, polling work is not being processed',
+                'ok' => 'Queue workers are working all polling queues',
+                'queue_driver' => 'Queue workers need a queue, the :driver queue driver runs jobs right away',
+                'unavailable' => 'Could not read the queue worker status: :message',
+                'unworked' => 'No queue workers for some queues, check the poller groups of each worker node',
             ],
             'CheckRedis' => [
                 'bad_driver' => ':driver is in use for locking. Set CACHE_STORE=redis.',

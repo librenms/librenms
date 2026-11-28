@@ -21,7 +21,7 @@ class AlertLogController extends TableController
     protected array $default_sort = ['time_logged' => 'asc'];
 
     /** Max entity rows rendered in the (collapsed) inline detail cell to bound memory. */
-    private const INLINE_DETAIL_ROW_LIMIT = 100;
+    private const int INLINE_DETAIL_ROW_LIMIT = 100;
 
     public function __construct(
         private readonly AlertLogDetailParser $parser
@@ -39,6 +39,7 @@ class AlertLogController extends TableController
             'state' => 'integer|nullable',
             'from' => 'nullable|date_or_relative',
             'to' => 'nullable|date_or_relative',
+            'widget_id' => 'nullable|integer|min:1',
         ];
     }
 
@@ -201,16 +202,28 @@ class AlertLogController extends TableController
             $alert_rule .= ' <span class="label label-default">' . $entity_count . '&times;</span>';
         }
 
+        $incidentId = $this->incidentId($model->id);
+
         return [
             'id' => $model->id,
             'time_logged' => $model->time_logged,
-            'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
+            'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#' . $incidentId . '" data-parent="#alerts"></a>',
             'verbose_details' => "<button type='button' class='btn btn-alert-details verbose-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='$model->id'><i class='fa-solid fa-circle-info'></i></button>",
-            'hostname' => '<div class="incident">' . Url::modernDeviceLink($model->device) . '<div id="incident' . $model->id . '" class="collapse">' . $fault_detail . '</div></div>',
+            'hostname' => '<div class="incident">' . Url::modernDeviceLink($model->device) . '<div id="' . $incidentId . '" class="collapse">' . $fault_detail . '</div></div>',
             'alert_rule' => $alert_rule,
             'status' => $status,
             'severity' => $model->rule?->severity,
         ];
+    }
+
+    /**
+     * Build the incident element id, namespaced by the dashboard widget instance when present.
+     */
+    private function incidentId(int $logId): string
+    {
+        $widgetId = request()->integer('widget_id');
+
+        return $widgetId > 0 ? "incident{$widgetId}-{$logId}" : "incident{$logId}";
     }
 
     protected function getExportHeaders(): array

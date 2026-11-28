@@ -1,5 +1,5 @@
 -- ============================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: The MIB is extracted from draft-ietf-bfd-base-04.txt.
 -- This file defines a portion of the Management Information Base (MIB) for use
@@ -7,14 +7,17 @@
 -- managed objects to configure or monitor Bi-Directional Forwarding Detection
 -- on devices supporting this feature.
 -- Reference:
--- Version: V1.5
+-- Version: V1.8
 -- History:
--- V1.0  2006-05-15 created by huanglina and xuqigang
--- V1.1  2014-01-20 modified by wangxingying
--- V1.2  2014-12-23 modified by wangxingying
--- V1.3  2016-03-12 modified by guobin
--- V1.4  2020-08-13 Update hh3cBfdGlobalObjects by xukele
--- V1.5  2021-03-18 Add hh3cBfdTrapBindObjects, and update hh3cBfdSessStateDown, hh3cBfdSessStateUp by xukele
+-- V1.0  2006-05-15 created by Huang Lina and Xu Qigang
+-- V1.1  2014-01-20 modified by Wang Xingying
+-- V1.2  2014-12-23 modified by Wang Xingying
+-- V1.3  2016-03-12 modified by Guo Bin
+-- V1.4  2020-08-13 Updated hh3cBfdGlobalObjects by Xu Kele
+-- V1.5  2021-03-18 Added hh3cBfdTrapBindObjects, and update hh3cBfdSessStateDown, hh3cBfdSessStateUp by Xu Kele
+-- V1.6  2021-10-16 Updated hh3cBfdTrapBindObjects, hh3cBfdSessStateDown, hh3cBfdSessStateUp by Xu Kele
+-- V1.7  2022-08-04 Updated hh3cBfdSessTable, hh3cBfdSessStateUp, hh3cBfdSessStateDown by Tang Aibo
+-- V1.8  2022-10-06 Updated hh3cBfdTrapBindObjects, hh3cBfdSessStateDown, and hh3cBfdSessStateUp by Zhou Xianwei
 -- ============================================================================
 HH3C-BFD-STD-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -27,7 +30,7 @@ IMPORTS
     TimeStamp,DisplayString
         FROM SNMPv2-TC
 
-    InterfaceIndex
+    InterfaceIndex, InterfaceIndexOrZero
         FROM IF-MIB
 
     InetAddress, InetAddressType, InetPortNumber
@@ -37,7 +40,7 @@ IMPORTS
         FROM HH3C-OID-MIB;
 
 hh3cBfdMIB MODULE-IDENTITY
-    LAST-UPDATED "202103181100Z"  -- 18 Mar 2021 11:00:00 Beijing time
+    LAST-UPDATED "202210061100Z"  -- 06 Oct 2022 11:00:00 Beijing time
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -50,9 +53,21 @@ hh3cBfdMIB MODULE-IDENTITY
         "Bidirectional Forwarding Management Information Base."
 
     -- Revision history.
+    REVISION "202210061100Z"  -- 06 Oct 2022 11:00:00 Beijing time
+    DESCRIPTION
+        "Updated hh3cBfdTrapBindObjects, hh3cBfdSessStateDown, and hh3cBfdSessStateUp."
+
+    REVISION "202208041100Z"  -- 04 Aug 2022 11:00:00 Beijing time
+    DESCRIPTION
+        "Updated hh3cBfdSessTable, hh3cBfdSessStateDown, hh3cBfdSessStateUp."
+
+    REVISION "202110161100Z"  -- 16 Oct 2021 11:00:00 Beijing time
+    DESCRIPTION
+        "Updated hh3cBfdTrapBindObjects, hh3cBfdSessStateDown, hh3cBfdSessStateUp."
+
     REVISION "202103181100Z"  -- 18 Mar 2021 11:00:00 Beijing time
     DESCRIPTION
-        "Add hh3cBfdTrapBindObjects, and modified the objects of hh3cBfdSessStateDown and hh3cBfdSessStateUp."
+        "Added hh3cBfdTrapBindObjects, and modified the objects of hh3cBfdSessStateDown and hh3cBfdSessStateUp."
 
     REVISION "202008131100Z"  -- 13 Aug 2020 11:00:00 Beijing time
     DESCRIPTION
@@ -68,7 +83,7 @@ hh3cBfdMIB MODULE-IDENTITY
 
     REVISION "200605161200Z"  -- 08 May 2006 12:00:00 Beijing time
     DESCRIPTION
-         "The first version. "
+         "The first version."
 
 ::= { hh3cCommon 72 }
 
@@ -87,7 +102,7 @@ BfdSessIndexTC ::= TEXTUAL-CONVENTION
     STATUS        current
     DESCRIPTION
         "An index used to uniquely identify BFD sessions."
-    SYNTAX Unsigned32 (1..4294967295)
+    SYNTAX Unsigned32 (0..4294967295)
 
 BfdInterval ::=   TEXTUAL-CONVENTION
     DISPLAY-HINT  "d"
@@ -242,7 +257,7 @@ hh3cBfdIfEntry OBJECT-TYPE
     INDEX { hh3cBfdIfIndex }
     ::= { hh3cBfdIfTable 1 }
 
-Hh3cBfdIfEntry ::= SEQUENCE {
+Hh3cBfdIfEntry ::= SEQUENCE{
         hh3cBfdIfIndex                      InterfaceIndex,
         hh3cBfdIfDesiredMinTxInterval       BfdInterval,
         hh3cBfdIfDesiredMinRxInterval       BfdInterval,
@@ -345,7 +360,7 @@ hh3cBfdSessEntry OBJECT-TYPE
 
 Hh3cBfdSessEntry ::= SEQUENCE {
         hh3cBfdSessIndex                    BfdSessIndexTC,
-        hh3cBfdSessIfIndex                  InterfaceIndex,
+        hh3cBfdSessIfIndex                  InterfaceIndexOrZero,
         hh3cBfdSessAppSupportId             BITS,
         hh3cBfdSessLocalDiscr               Unsigned32,
         hh3cBfdSessRemoteDiscr              Unsigned32,
@@ -371,12 +386,13 @@ hh3cBfdSessIndex OBJECT-TYPE
     ::= { hh3cBfdSessEntry 1 }
 
 hh3cBfdSessIfIndex  OBJECT-TYPE
-    SYNTAX        InterfaceIndex
+    SYNTAX        InterfaceIndexOrZero
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
         "This variable contains an interface's index under which the BFD
-         session runs."
+         session runs. If hh3cBfdSessIfIndex is equal to 0, it means that
+         the BFD session does not specify an interface."
     ::= { hh3cBfdSessEntry 2 }
 
 hh3cBfdSessAppSupportId OBJECT-TYPE
@@ -428,12 +444,11 @@ hh3cBfdSessDstPort OBJECT-TYPE
     ::= { hh3cBfdSessEntry 6 }
 
 hh3cBfdSessOperMode OBJECT-TYPE
-    SYNTAX   INTEGER {
+    SYNTAX   INTEGER{
                          asynchModeWOEchoFun(1),
                          demandModeWOEchoFunction(2),
                          asyncModeWEchoFun(3),
                          demandModeWEchoFunction(4)
-
     }
     MAX-ACCESS   read-only
     STATUS   current
@@ -803,6 +818,107 @@ hh3cBfdRemoteAddr OBJECT-TYPE
          associated with a specific interface."
     ::= { hh3cBfdTrapBindObjects 4 }
 
+hh3cBfdIfName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "It is the name of the binding interface in the BFD session."
+    ::= { hh3cBfdTrapBindObjects 5 }
+
+hh3cBfdSessType OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            static(1),
+                            dynamic(2)
+    }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "The type of the BFD session."
+    ::= { hh3cBfdTrapBindObjects 6 }
+
+hh3cBfdVrfIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "The index of the VPN interface."
+    ::= { hh3cBfdTrapBindObjects 7 }
+
+hh3cBfdDiscrAuto OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Describe whether the discriminator can be auto allocated.
+         It is set to true(1) when enabled and false(2) when not enabled"
+    DEFVAL { false }
+    ::= { hh3cBfdTrapBindObjects 8 }
+
+hh3cBfdSessVsiPeerAddr OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "It is the peer ip of VSI."
+    ::= { hh3cBfdTrapBindObjects 9 }
+
+hh3cBfdSessVsiName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "It is the name of VSI."
+    ::= { hh3cBfdTrapBindObjects 10 }
+
+hh3cBfdSessDefaultIp OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "BFD session use default multicast IP as the detect peer ip.
+        When set to true(1), the multicast address is not used as the peer
+        IP address, and when set to false(2), the multicast address is used
+        as the peer IP address"
+    ::= { hh3cBfdTrapBindObjects 11 }
+
+hh3cBfdSessNextHop OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "It is the next hop of the BFD session."
+    ::= { hh3cBfdTrapBindObjects 12 }
+
+hh3cBfdSessPWSecondaryFlag OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            masterPW(1),
+                            secondaryPW(2),
+                            noPW(3)
+    }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "The role of the PW bound with BFD session."
+    ::= { hh3cBfdTrapBindObjects 13 }
+
+hh3cBfdSessVcId OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "It is the ID of VC."
+    ::= { hh3cBfdTrapBindObjects 14 }
+
+hh3cBfdLocalDiscr OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "This variable defines the local discriminator that uniquely identifies a BFD
+         session."
+    ::= { hh3cBfdTrapBindObjects 15 }
+
 hh3cBfdSessStateChange NOTIFICATION-TYPE
     OBJECTS       { hh3cBfdSessIfIndex,
                     hh3cBfdSessIndex,
@@ -850,7 +966,19 @@ hh3cBfdSessStateUp NOTIFICATION-TYPE
                     hh3cBfdSessName,
                     hh3cBfdVpnInstanceName,
                     hh3cBfdLocalAddr,
-                    hh3cBfdRemoteAddr
+                    hh3cBfdRemoteAddr,
+                    hh3cBfdIfName,
+                    hh3cBfdSessLocalDiag,
+                    hh3cBfdSessType,
+                    hh3cBfdVrfIndex,
+                    hh3cBfdDiscrAuto,
+                    hh3cBfdSessVsiPeerAddr,
+                    hh3cBfdSessVsiName,
+                    hh3cBfdSessDefaultIp,
+                    hh3cBfdSessNextHop,
+                    hh3cBfdSessPWSecondaryFlag,
+                    hh3cBfdSessVcId,
+                    hh3cBfdLocalDiscr
     }
     STATUS        current
     DESCRIPTION
@@ -876,6 +1004,31 @@ hh3cBfdSessStateUp NOTIFICATION-TYPE
 
          The hh3cBfdRemoteAddr contains an IP address of the remote interface
          from which the BFD packets is transmitted.
+
+         The hh3cBfdIfName is the name of the binding interface in the BFD session.
+
+         The hh3cBfdSessLocalDiag is the BFD diagnostic code for the BFD session was down with the
+         neighbor.
+
+         The hh3cBfdSessType is the type of the BFD session.
+
+         The hh3cBfdVrfIndex is the index of the VPN interface.
+
+         The hh3cBfdDiscrAuto describes whether the discriminator can be auto allocated.
+
+         The hh3cBfdSessVsiPeerAddr is the peer ip of VSI.
+
+         The hh3cBfdSessVsiName is the name of VSI.
+
+         The hh3cBfdSessDefaultIp describes whether BFD session use default multicast IP as the detect peer ip.
+
+         The hh3cBfdSessNextHop is the next hop of the BFD session for LSP.
+
+         The hh3cBfdSessPWSecondaryFlag is the role of the PW bound with BFD session.
+
+         The hh3cBfdSessVcId is the ID of VC.
+
+         The hh3cBfdLocalDiscr is the local discriminator of the BFD session.
          "
     ::= { hh3cBfdNotifications 3 }
 
@@ -886,7 +1039,19 @@ hh3cBfdSessStateDown NOTIFICATION-TYPE
                     hh3cBfdSessName,
                     hh3cBfdVpnInstanceName,
                     hh3cBfdLocalAddr,
-                    hh3cBfdRemoteAddr
+                    hh3cBfdRemoteAddr,
+                    hh3cBfdIfName,
+                    hh3cBfdSessLocalDiag,
+                    hh3cBfdSessType,
+                    hh3cBfdVrfIndex,
+                    hh3cBfdDiscrAuto,
+                    hh3cBfdSessVsiPeerAddr,
+                    hh3cBfdSessVsiName,
+                    hh3cBfdSessDefaultIp,
+                    hh3cBfdSessNextHop,
+                    hh3cBfdSessPWSecondaryFlag,
+                    hh3cBfdSessVcId,
+                    hh3cBfdLocalDiscr
     }
     STATUS        current
     DESCRIPTION
@@ -913,6 +1078,31 @@ hh3cBfdSessStateDown NOTIFICATION-TYPE
 
          The hh3cBfdRemoteAddr contains an IP address of the remote interface
          from which the BFD packets is transmitted.
+
+         The hh3cBfdIfName is the name of the binding interface in the BFD session.
+
+         The hh3cBfdSessLocalDiag is the BFD diagnostic code for the BFD session was down with the
+         neighbor.
+
+         The hh3cBfdSessType is the type of the BFD session.
+
+         The hh3cBfdVrfIndex is the index of the VPN interface.
+
+         The hh3cBfdDiscrAuto describes whether the discriminator can be auto allocated.
+
+         The hh3cBfdSessVsiPeerAddr is the peer ip of VSI.
+
+         The hh3cBfdSessVsiName is the name of VSI.
+
+         The hh3cBfdSessDefaultIp describes whether BFD session use default multicast IP as the detect peer ip.
+
+         The hh3cBfdSessNextHop is the next hop of the BFD session for LSP.
+
+         The hh3cBfdSessPWSecondaryFlag is the role of the PW bound with BFD session.
+
+         The hh3cBfdSessVcId is the ID of VC.
+
+         The hh3cBfdLocalDiscr is the local discriminator of the BFD session.
          "
     ::= { hh3cBfdNotifications 4 }
 

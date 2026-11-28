@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Observers\ProcessorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Interfaces\Models\HasMetrics;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Rewrite;
 
 /**
  * @property int $hrDeviceIndex
@@ -19,7 +22,7 @@ use LibreNMS\Util\Number;
  * @property int|null $processor_perc_warn_custom
  */
 #[ObservedBy([ProcessorObserver::class])]
-class Processor extends DeviceRelatedModel implements Keyable
+class Processor extends DeviceRelatedModel implements HasMetrics, Keyable
 {
     use HasFactory;
 
@@ -111,13 +114,22 @@ class Processor extends DeviceRelatedModel implements Keyable
      */
     public function getFormattedDescription(): string
     {
-        $descr = str_replace(['GenuineIntel:', 'AuthenticAMD:', 'Intel(R)', 'CPU', '(R)', '(tm)'], '', $this->processor_descr);
-
-        return trim(preg_replace('/ {2,}/', ' ', $descr));
+        return Rewrite::processorDescr($this->processor_descr);
     }
 
     public function getCompositeKey(): string
     {
         return $this->processor_type . '_' . $this->processor_index;
+    }
+
+    /**
+     * Identity used when storing and reading a measurement of this processor
+     */
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        return new MetricIdentity(
+            $measurement,
+            ['hostname' => (string) $this->device?->hostname, 'type' => $this->processor_type, 'index' => $this->processor_index],
+        );
     }
 }

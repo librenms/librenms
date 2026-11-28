@@ -54,7 +54,7 @@ class AlertUtil
      * Map of alert-query id columns to registered morph aliases (see AppServiceProvider).
      * Used to resolve the entity a problem is about (Port, Sensor, ...).
      */
-    private const ENTITY_COLUMN_MAP = [
+    private const array ENTITY_COLUMN_MAP = [
         'port_id' => 'interface',
         'sensor_id' => 'sensor',
         'bgpPeer_id' => 'bgppeer',

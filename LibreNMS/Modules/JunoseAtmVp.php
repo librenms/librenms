@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -104,10 +104,11 @@ class JunoseAtmVp implements Module
     /**
      * @inheritDoc
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function poll(OS $os, WriteInterface $datastore): void
     {
+        $device = $os->getDevice();
         // port_id is the owner key the ports are matched back by, it must be selected
-        $vp_rows = $os->getDevice()->juniAtmVps()->with('port:port_id,ifIndex')->get();
+        $vp_rows = $device->juniAtmVps()->with('port:port_id,ifIndex')->get();
 
         if ($vp_rows->isEmpty()) {
             return;
@@ -146,8 +147,6 @@ class JunoseAtmVp implements Module
 
             $t_vp = $vp_cache[$oid] ?? [];
 
-            $rrd_name = ['vp', $ifIndex, $vp_id];
-
             $fields = [
                 'incells' => $t_vp['juniAtmVpStatsInCells'] ?? null,
                 'outcells' => $t_vp['juniAtmVpStatsOutCells'] ?? null,
@@ -159,8 +158,9 @@ class JunoseAtmVp implements Module
                 'outpacketerrors' => $t_vp['juniAtmVpStatsOutPacketErrors'] ?? null,
             ];
 
-            $tags = ['ifIndex' => $ifIndex, 'vp_id' => $vp_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
-            $datastore->put($os->getDeviceArray(), 'atm-vp', $tags, $fields);
+            $vp->port?->setRelation('device', $device);
+            $metric = $vp->metricIdentity('atm_vp');
+            $datastore->write($metric->measurement, $fields, $metric->tags, ['metric' => $metric, 'rrd_def' => $rrd_def]);
         }
         $progress->end();
     }

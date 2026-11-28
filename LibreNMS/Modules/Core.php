@@ -70,11 +70,20 @@ class Core implements Module
 
     public function discover(OS $os): void
     {
-        $snmpdata = SnmpQuery::numeric()->get([
+        $response = SnmpQuery::numeric()->get([
             'SNMPv2-MIB::sysObjectID.0',
             'SNMPv2-MIB::sysDescr.0',
             'SNMPv2-MIB::sysName.0',
-        ])->values();
+        ]);
+
+        if ($response->hasConnectionError()) {
+            // device stopped answering after shouldDiscover(), keep what we have like poll() does
+            Log::warning('Core discovery: SNMP connection error, keeping os ' . $os->getDevice()->os);
+
+            return;
+        }
+
+        $snmpdata = $response->values();
 
         $snmp_engine = SnmpQuery::get('SNMP-FRAMEWORK-MIB::snmpEngineID.0')->value();
 
