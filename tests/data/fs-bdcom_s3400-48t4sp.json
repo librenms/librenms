@@ -10680,7 +10680,7 @@
                 {
                     "context_name": "",
                     "inetCidrRouteIfIndex": 194,
-                    "inetCidrRouteType": 4,
+                    "inetCidrRouteType": 3,
                     "inetCidrRouteProto": 3,
                     "inetCidrRouteNextHopAS": 0,
                     "inetCidrRouteMetric1": 1,
