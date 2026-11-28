@@ -20,6 +20,10 @@
             <th data-column-id="ifOutErrors_delta" data-searchable="false" data-visible="{{ $show_errors }}" data-css-class="red">Errors Out Rate</th>
             <th data-column-id="ifInErrors" data-searchable="false" data-visible="{{ $show_errors }}" data-css-class="red">Errors In</th>
             <th data-column-id="ifOutErrors" data-searchable="false" data-visible="{{ $show_errors }}" data-css-class="red">Errors Out</th>
+            <th data-column-id="ifInDiscards_delta" data-searchable="false" data-visible="{{ $show_discards }}" data-css-class="red">Discards In Rate</th>
+            <th data-column-id="ifOutDiscards_delta" data-searchable="false" data-visible="{{ $show_discards }}" data-css-class="red">Discards Out Rate</th>
+            <th data-column-id="ifInDiscards" data-searchable="false" data-visible="{{ $show_discards }}" data-css-class="red">Discards In</th>
+            <th data-column-id="ifOutDiscards" data-searchable="false" data-visible="{{ $show_discards }}" data-css-class="red">Discards Out</th>
             <th data-column-id="ifType">Media</th>
             <th data-column-id="ifAlias">Description</th>
             <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
@@ -105,9 +109,20 @@
         $(".actionBar").append($wrapper);
     }
 
+    // the errors/discards columns are chosen server side, reload the page when those filters change
+    function counterFilters(filters) {
+        const isSet = (key) => ['1', 'true', 'on', 'yes'].includes(String(filters?.[key]?.eq));
+        return isSet('errors') + ':' + isSet('discards');
+    }
+    const initialCounterFilters = counterFilters(filter);
+
     $(window).on('filter:apply', function (event) {
         if (event.originalEvent.detail.name === 'ports') {
             filter = event.originalEvent.detail.filters;
+            if (counterFilters(filter) !== initialCounterFilters) {
+                window.location.reload(); // the filter bar already put the new filters in the url
+                return;
+            }
             grid.bootgrid('reload');
         }
     });

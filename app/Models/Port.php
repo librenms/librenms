@@ -57,6 +57,7 @@ class Port extends DeviceRelatedModel
         'state',
         'search',
         'errors',
+        'discards',
         'groups.id',
         'device.groups.id',
         'device.location_id',
@@ -380,6 +381,21 @@ class Port extends DeviceRelatedModel
 
             $query->where($this->qualifyColumn('ifInErrors_delta'), $operator, 0, $boolean)
                 ->where($this->qualifyColumn('ifOutErrors_delta'), $operator, 0, $boolean);
+        });
+    }
+
+    public function filterDiscards(Builder $query, mixed $value, array $config): void
+    {
+        $value
+            ? $query->whereHas('statistics', $this->discardsConstraint(...))
+            : $query->whereDoesntHave('statistics', $this->discardsConstraint(...));
+    }
+
+    private function discardsConstraint(Builder $query): void
+    {
+        $query->where(function (Builder $query): void {
+            $query->where('ifInDiscards_delta', '>', 0)
+                ->orWhere('ifOutDiscards_delta', '>', 0);
         });
     }
 
