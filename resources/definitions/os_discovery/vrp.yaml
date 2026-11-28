@@ -251,100 +251,15 @@ modules:
                             oid: HUAWEI-WAN-MIB::hw3GIMEI
                             op: '='
                             value: ''
-                -
-                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
-                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
-                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{{ $index }}'
-                    descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
-                    entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'ports'
-                    group: transceiver
-                    index: 'rx-{{ $index }}'
-                    user_func: 'uw_to_dbm'
-                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowWarnThreshold
-                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighWarnThreshold
-                    skip_values:
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
-                            op: '<='
-                            value: 0
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
-                            op: '='
-                            value: 12
-                -
-                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
-                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
-                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{{ $index }}'
-                    descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
-                    entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'ports'
-                    group: transceiver
-                    index: 'rx-{{ $index }}'
-                    divisor: 100
-                    skip_values:
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
-                            op: '>'
-                            value: 0
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
-                            op: '='
-                            value: 12
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
-                            op: 'exists'
-                            value: true
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
-                            op: '='
-                            value: 0
-                -
-                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
-                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
-                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{{ $index }}'
-                    descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
-                    entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'ports'
-                    group: transceiver
-                    index: 'tx-{{ $index }}'
-                    user_func: 'uw_to_dbm'
-                    skip_values:
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
-                            op: '<='
-                            value: 0
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
-                            op: '='
-                            value: 12
-                -
-                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
-                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
-                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{{ $index }}'
-                    descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
-                    entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'ports'
-                    group: transceiver
-                    index: 'tx-{{ $index }}'
-                    divisor: 100
-                    skip_values:
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
-                            op: '>'
-                            value: 0
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
-                            op: '='
-                            value: 12
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
-                            op: 'exists'
-                            value: true
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
-                            op: '='
-                            value: 0
+                # Optical Rx/Tx power. Three definitions per direction share the same index, so
+                # exactly one of them must match a port:
+                #   1. per-lane power (0.01 dBm), used whenever the port has a lane reading;
+                #   2. total power in uW, for ports without a lane reading;
+                #   3. total power in 0.01 dBm, for ports without a lane reading.
+                # 2 and 3 skip ports whose lane reading has a number, so they never overwrite 1; an
+                # empty lane reading falls back to them. Thresholds are always 0.01 dBm, so 2 has
+                # none: uw_to_dbm would also be applied to them.
+                # BiasCurrent <= 0 means an empty cage or a laser that is off.
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
@@ -353,19 +268,65 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
-                    index: 'lane-rx-{{ $index }}'
+                    index: 'rx-{{ $index }}'
                     divisor: 100
-                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighThreshold
-                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowThreshold
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighWarnThreshold
                     skip_values:
                         -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
-                            op: '>'
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '<='
                             value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
                             op: '='
                             value: 12
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'rx-{{ $index }}'
+                    user_func: 'uw_to_dbm'
+                    skip_value_lt: 1
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
+                            op: 'regex'
+                            value: '/\d/'
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'rx-{{ $index }}'
+                    divisor: 100
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighWarnThreshold
+                    skip_value_gt: 0
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '<='
+                            value: 0
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
+                            op: 'regex'
+                            value: '/\d/'
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
@@ -374,19 +335,65 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
-                    index: 'lane-tx-{{ $index }}'
-                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighThreshold
-                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowThreshold
+                    index: 'tx-{{ $index }}'
+                    divisor: 100
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighWarnThreshold
                     skip_values:
                         -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
-                            op: '>'
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '<='
                             value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
                             op: '='
                             value: 12
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'tx-{{ $index }}'
+                    user_func: 'uw_to_dbm'
+                    skip_value_lt: 1
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
+                            op: 'regex'
+                            value: '/\d/'
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'tx-{{ $index }}'
                     divisor: 100
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighWarnThreshold
+                    skip_value_gt: 0
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '<='
+                            value: 0
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
+                            op: 'regex'
+                            value: '/\d/'
         voltage:
             data:
                 -
