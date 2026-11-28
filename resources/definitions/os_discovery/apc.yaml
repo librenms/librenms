@@ -1084,6 +1084,29 @@ modules:
                     descr: 'Output - Phase {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
+                -
+                    oid: PowerNet-MIB::ats5gSwitchSourceAVoltage
+                    value: PowerNet-MIB::ats5gSwitchSourceAVoltage
+                    num_oid: '.1.3.6.1.4.1.318.1.1.33.3.1.19.{{ $index }}'
+                    descr: Input Feed A
+                    index: '3.3.1.3.1'
+                -
+                    oid: PowerNet-MIB::ats5gSwitchSourceBVoltage
+                    value: PowerNet-MIB::ats5gSwitchSourceBVoltage
+                    num_oid: '.1.3.6.1.4.1.318.1.1.33.3.1.20.{{ $index }}'
+                    descr: Input Feed B
+                    index: '3.3.1.3.2'
+                -
+                    oid: PowerNet-MIB::atsInputVoltage
+                    value: PowerNet-MIB::atsInputVoltage
+                    num_oid: '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.{{ $index }}'
+                    descr: 'Input Feed {{ $subindex0 }}'
+                    index: '3.3.1.3.{{ $subindex0 }}'
+                    skip_values:
+                        -
+                            oid: 'PowerNet-MIB::ats5gSwitchSourceAVoltage.1'
+                            op: exists
+                            value: true
         current:
             data:
                 # rPDULoadStatusLoad and rPDU2PhaseStatusCurrent at OID .1.3.6.1.4.1.318.1.1.26.6.3.1.5 is done in the includes/discovery/sensors/current/apc.inc.php:19 file
@@ -1197,6 +1220,29 @@ modules:
                     descr: 'System Output'
                     divisor: 10
                     skip_values: -1
+                -
+                    oid: PowerNet-MIB::ats5gSwitchSourceAFrequency
+                    value: PowerNet-MIB::ats5gSwitchSourceAFrequency
+                    num_oid: '.1.3.6.1.4.1.318.1.1.33.3.1.24.{{ $index }}'
+                    descr: Input Feed A
+                    index: '3.2.1.4.1'
+                -
+                    oid: PowerNet-MIB::ats5gSwitchSourceBFrequency
+                    value: PowerNet-MIB::ats5gSwitchSourceBFrequency
+                    num_oid: '.1.3.6.1.4.1.318.1.1.33.3.1.25.{{ $index }}'
+                    descr: Input Feed B
+                    index: '3.2.1.4.2'
+                -
+                    oid: PowerNet-MIB::atsInputFrequency
+                    value: PowerNet-MIB::atsInputFrequency
+                    num_oid: '.1.3.6.1.4.1.318.1.1.8.5.3.2.1.4.{{ $index }}'
+                    descr: 'Input Feed {{ $index }}'
+                    index: '3.2.1.4.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: 'PowerNet-MIB::ats5gSwitchSourceAFrequency.1'
+                            op: exists
+                            value: true
         power:
             data:
                 -
