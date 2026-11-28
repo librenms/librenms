@@ -1,0 +1,338 @@
+modules:
+    os:
+        hardware: UPS-MIB::upsIdentModel.0
+        serial: TIC-RMTI5-4400-MIB::upsIdentSerialNumber.0
+        version: UPS-MIB::upsIdentAgentSoftwareVersion.0
+        version_regex: '/RemotEye5 v?(?<version>\S+)/'
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputLLVoltageAB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.1.{{ $index }}'
+                    index: upsInputLLVoltageAB
+                    descr: 'Input A-B'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputLLVoltageBC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.2.{{ $index }}'
+                    index: upsInputLLVoltageBC
+                    descr: 'Input B-C'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputLLVoltageCA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.3.{{ $index }}'
+                    index: upsInputLLVoltageCA
+                    descr: 'Input C-A'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputLNVoltageAN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.4.{{ $index }}'
+                    index: upsInputLNVoltageAN
+                    descr: 'Input A-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputLNVoltageBN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.5.{{ $index }}'
+                    index: upsInputLNVoltageBN
+                    descr: 'Input B-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputLNVoltageCN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.6.{{ $index }}'
+                    index: upsInputLNVoltageCN
+                    descr: 'Input C-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputLLVoltageAB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.2.{{ $index }}'
+                    index: upsOutputLLVoltageAB
+                    descr: 'Output A-B'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputLLVoltageBC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.3.{{ $index }}'
+                    index: upsOutputLLVoltageBC
+                    descr: 'Output B-C'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputLLVoltageCA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.4.{{ $index }}'
+                    index: upsOutputLLVoltageCA
+                    descr: 'Output C-A'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputLNVoltageAN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.5.{{ $index }}'
+                    index: upsOutputLNVoltageAN
+                    descr: 'Output A-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputLNVoltageBN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.6.{{ $index }}'
+                    index: upsOutputLNVoltageBN
+                    descr: 'Output B-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputLNVoltageCN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.7.{{ $index }}'
+                    index: upsOutputLNVoltageCN
+                    descr: 'Output C-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassLLVoltageAB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.1.{{ $index }}'
+                    index: upsBypassLLVoltageAB
+                    descr: 'Bypass A-B'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassLLVoltageBC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.2.{{ $index }}'
+                    index: upsBypassLLVoltageBC
+                    descr: 'Bypass B-C'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassLLVoltageCA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.3.{{ $index }}'
+                    index: upsBypassLLVoltageCA
+                    descr: 'Bypass C-A'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassLNVoltageAN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.4.{{ $index }}'
+                    index: upsBypassLNVoltageAN
+                    descr: 'Bypass A-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassLNVoltageBN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.5.{{ $index }}'
+                    index: upsBypassLNVoltageBN
+                    descr: 'Bypass B-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassLNVoltageCN
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.6.{{ $index }}'
+                    index: upsBypassLNVoltageCN
+                    descr: 'Bypass C-N'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsDCBUSTotalVoltage
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.5.1.{{ $index }}'
+                    index: upsDCBUSTotalVoltage
+                    descr: 'DC Bus Total'
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsDCBusPositiveVoltage
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.5.2.{{ $index }}'
+                    index: upsDCBusPositiveVoltage
+                    descr: 'DC Bus Positive'
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsDCBusNegativeVoltage
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.5.3.{{ $index }}'
+                    index: upsDCBusNegativeVoltage
+                    descr: 'DC Bus Negative'
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.7.2.6.{{ $index }}'
+                    index: upsBatteryVoltage
+                    descr: 'Battery'
+        current:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputCurrentPhaseA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.10.{{ $index }}'
+                    index: upsInputCurrentPhaseA
+                    descr: 'Input Phase A'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputCurrentPhaseB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.11.{{ $index }}'
+                    index: upsInputCurrentPhaseB
+                    descr: 'Input Phase B'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputCurrentPhaseC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.12.{{ $index }}'
+                    index: upsInputCurrentPhaseC
+                    descr: 'Input Phase C'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputCurrentPhaseA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.11.{{ $index }}'
+                    index: upsOutputCurrentPhaseA
+                    descr: 'Output Phase A'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputCurrentPhaseB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.12.{{ $index }}'
+                    index: upsOutputCurrentPhaseB
+                    descr: 'Output Phase B'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputCurrentPhaseC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.13.{{ $index }}'
+                    index: upsOutputCurrentPhaseC
+                    descr: 'Output Phase C'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassCurrentPhaseA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.10.{{ $index }}'
+                    index: upsBypassCurrentPhaseA
+                    descr: 'Bypass Phase A'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassCurrentPhaseB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.11.{{ $index }}'
+                    index: upsBypassCurrentPhaseB
+                    descr: 'Bypass Phase B'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassCurrentPhaseC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.12.{{ $index }}'
+                    index: upsBypassCurrentPhaseC
+                    descr: 'Bypass Phase C'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBatteryCurrent
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.7.2.8.{{ $index }}'
+                    index: upsBatteryCurrent
+                    descr: 'Battery'
+        frequency:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsInputFrequency
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.2.2.16.{{ $index }}'
+                    index: upsInputFrequency
+                    descr: 'Input'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.17.{{ $index }}'
+                    index: upsOutputFrequency
+                    descr: 'Output'
+                    divisor: 10
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBypassFrequency
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.4.2.13.{{ $index }}'
+                    index: upsBypassFrequency
+                    descr: 'Bypass'
+                    divisor: 10
+        power:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputTotalActivePower
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.18.{{ $index }}'
+                    index: upsOutputTotalActivePower
+                    descr: 'Output Active Power'
+                    multiplier: 100
+        load:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputTotalActivePowerPercent
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.19.{{ $index }}'
+                    index: upsOutputTotalActivePowerPercent
+                    descr: 'Output Active Power'
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputCurrentPercentPhaseA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.14.{{ $index }}'
+                    index: upsOutputCurrentPercentPhaseA
+                    descr: 'Output Phase A'
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputCurrentPercentPhaseB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.15.{{ $index }}'
+                    index: upsOutputCurrentPercentPhaseB
+                    descr: 'Output Phase B'
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputCurrentPercentPhaseC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.16.{{ $index }}'
+                    index: upsOutputCurrentPercentPhaseC
+                    descr: 'Output Phase C'
+        power_factor:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputPowerFactor
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.20.{{ $index }}'
+                    index: upsOutputPowerFactor
+                    descr: 'Output'
+                    divisor: 100
+                    low_limit: -1.01
+                    high_limit: 1.01
+        charge:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBatteryCapacity
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.7.2.7.{{ $index }}'
+                    index: upsBatteryCapacity
+                    descr: 'Battery Charge'
+        runtime:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBatteryEstimatedRuntime
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.7.2.4.{{ $index }}'
+                    index: upsBatteryEstimatedRuntime
+                    descr: 'Estimated Runtime'
+        count:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsAlarmsPresent
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.8.1.{{ $index }}'
+                    index: upsAlarmsPresent
+                    descr: 'Active Alarms'
+        state:
+            data:
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.7.2.1.{{ $index }}'
+                    index: upsBatteryStatus
+                    descr: 'Battery Status'
+                    state_name: upsBatteryStatus
+                    states:
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: batteryNormal, generic: 0 }
+                        - { value: 3, descr: batteryLow, generic: 1 }
+                        - { value: 4, descr: batteryDepleted, generic: 2 }
+                        - { value: 5, descr: batteryDischarging, generic: 1 }
+                        - { value: 6, descr: batteryTestFailure, generic: 2 }
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsOutputSource
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.3.2.1.{{ $index }}'
+                    index: upsOutputSource
+                    descr: 'Output Source'
+                    state_name: upsOutputSource
+                    states:
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: shutdown, generic: 2 }
+                        - { value: 3, descr: normal, generic: 0 }
+                        - { value: 4, descr: bypass, generic: 1 }
+                        - { value: 5, descr: battery, generic: 1 }
+                        - { value: 6, descr: batteryTest, generic: 1 }
+                        - { value: 7, descr: preCharge, generic: 1 }
+                        - { value: 8, descr: gateCheck, generic: 1 }
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsTestBatteryResult
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.7.3.2.{{ $index }}'
+                    index: upsTestBatteryResult
+                    descr: 'Battery Test Result'
+                    state_name: upsTestBatteryResult
+                    states:
+                        - { value: 1, descr: pass, generic: 0 }
+                        - { value: 2, descr: failed, generic: 2 }
+                        - { value: 3, descr: inProgress, generic: 1 }
+                        - { value: 4, descr: none, generic: 3 }
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsAlarmFault
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.8.3.1.{{ $index }}'
+                    index: upsAlarmFault
+                    descr: 'UPS Fault'
+                    state_name: upsAlarmFault
+                    states:
+                        - { value: 0, descr: Normal, generic: 0 }
+                        - { value: 1, descr: Alarm, generic: 2 }
+                -
+                    oid: TIC-RMTI5-4400-MIB::upsAlarmOutputOverload
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.6.6.8.3.51.{{ $index }}'
+                    index: upsAlarmOutputOverload
+                    descr: 'Output Overload'
+                    state_name: upsAlarmOutputOverload
+                    states:
+                        - { value: 0, descr: Normal, generic: 0 }
+                        - { value: 1, descr: Alarm, generic: 2 }
