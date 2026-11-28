@@ -29,9 +29,10 @@ REDIS_SENTINEL_SERVICE=mymaster
 REDIS_PASSWORD=your_redis_password
 
 # These values tell the web app to use Sentinel as the Redis backend - do not change
+CACHE_STORE=redis
 REDIS_BROADCAST_CONNECTION=sentinel_cache
 REDIS_CACHE_CONNECTION=sentinel_cache
-REDIS_LOCK_CACHE_CONNECTION=sentinel_cache
+REDIS_CACHE_LOCK_CONNECTION=sentinel_cache
 SESSION_DRIVER=redis
 SESSION_CONNECTION=sentinel_session
 ```
@@ -75,3 +76,8 @@ For more information about the distributed polling configuration, read
 To test your Redis Sentinel setup with LibreNMS, connect to the Redis
 Sentinel cluster with `redis-cli`. Then run the `MONITOR` command. This
 command shows the commands of the Redis cluster.
+
+`./validate.php` checks the Redis connection that LibreNMS uses for locks,
+and shows its name, for example `Redis is functional (connection: sentinel_cache)`.
+If it reports `connection: default` while you are using Sentinel,
+check that `REDIS_CACHE_LOCK_CONNECTION` is set as shown above.
