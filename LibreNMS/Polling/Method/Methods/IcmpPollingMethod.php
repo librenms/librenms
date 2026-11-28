@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Polling\Method\Methods;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Icmp\Fping;
@@ -25,6 +26,11 @@ final class IcmpPollingMethod extends PollingMethod
     public function defaultAffectsAvailability(): bool
     {
         return true;
+    }
+
+    public function defaultCreationInput(): array
+    {
+        return ['active' => (bool) LibrenmsConfig::get('icmp_check', true)];
     }
 
     /**

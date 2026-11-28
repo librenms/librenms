@@ -64,7 +64,7 @@ class AddDeviceController
         ];
     }
 
-    public function index(Request $request): View
+    public function index(Request $request, BuildDefaultPollingMethods $buildMethods): View
     {
         $this->authorize('create', Device::class);
 
@@ -91,9 +91,10 @@ class AddDeviceController
         $defaultPollerGroup = LibrenmsConfig::get('default_poller_group', 0);
         $pollerGroups = PollerGroup::orderBy('group_name')->get();
 
-        $defaultActiveMethods = LibrenmsConfig::get('icmp_check', true)
-            ? [PollingMethodType::Icmp->value, PollingMethodType::Snmp->value]
-            : [PollingMethodType::Snmp->value];
+        $defaultTypes = $buildMethods->execute(new Device)
+            ->map(fn (DevicePollingMethod $method): string => $method->method_type->value)
+            ->all();
+        $defaultActiveMethods = array_values(array_intersect(array_column($availableMethods, 'type'), $defaultTypes));
         $oldActiveMethods = old('active_methods', $defaultActiveMethods);
         $defaultDisplayTemplate = LibrenmsConfig::get('device_display_default', '{{ $hostname }}');
 

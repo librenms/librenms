@@ -157,6 +157,24 @@ abstract class PollingMethod
     abstract public function defaultAffectsAvailability(): bool;
 
     /**
+     * Input for adding this method to a new device by default, or null to omit it.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function defaultCreationInput(): ?array
+    {
+        return null;
+    }
+
+    /**
+     * Default discovery order; methods with the same order follow the enum order.
+     */
+    public function defaultCreationOrder(): int
+    {
+        return 0;
+    }
+
+    /**
      * The value of each setting when it is not set, keyed like the definition fields.
      *
      * @return array<string, mixed>

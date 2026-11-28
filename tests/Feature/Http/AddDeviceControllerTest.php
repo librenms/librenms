@@ -19,6 +19,7 @@ use LibreNMS\Enum\SecretType;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Permission;
 
 final class AddDeviceControllerTest extends DBTestCase
@@ -87,14 +88,49 @@ final class AddDeviceControllerTest extends DBTestCase
             ->assertViewHas('add_device_config', fn (array $config): bool => $config['hostname'] === 'corrected.example.test');
     }
 
-    public function testIndexDefaultMethodsFollowIcmpCheck(): void
+    /**
+     * @param  list<string>  $expected
+     */
+    #[DataProvider('defaultMethodsProvider')]
+    public function testIndexDefaultMethodsFollowConfiguration(bool $icmp, int $mtu, array $expected): void
     {
-        $this->actingAs($this->admin)->get(route('device.add'))
-            ->assertViewHas('oldActiveMethods', [PollingMethodType::Icmp->value, PollingMethodType::Snmp->value]);
+        LibrenmsConfig::set('icmp_check', $icmp);
+        LibrenmsConfig::set('mtu_options.bytes', $mtu);
 
-        LibrenmsConfig::set('icmp_check', false);
         $this->actingAs($this->admin)->get(route('device.add'))
-            ->assertViewHas('oldActiveMethods', [PollingMethodType::Snmp->value]);
+            ->assertOk()
+            ->assertViewHas('oldActiveMethods', $expected)
+            ->assertViewHas('add_device_config', fn (array $config): bool => $config['active_methods'] === $expected
+                && $config['active_tab'] === PollingMethodType::Snmp->value);
+    }
+
+    /**
+     * @return array<string, array{bool, int, list<string>}>
+     */
+    public static function defaultMethodsProvider(): array
+    {
+        return [
+            'icmp enabled, mtu disabled' => [true, 0, ['icmp', 'snmp']],
+            'icmp enabled, mtu positive' => [true, 1500, ['icmp', 'mtu', 'snmp']],
+            'icmp enabled, mtu negative' => [true, -1, ['icmp', 'snmp']],
+            'icmp disabled, mtu positive' => [false, 1500, ['snmp']],
+            'icmp disabled, mtu disabled' => [false, 0, ['snmp']],
+        ];
+    }
+
+    public function testIndexRestoresPreviouslySelectedMethods(): void
+    {
+        LibrenmsConfig::set('icmp_check', true);
+        LibrenmsConfig::set('mtu_options.bytes', 1500);
+        $activeMethods = ['unix-agent', 'icmp'];
+
+        $this->actingAs($this->admin)
+            ->withSession(['_old_input' => ['active_methods' => $activeMethods, 'active_tab' => 'icmp']])
+            ->get(route('device.add'))
+            ->assertOk()
+            ->assertViewHas('oldActiveMethods', $activeMethods)
+            ->assertViewHas('add_device_config', fn (array $config): bool => $config['active_methods'] === $activeMethods
+                && $config['active_tab'] === 'icmp');
     }
 
     public function testStoreWithoutCheckingSavesDeviceAndSettings(): void

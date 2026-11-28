@@ -6,6 +6,7 @@ return [
         'snmp' => 'SNMP',
         'icmp' => 'ICMP',
         'ipmi' => 'IPMI',
+        'mtu' => 'MTU',
         'proxmox-api' => 'Proxmox API',
         'unix-agent' => 'Unix Agent',
         'unknown' => 'Unknown',
@@ -20,6 +21,11 @@ return [
             'ciphersuite' => 'Cipher Suite',
             'timeout' => 'Timeout',
             'type' => 'Interface',
+        ],
+        'mtu' => [
+            'fragmentation' => 'Packet Fragmentation',
+            'ip_version' => 'IP Version',
+            'packet_size' => 'Packet Size',
         ],
         'proxmox-api' => [
             'hostname' => 'Hostname',

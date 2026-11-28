@@ -10,6 +10,7 @@ enum PollingMethodType: string
 
     case Icmp = 'icmp';
     case Ipmi = 'ipmi';
+    case Mtu = 'mtu';
     case ProxmoxApi = 'proxmox-api';
     case Snmp = 'snmp';
     case UnixAgent = 'unix-agent';

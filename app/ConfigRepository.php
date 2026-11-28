@@ -34,6 +34,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Enum\MtuFragOption;
 use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Debug;
 use Log;
@@ -87,7 +88,15 @@ class ConfigRepository
      */
     public function getDefinitions(): array
     {
-        return json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/config_definitions.json'), true)['config'];
+        $definitions = json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/config_definitions.json'), true)['config'];
+        $options = $definitions['mtu_options.fragmentation']['options'];
+        $definitions['mtu_options.fragmentation']['options'] = array_filter(
+            $options,
+            fn ($label, $value) => MtuFragOption::from($value)->isSupported(),
+            ARRAY_FILTER_USE_BOTH
+        );
+
+        return $definitions;
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace App\Actions\Device;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
@@ -59,10 +58,20 @@ readonly class BuildDefaultPollingMethods
     {
         $pollingMethods = collect();
 
-        $methodsData = $input['methods'] ?? [
-            'icmp' => ['active' => (bool) LibrenmsConfig::get('icmp_check', true)],
-            'snmp' => ['active' => true],
-        ];
+        if (isset($input['methods'])) {
+            $methodsData = $input['methods'];
+        } else {
+            $methodsData = [];
+            $types = collect(PollingMethodType::known())->sortBy(
+                fn (PollingMethodType $type): int => $this->pollingMethods->get($type)->defaultCreationOrder(),
+            );
+            foreach ($types as $type) {
+                $data = $this->pollingMethods->get($type)->defaultCreationInput();
+                if ($data !== null) {
+                    $methodsData[$type->value] = $data;
+                }
+            }
+        }
 
         foreach ($methodsData as $methodName => $data) {
             if (empty($data['active'])) {
