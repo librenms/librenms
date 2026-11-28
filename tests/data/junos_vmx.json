@@ -12225,7 +12225,7 @@
                     "bgpPeerInUpdateElapsedTime": 12759,
                     "context_name": "",
                     "bgpLocalAs": 64999,
-                    "vrf_name": null
+                    "vrf_name": "WAN_EDGE"
                 },
                 {
                     "astext": "AS62371-MOCK-TEXT",
@@ -12248,7 +12248,7 @@
                     "bgpPeerInUpdateElapsedTime": 12757,
                     "context_name": "",
                     "bgpLocalAs": 64999,
-                    "vrf_name": null
+                    "vrf_name": "WAN_EDGE"
                 }
             ],
             "bgpPeers_cbgp": [
@@ -12325,7 +12325,7 @@
                     "bgpPeerInUpdateElapsedTime": 12759,
                     "context_name": "",
                     "bgpLocalAs": 64999,
-                    "vrf_name": null
+                    "vrf_name": "WAN_EDGE"
                 },
                 {
                     "astext": "AS62371-MOCK-TEXT",
@@ -12348,7 +12348,7 @@
                     "bgpPeerInUpdateElapsedTime": 12757,
                     "context_name": "",
                     "bgpLocalAs": 64999,
-                    "vrf_name": null
+                    "vrf_name": "WAN_EDGE"
                 }
             ],
             "bgpPeers_cbgp": [

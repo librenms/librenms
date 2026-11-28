@@ -519,6 +519,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
 
     /**
      * Sessions are indexed by instance, local and remote address, and read in each VRF context.
+     * The default context reports the sessions of every routing instance.
      * BGP4-MIB is read when the table has no sessions.
      *
      * @return Collection<int, BgpPeer>
@@ -547,6 +548,10 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
 
                 return $this->makeBgpPeer($address, $zone, $context, $vrfId, $row);
             })->filter();
+
+            if ($vrfId === null) {
+                $this->setJnxBgpM2InstanceVrfs($found);
+            }
 
             $peers = $peers->merge($found->isNotEmpty() ? $found : $this->discoverBgp4MibPeers($context));
         }
@@ -590,6 +595,57 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
         }
 
         return $families->filter()->values();
+    }
+
+    /**
+     * The table only numbers the instance of a session, so the VRF of an instance is the VRF of
+     * the interface that holds the local address of one of its sessions.
+     * Instance 0 is the master instance, its sessions are in no VRF.
+     * A local address held by more than one interface is skipped, instances may reuse addresses.
+     *
+     * @param  iterable<int|string, BgpPeer>  $peers  keyed by session index
+     */
+    private function setJnxBgpM2InstanceVrfs(iterable $peers): void
+    {
+        $instances = [];
+        foreach ($peers as $index => $peer) {
+            $instances[(int) explode('.', (string) $index)[0]][] = $peer;
+        }
+        unset($instances[0]);
+
+        foreach ($instances as $sessions) {
+            $vrfId = 0;
+            foreach ($sessions as $peer) {
+                $vrfId = $this->vrfIdOfLocalAddress($peer);
+                if ($vrfId) {
+                    break;
+                }
+            }
+
+            foreach ($vrfId ? $sessions : [] as $peer) {
+                $peer->vrf_id = $vrfId;
+            }
+        }
+    }
+
+    /**
+     * The VRF of the only interface that holds the local address of a session, 0 when there is none
+     */
+    private function vrfIdOfLocalAddress(BgpPeer $peer): int
+    {
+        $ip = IP::parse((string) $peer->bgpLocalAddr, true);
+        if ($ip === null) {
+            return 0;
+        }
+
+        // an interface may hold the address in more than one context, so count interfaces
+        $ports = $this->getDevice()->ports();
+        $vrfIds = ($ip->getFamily() == 'ipv4'
+            ? $ports->whereHas('ipv4', fn ($query) => $query->where('ipv4_address', $ip->uncompressed()))
+            : $ports->whereHas('ipv6', fn ($query) => $query->where('ipv6_address', $ip->uncompressed()))
+        )->pluck('ifVrf');
+
+        return $vrfIds->count() == 1 ? (int) $vrfIds->first() : 0;
     }
 
     /**
