@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Apc extends OS implements OSDiscovery
 {
@@ -60,6 +61,18 @@ class Apc extends OS implements OSDiscovery
                 $version = "AOS {$version_matches[1]} / App $version_matches[2]";
             }
             $device->version = $version;
+        }
+
+        $battery = SnmpQuery::get([
+            'PowerNet-MIB::upsAdvBatteryInternalSKU.0',
+            'PowerNet-MIB::upsAdvBatteryExternalSKU.0',
+        ])->values();
+
+        $internal = $battery['PowerNet-MIB::upsAdvBatteryInternalSKU.0'] ?? '';
+        $external = $battery['PowerNet-MIB::upsAdvBatteryExternalSKU.0'] ?? '';
+
+        if ($internal !== '') {
+            $device->features = 'Battery: ' . $internal . ($external !== '' ? ' / Ext: ' . $external : '');
         }
     }
 }
