@@ -80,6 +80,7 @@ use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\EntitySensorMib;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\IpMib;
 use LibreNMS\OS\Traits\LegacySensorDiscovery;
 use LibreNMS\OS\Traits\LegacySensorPolling;
 use LibreNMS\OS\Traits\LldpMib;
@@ -151,6 +152,7 @@ class OS implements
     use BridgeMib;
     use EntityMib;
     use EntitySensorMib;
+    use IpMib;
     use LldpMib;
     use MefUniEvcMib;
     use MplsVpnMib;

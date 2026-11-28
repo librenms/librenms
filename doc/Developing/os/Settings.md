@@ -87,6 +87,11 @@ ifalias: true
 ifindex: true
 ```
 
+### IPv4 address discovery
+
+LibreNMS reads IPv4 addresses from `IP-MIB::ipAddressTable` and walks the
+older `IP-MIB::ipAddrTable` when the first table looks incomplete.
+
 ### Poller and Discovery Modules
 
 You can enable and disable each discovery module and poller module for
