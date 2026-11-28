@@ -55,6 +55,7 @@
                 ...request,
                 acknowledged: @json($acknowledged),
                 unreachable: @json($unreachable),
+                scheduled_maintenance: @json($scheduled_maintenance),
                 fired: @json($fired),
                 state: @json($state),
                 min_severity: severityQuickFilter !== null ? severityQuickFilter : (widgetDefaultMinSeverity ?? ''),

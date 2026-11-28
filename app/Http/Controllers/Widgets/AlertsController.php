@@ -46,6 +46,7 @@ class AlertsController extends WidgetController
         'hidenavigation' => 0,
         'uncollapse_key_count' => 1,
         'unreachable' => null,
+        'scheduled_maintenance' => null,
     ];
 
     public function getSettingsView(Request $request): View

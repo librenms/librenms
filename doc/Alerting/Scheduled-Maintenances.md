@@ -53,6 +53,14 @@ the start hour and the start date, or the same.
 
 To end a maintenance early, remove it.
 
+## Hiding Maintained Devices From Faults
+
+The Faults page (Alert → Faults) has a *Scheduled Maintenance* filter. Set it
+to *No* to hide the faults of all devices that are currently in a
+maintenance, or to *Yes* to show only those devices. A device counts as
+maintained when an active maintenance targets the device itself, its
+location, or one of the device groups it belongs to.
+
 ## Add Single Device Maintenance
 
 To put one device into maintenance, open its edit section and then
