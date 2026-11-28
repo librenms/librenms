@@ -3030,7 +3030,7 @@
             ]
         }
     },
-    "route": {
+    "routes": {
         "discovery": {
             "route": [
                 {

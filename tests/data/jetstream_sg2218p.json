@@ -4138,7 +4138,7 @@
             ]
         }
     },
-    "route": {
+    "routes": {
         "discovery": {
             "route": [
                 {

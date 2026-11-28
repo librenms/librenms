@@ -8356,7 +8356,7 @@
             ]
         }
     },
-    "route": {
+    "routes": {
         "discovery": {
             "route": [
                 {

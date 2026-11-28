@@ -3123,7 +3123,7 @@
             ]
         }
     },
-    "route": {
+    "routes": {
         "discovery": {
             "route": [
                 {

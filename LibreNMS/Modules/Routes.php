@@ -197,8 +197,8 @@ class Routes implements Module
         }
 
         return [
-            'route' => $device->routes()->get()->map->makeHidden([
-                'route_id', 'created_at', 'updated_at', 'laravel_through_key']),
+            'route' => $device->routes()->orderBy('inetCidrRouteDest')->get()->map->makeHidden([
+                'port_id', 'device_id', 'route_id', 'created_at', 'updated_at', 'laravel_through_key']),
         ];
     }
 

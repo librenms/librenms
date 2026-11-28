@@ -542,7 +542,7 @@ return [
                 'description' => 'Процесори',
             ],
 
-            'route' => [
+            'routes' => [
                 'description' => 'Маршрут',
             ],
 

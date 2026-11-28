@@ -1963,7 +1963,7 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.route": {
+        "discovery_modules.routes": {
             "order": 270,
             "group": "discovery",
             "section": "discovery_modules",

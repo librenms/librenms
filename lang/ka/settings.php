@@ -701,7 +701,7 @@ return [
                 'description' => 'QoS',
             ],
 
-            'route' => [
+            'routes' => [
                 'description' => 'რაუტი',
             ],
 

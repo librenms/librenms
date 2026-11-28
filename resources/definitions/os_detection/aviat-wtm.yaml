@@ -34,7 +34,7 @@ discovery_modules:
     bgp-peers: false
 poller_modules:
     netstats: false
-    route: false
+    routes: false
     hr-mib: false
     ucd-mib: false
     ospf: false

@@ -25,10 +25,6 @@ cisco-pw:
         joins:
             - { left: pseudowires.port_id, right: ports.port_id, select: [ ifIndex ] }
         order_by: cpwVcID, ifIndex
-route:
-    route:
-        excluded_fields: [port_id, device_id, route_id, created_at, updated_at]
-        order_by: inetCidrRouteDest
 sensors:
     sensors:
         excluded_fields: [device_id, sensor_id, state_translation_id, state_index_id, sensors_to_state_translations_id, lastupdate]

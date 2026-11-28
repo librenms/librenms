@@ -452,7 +452,7 @@ return [
                 'description' => 'Processeurs',
             ],
 
-            'route' => [
+            'routes' => [
                 'description' => 'Route',
             ],
 

@@ -157,22 +157,6 @@ function create_state_index($state_name, $states = []): void
     ]), $states));
 }
 
-function hytera_h2f($number, $nd)
-{
-    return \LibreNMS\OS\Hytera::hexToFloat((string) $number, (int) $nd);
-}
-
-/**
- * The number of OIDs to request at once from the device's SNMP polling method settings.
- *
- * @param  array  $device
- * @return int
- */
-function get_device_oid_limit($device): int
-{
-    return DeviceCache::get($device['device_id'] ?? null)->polling()->snmp()->maxOid;
-}
-
 /**
  * If Distributed, create a lock, then purge the mysql table
  *

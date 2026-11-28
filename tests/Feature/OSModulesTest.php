@@ -127,7 +127,7 @@ final class OSModulesTest extends DBTestCase
             $this->checkTestData($expected, $actual, 'Discovered', $os, $module, $filename, $helper, $phpunit_debug);
 
             // modules without polling
-            if (in_array($module, ['route', 'vlans'])) {
+            if (in_array($module, ['routes', 'vlans'])) {
                 continue;
             }
 

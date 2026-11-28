@@ -837,7 +837,7 @@ return [
                 'description' => 'QoS',
             ],
 
-            'route' => [
+            'routes' => [
                 'description' => 'Route',
             ],
 

@@ -977,7 +977,7 @@ return [
             'qos' => [
                 'description' => 'QoS',
             ],
-            'route' => [
+            'routes' => [
                 'description' => 'Rutt',
             ],
             'sensors' => [

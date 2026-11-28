@@ -687,7 +687,7 @@ return [
             'processors' => [
                 'description' => 'Процессоры',
             ],
-            'route' => [
+            'routes' => [
                 'description' => 'Маршрут',
             ],
             'sensors' => [

@@ -117,7 +117,7 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
  */
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
-    $oid_limit = get_device_oid_limit($device);
+    $oid_limit = \App\Facades\DeviceCache::get($device['device_id'] ?? null)->polling()->snmp()->maxOid;
 
     if (! is_array($oids)) {
         $oids = explode(' ', (string) $oids);

@@ -693,7 +693,7 @@ return [
             'qos' => [
                 'description' => 'QoS',
             ],
-            'route' => [
+            'routes' => [
                 'description' => 'Rota',
             ],
             'sensors' => [

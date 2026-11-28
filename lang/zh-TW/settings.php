@@ -966,7 +966,7 @@ return [
             'qos' => [
                 'description' => 'QoS',
             ],
-            'route' => [
+            'routes' => [
                 'description' => '路由',
             ],
             'sensors' => [
