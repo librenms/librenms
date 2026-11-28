@@ -11,10 +11,10 @@
                     <th>{{ __('Type') }}</th>
                     <th>{{ __('Description') }}</th>
                     <th>{{ __('Current') }}</th>
-                    <th class="col-sm-1">{{ __('High Limit') }}</th>
-                    <th class="col-sm-1">{{ __('High warn') }}</th>
-                    <th class="col-sm-1">{{ __('Low warn') }}</th>
                     <th class="col-sm-1">{{ __('Low Limit') }}</th>
+                    <th class="col-sm-1">{{ __('Low Warning') }}</th>
+                    <th class="col-sm-1">{{ __('High Warning') }}</th>
+                    <th class="col-sm-1">{{ __('High Limit') }}</th>
                     <th class="col-sm-2">{{ __('Alerts') }}</th>
                     <th></th>
                 </tr>
@@ -24,7 +24,7 @@
                         <td>{{ $sensor->sensor_type }}</td>
                         <td style="white-space: nowrap">{{ $sensor->sensor_descr }}</td>
                         <td>{{ $sensor->sensor_current . ' ' . $sensor->unit(userPreference: false) }}</td>
-                        @foreach (['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low'] as $valueType)
+                        @foreach (['sensor_limit_low', 'sensor_limit_low_warn', 'sensor_limit_warn', 'sensor_limit'] as $valueType)
                             <td>
                                 <div class="form-group has-feedback">
                                     <input type="text"
@@ -32,7 +32,11 @@
                                            data-field="{{ $valueType }}"
                                            data-sensor_id="{{ $sensor->sensor_id }}"
                                            data-update-url="{{ route('device.edit.health.update', [$device, $sensor]) }}"
-                                           value="{{ $sensor->$valueType }}">
+                                           value="{{ $sensor->$valueType }}"
+                                           @if($sensor->exceeds($valueType)) style="outline: 2px solid {{ \App\Models\SensorModel::LIMIT_COLORS[$valueType] }};" @endif>
+                                    <span class="form-control-feedback">
+                                        <i class="fa-solid {{ \App\Models\SensorModel::LIMIT_ICONS[$valueType] }}" style="color: {{ \App\Models\SensorModel::LIMIT_COLORS[$valueType] }};" aria-hidden="true"></i>
+                                    </span>
                                 </div>
                             </td>
                         @endforeach

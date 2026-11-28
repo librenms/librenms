@@ -48,6 +48,8 @@ trait SensorTrait
             'sensor_descr',
             'sensor_current',
             'sensor_limit_low',
+            'sensor_limit_low_warn',
+            'sensor_limit_warn',
             'sensor_limit',
         ];
     }
@@ -103,6 +105,8 @@ trait SensorTrait
             'alert' => $alert,
             'sensor_current' => $sensor_current,
             'sensor_limit_low' => Html::severityToLabel(Severity::Unknown, $model->formatValue('sensor_limit_low')),
+            'sensor_limit_low_warn' => Html::severityToLabel(Severity::Unknown, $model->formatValue('sensor_limit_low_warn')),
+            'sensor_limit_warn' => Html::severityToLabel(Severity::Unknown, $model->formatValue('sensor_limit_warn')),
             'sensor_limit' => Html::severityToLabel(Severity::Unknown, $model->formatValue('sensor_limit')),
         ];
     }
@@ -117,6 +121,8 @@ trait SensorTrait
             'Sensor',
             'Current',
             'Limit Low',
+            'Limit Low Warn',
+            'Limit High Warn',
             'Limit High',
             'Sensor Class',
             'Sensor Type',
@@ -138,6 +144,8 @@ trait SensorTrait
             $sensor->sensor_descr,
             $sensor->formatValue(),
             $sensor->formatValue('sensor_limit_low'),
+            $sensor->formatValue('sensor_limit_low_warn'),
+            $sensor->formatValue('sensor_limit_warn'),
             $sensor->formatValue('sensor_limit'),
             $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class,
             $sensor->sensor_type,
