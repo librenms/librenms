@@ -173,6 +173,19 @@ EOT;
         $this->assertEquals(50, $sensors[0]->sensor_current);
     }
 
+    public function testSubmoduleRemovesSensorsTheToolNoLongerReports(): void
+    {
+        (new Sensors)->discover($this->os());
+
+        // ipmitool answers with a fan only, the temperature is gone
+        Process::fake(fn () => "FAN1 | 3600.000 | RPM | ok\n");
+        $module = new Sensors;
+        $module->setSubmodules(['temperature']);
+        $module->discover($this->os());
+
+        $this->assertSame(['fanspeed', 'voltage'], $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_class')->all());
+    }
+
     public function testSensorsOfOtherClassesAreDropped(): void
     {
         // the source returns a voltage sensor when only temperature is discovered

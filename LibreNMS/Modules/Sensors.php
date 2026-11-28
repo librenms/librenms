@@ -100,20 +100,20 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
             Log::info($method->label() . ':');
             try {
-                $discovered = $source->discoverSensors($types)->whereIn('sensor_class', $classes);
+                $reported = $source->discoverSensors($types);
             } catch (SnmpConnectionException $e) {
                 Log::warning('Device did not answer, ' . $method->label() . ' sensors were not updated: ' . $e->getMessage());
 
                 continue;
             }
 
-            if ($discovered->isEmpty() && $method !== PollingMethodType::Snmp) {
+            if ($reported->isEmpty() && $method !== PollingMethodType::Snmp) {
                 Log::info('No sensors reported, keeping the existing sensors');
                 continue;
             }
 
             $pollerType = self::pollerType($method);
-            foreach ($discovered as $sensor) {
+            foreach ($reported->whereIn('sensor_class', $classes) as $sensor) {
                 $collector->discover($sensor->setAttribute('poller_type', $pollerType));
             }
 
