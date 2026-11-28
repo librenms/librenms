@@ -305,6 +305,40 @@ modules:
         state:
             data:
                 -
+                    oid: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable
+                    value: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentModemStatus
+                    num_oid: '.1.3.6.1.4.1.2636.3.87.1.1.1.1.15.{{ $index }}'
+                    descr: "{{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork|default('Cellular') }} {{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode }} Modem status ({{ $index }})"
+                    group: Cellular
+                    index: 'jnxWirelessWANNetworkInfoCurrentModemStatus.{{ $index }}'
+                    state_name: jnxWirelessWANNetworkInfoCurrentModemStatus
+                    states:
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: Disconnected, value: 1, generic: 2 }
+                        - { descr: Calling, value: 2, generic: 1 }
+                        - { descr: Connected, value: 3, generic: 0 }
+                -
+                    oid: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoTable
+                    value: JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceStatus
+                    num_oid: '.1.3.6.1.4.1.2636.3.87.1.1.1.1.16.{{ $index }}'
+                    descr: "{{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoNetwork|default('Cellular') }} {{ JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoCurrentServiceMode }} Service status ({{ $index }})"
+                    group: Cellular
+                    index: 'jnxWirelessWANNetworkInfoCurrentServiceStatus.{{ $index }}'
+                    state_name: jnxWirelessWANNetworkInfoCurrentServiceStatus
+                    states:
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: Normal, value: 1, generic: 0 }
+                        - { descr: Emergency Call Only, value: 2, generic: 2 }
+                        - { descr: No Service Available, value: 3, generic: 2 }
+                        - { descr: Unable To Register, value: 4, generic: 2 }
+                        - { descr: Forbidden PLMN, value: 5, generic: 2 }
+                        - { descr: Forbidden Area, value: 6, generic: 2 }
+                        - { descr: Roaming Not Permitted, value: 7, generic: 2 }
+                        - { descr: Account Not Permitted, value: 8, generic: 2 }
+                        - { descr: Modem Not Permitted, value: 9, generic: 2 }
+                        - { descr: Unknown IMSI, value: 10, generic: 2 }
+                        - { descr: Authentication Failure, value: 11, generic: 2 }
+                -
                     oid: JUNIPER-ALARM-MIB::jnxYellowAlarmState
                     value: JUNIPER-ALARM-MIB::jnxYellowAlarmState
                     num_oid: '.1.3.6.1.4.1.2636.3.4.2.2.1.{{ $index }}'
