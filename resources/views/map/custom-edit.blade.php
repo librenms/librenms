@@ -281,15 +281,7 @@
             }
         options['manipulation']['deleteNode'] = function (data, callback) {
                 callback(null);
-                $.each( data.edges, function( edge_idx, edgeid ) {
-                    edgeid = edgeid.split("_")[0];
-                    deleteEdge(edgeid);
-                });
-                $.each( data.nodes, function( node_idx, nodeid ) {
-                    network_nodes.remove(nodeid);
-                    network_nodes.flush();
-                });
-                $("#map-saveDataButton").show();
+                deleteItems(data.edges, data.nodes);
             }
         options['manipulation']['addEdge'] = function (data, callback) {
                 // Because we deal with multiple edges, do not use the default callback
@@ -851,9 +843,25 @@
         edgeEdit(getEdgeData(edge.id));
     }
 
+    function deleteItems(delEdges, delNodes) {
+        $.each( delEdges, function( edge_idx, edgeid ) {
+            edgeid = edgeid.split("_")[0];
+            deleteEdge(edgeid);
+        });
+        $.each( delNodes, function( node_idx, nodeid ) {
+            network_nodes.remove(nodeid);
+            network_nodes.flush();
+        });
+        $("#map-saveDataButton").show();
+    }
+
     function deleteEdge(edgeid) {
         const edge1 = network_edges.get(edgeid + "_from");
         const edge2 = network_edges.get(edgeid + "_to");
+
+        // Do not error if the edge has already been removed
+        if (!edge1 && !edge2) return;
+
         var nm_id = edge1.from < edge2.from ? edge1.from + '.' + edge2.from : edge2.from + '.' + edge1.from;
         edgeNodesRemove(nm_id, edgeid);
         network_edges.remove(edgeid + "_to");
@@ -1117,6 +1125,8 @@
             } else if (e.ctrlKey && e.key === 'a') {
                 e.preventDefault();
                 network.selectNodes(network_nodes.getIds());
+            } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                deleteItems(network.getSelectedEdges(), network.getSelectedNodes());
             } else if (e.key === '?') {
                 e.preventDefault();
                 Alpine.$data(document.getElementById("showHelpContainer")).toggleHelp();

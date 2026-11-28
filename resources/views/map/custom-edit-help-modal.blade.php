@@ -60,6 +60,14 @@
             <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">E</kbd>
           </div>
          </div>
+         <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
+          <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('Delete Selected Items') }}</span>
+          <div class="tw:flex tw:items-center tw:gap-1.5">
+            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Delete</kbd>
+            <span class="tw:text-gray-400 tw:dark:text-dark-white-400">/</span>
+            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Backspace</kbd>
+          </div>
+         </div>
        </div>
      </div>
     <div>
