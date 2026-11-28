@@ -1250,7 +1250,7 @@ class Cisco extends OS implements
                 'bgpPeerOutUpdates' => 'cbgpPeer2OutUpdates',
                 'bgpPeerInTotalMessages' => 'cbgpPeer2InTotalMessages',
                 'bgpPeerOutTotalMessages' => 'cbgpPeer2OutTotalMessages',
-            ]))->map(function (array $row, int|string $index) use ($context, $vrfId): ?BgpPeer {
+            ], 'CISCO-BGP4-MIB::cbgpPeer2Table'))->map(function (array $row, int|string $index) use ($context, $vrfId): ?BgpPeer {
                 $parts = explode('.', (string) $index);
                 $address = Bgp::shiftInetAddress($parts, 0, $zone);
 
@@ -1378,7 +1378,7 @@ class Cisco extends OS implements
             'AdvertisedPrefixes' => "{$table}AdvertisedPrefixes",
             'SuppressedPrefixes' => "{$table}SuppressedPrefixes",
             'WithdrawnPrefixes' => "{$table}WithdrawnPrefixes",
-        ]);
+        ], $typedAddress ? 'CISCO-BGP4-MIB::cbgpPeer2AddrFamilyPrefixTable' : 'CISCO-BGP4-MIB::cbgpPeerAddrFamilyPrefixTable');
 
         $families = new Collection;
         foreach ($rows as $index => $counters) {
