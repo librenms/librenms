@@ -36,6 +36,8 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessApCountPolling;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Bgp;
@@ -44,9 +46,16 @@ use SnmpQuery;
 
 class Fortigate extends OS implements
     OSPolling,
+    WirelessApCountDiscovery,
+    WirelessApCountPolling,
     WirelessClientsDiscovery,
-    WirelessApCountDiscovery
+    WirelessClientsPolling
 {
+    // fgWcInfoWtpSessions.0 and fgWcInfoStationCount.0. VDOM scoped; kept as sensor_oids so existing
+    // sensor rows do not change.
+    private const string WTP_SESSIONS_OID = '.1.3.6.1.4.1.12356.101.14.2.5.0';
+    private const string STATION_COUNT_OID = '.1.3.6.1.4.1.12356.101.14.2.7.0';
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
@@ -104,22 +113,135 @@ class Fortigate extends OS implements
         }
     }
 
+    /**
+     * @return array<int, WirelessSensor>
+     */
     public function discoverWirelessClients()
     {
-        $oid = '.1.3.6.1.4.1.12356.101.14.2.7.0';
-
         return [
-            new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'fortigate', 1, 'Clients: Total'),
+            new WirelessSensor(
+                WirelessSensorType::Clients,
+                $this->getDeviceId(),
+                self::STATION_COUNT_OID,
+                'fortigate',
+                1,
+                'Clients: Total',
+                $this->countWirelessClients()
+            ),
         ];
     }
 
+    /**
+     * @param  array<int, \App\Models\WirelessSensor>  $sensors
+     * @return array<int, int>
+     */
+    public function pollWirelessClients(array $sensors)
+    {
+        return $this->fillSensors($sensors, $this->countWirelessClients());
+    }
+
+    /**
+     * @return array<int, WirelessSensor>
+     */
     public function discoverWirelessApCount()
     {
-        $oid = '.1.3.6.1.4.1.12356.101.14.2.5.0';
-
         return [
-            new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
+            new WirelessSensor(
+                WirelessSensorType::ApCount,
+                $this->getDeviceId(),
+                self::WTP_SESSIONS_OID,
+                'fortigate',
+                1,
+                'Connected APs',
+                $this->countConnectedAps()
+            ),
         ];
+    }
+
+    /**
+     * @param  array<int, \App\Models\WirelessSensor>  $sensors
+     * @return array<int, int>
+     */
+    public function pollWirelessApCount(array $sensors)
+    {
+        return $this->fillSensors($sensors, $this->countConnectedAps());
+    }
+
+    /**
+     * Count the FortiAPs that hold a CAPWAP session, across every VDOM.
+     *
+     * fgWcInfoWtpSessions only counts the APs of the VDOM that answers the SNMP query, so it
+     * reports 0 when the APs are managed in another VDOM. fgWcWtpSessionTable is indexed by
+     * fgVdEntIndex and also lists the APs of other VDOMs, so count its rows that are not offLine.
+     * Devices without the ConnectionState column count every row. Some devices count an AP in
+     * the scalar that the table does not list, so report the higher of the two and never less
+     * than the scalar.
+     *
+     * @return int|null null when the device reports no wireless controller data
+     */
+    private function countConnectedAps(): ?int
+    {
+        $scalar = $this->wirelessScalar('FORTINET-FORTIGATE-MIB::fgWcInfoWtpSessions.0');
+        $response = SnmpQuery::cache()->enumStrings()->walk('FORTINET-FORTIGATE-MIB::fgWcWtpSessionConnectionState');
+
+        if ($response->hasConnectionError()) {
+            return $scalar;
+        }
+
+        $states = $response->values();
+        $sessions = empty($states)
+            ? SnmpQuery::cache()->walk('FORTINET-FORTIGATE-MIB::fgWcWtpSessionWtpStationCount')->values()
+            : array_filter($states, fn ($state) => $state !== 'offLine');
+
+        if (empty($states) && empty($sessions)) {
+            return $scalar;
+        }
+
+        return max(count($sessions), (int) $scalar);
+    }
+
+    /**
+     * Count the wireless clients of every FortiAP, across every VDOM.
+     *
+     * fgWcInfoStationCount is VDOM scoped in the same way as fgWcInfoWtpSessions.
+     *
+     * @return int|null null when the device reports no wireless controller data
+     */
+    private function countWirelessClients(): ?int
+    {
+        $scalar = $this->wirelessScalar('FORTINET-FORTIGATE-MIB::fgWcInfoStationCount.0');
+        $stations = SnmpQuery::cache()->walk('FORTINET-FORTIGATE-MIB::fgWcWtpSessionWtpStationCount')->values();
+
+        if (empty($stations)) {
+            return $scalar;
+        }
+
+        return max((int) array_sum($stations), (int) $scalar);
+    }
+
+    private function wirelessScalar(string $oid): ?int
+    {
+        $value = SnmpQuery::cache()->get($oid)->value();
+
+        return is_numeric($value) ? (int) $value : null;
+    }
+
+    /**
+     * @param  array<int, \App\Models\WirelessSensor>  $sensors
+     * @return array<int, int> sensor_id => value
+     */
+    private function fillSensors(array $sensors, ?int $value): array
+    {
+        if ($value === null) {
+            return [];
+        }
+
+        $data = [];
+        foreach ($sensors as $sensor) {
+            $data[$sensor->sensor_id] = $value;
+        }
+
+        return $data;
     }
 
     public function fetchLocation(): Location
