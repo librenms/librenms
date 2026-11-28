@@ -72,20 +72,30 @@ class PhpSnmp implements SnmpBackendInterface
             return null;
         }
 
+        $context = $this->context($config, $options);
+
         $snmp = new \SNMP(
             $this->snmpver($config->version),
             Rewrite::addIpv6Brackets($target) . ':' . $config->port,
-            $this->communityOrUsername($config, $options->context),
+            $this->communityOrUsername($config, $context),
             $config->timeout * 1000000,
             $config->retries,
         );
 
         $snmp->max_oids = max($config->maxOid, 1);
-        $this->setSecurityOptions($snmp, $config, $options->context);
+        $this->setSecurityOptions($snmp, $config, $context);
         $this->setOptions($snmp, $options);
         $this->initMibs($options);
 
         return $snmp;
+    }
+
+    /**
+     * The context of the options, or the context of the config when the options do not set one.
+     */
+    private function context(SnmpConfig $config, SnmpQueryOptions $options): string
+    {
+        return $options->context ?: (string) $config->context;
     }
 
     private function communityOrUsername(SnmpConfig $config, string $context): string

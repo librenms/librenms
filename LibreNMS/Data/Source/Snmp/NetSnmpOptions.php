@@ -141,12 +141,16 @@ class NetSnmpOptions
     }
 
     /**
+     * The context defaults to the context of the config.
+     *
      * @return string[]
      *
      * @throws SnmpException
      */
     public function buildAuth(SnmpConfig $config, ?string $context = null): array
     {
+        $context = $context ?: $config->context;
+
         if ($config->version === 'v2c' || $config->version === 'v1') {
             return [
                 "-$config->version",
