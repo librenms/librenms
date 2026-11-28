@@ -47,12 +47,13 @@ trait CiscoEntitySensorMib
     /**
      * CISCO-ENTITY-SENSOR-MIB sensors replace the ENTITY-SENSOR-MIB sensors of the same entity.
      *
+     * @param  list<SensorType>  $types
      * @param  Collection<int, Sensor>  $sensors
      * @return Collection<int, Sensor>
      */
-    protected function withCiscoEntitySensors(Collection $sensors): Collection
+    protected function withCiscoEntitySensors(array $types, Collection $sensors): Collection
     {
-        $cisco = $this->discoverCiscoEntitySensors();
+        $cisco = $this->discoverCiscoEntitySensors($types);
         $keys = $cisco->map(fn (Sensor $sensor) => "$sensor->sensor_class-$sensor->sensor_index")->flip();
 
         return $cisco->merge($sensors->reject(fn (Sensor $sensor) => $sensor->sensor_type == 'entity-sensor'
@@ -60,9 +61,10 @@ trait CiscoEntitySensorMib
     }
 
     /**
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverCiscoEntitySensors(): Collection
+    public function discoverCiscoEntitySensors(array $types): Collection
     {
         $sensors = new Collection;
         $data = SnmpQuery::enumStrings()->walk([
@@ -73,6 +75,7 @@ trait CiscoEntitySensorMib
             'CISCO-ENTITY-SENSOR-MIB::entSensorPrecision',
         ])->table(1);
 
+        $data = array_filter($data, fn ($entry) => in_array($this->ciscoEntitySensorClass($entry['CISCO-ENTITY-SENSOR-MIB::entSensorType'] ?? null), $types, true));
         if (empty($data)) {
             return $sensors;
         }
@@ -98,7 +101,6 @@ trait CiscoEntitySensorMib
         foreach ($data as $index => $entry) {
             $value = $entry['CISCO-ENTITY-SENSOR-MIB::entSensorValue'] ?? null;
             $class = $this->ciscoEntitySensorClass($entry['CISCO-ENTITY-SENSOR-MIB::entSensorType'] ?? null);
-
             if ($class === null || ! is_numeric($value) || ! is_numeric($index)) {
                 continue;
             }
@@ -166,7 +168,7 @@ trait CiscoEntitySensorMib
      */
     protected function ciscoEntitySensorName(int $index, array $entities): string
     {
-        return ($entities[$index]['ENTITY-MIB::entPhysicalName'] ?? null) ?: $entities[$index]['ENTITY-MIB::entPhysicalDescr'] ?? '';
+        return ($entities[$index]['ENTITY-MIB::entPhysicalName'] ?? '') ?: $entities[$index]['ENTITY-MIB::entPhysicalDescr'] ?? '';
     }
 
     private function ciscoEntitySensorClass(?string $type): ?SensorType

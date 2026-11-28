@@ -347,12 +347,14 @@ possible. We usually reject PHP discovery in that case, because PHP
 causes more problems later.
 
 The sensors module gets the sensors from `discoverSensors()` of the OS.
-It discovers, in this order:
+It passes the sensor classes to discover, all of them or the classes of
+`-m sensors/<class>`. It discovers, in this order:
 
 1. ENTITY-SENSOR-MIB sensors (`discoverEntitySensors()`).
    Shared\Cisco adds CISCO-ENTITY-SENSOR-MIB sensors, they replace the
    ENTITY-SENSOR-MIB sensors of the same entity.
-2. The sensors of the OS code, `discoverOsSensors()`. OS that run on
+2. The sensors of the OS code, a method for each class, such as
+   `discoverTemperatureSensors()` or `discoverStateSensors()`. OS that run on
    servers (Unix, Windows, VMware ESXi) use the `ServerHardware` trait,
    it adds the sensors of the Dell OpenManage, HP Insight or Supermicro
    SuperDoctor agent that answers.
@@ -361,10 +363,17 @@ It discovers, in this order:
 
 A sensor replaces earlier sensors of the same class, type and index.
 
-To add sensors, override `discoverOsSensors()` and return a Collection
-of `App\Models\Sensor` models. Include the sensors of the parent class,
-the OS may extend a group class with sensors of its own. The
-attributes of a sensor are:
+To add sensors, override the method of the class, such as
+`discoverDbmSensors()`, and return a Collection of `App\Models\Sensor`
+models of that class. Include the sensors of the parent class, the OS
+may extend a group class with sensors of its own.
+
+When one table has sensors of several classes, override
+`discoverSensors(array $types)` instead and walk the table once. Add
+the sensors of the given classes to those of the parent class, sensors
+of other classes are dropped.
+
+The attributes of a sensor are:
 
 - `sensor_class` = required. The sensor class from the table above, such
   as humidity.
@@ -457,9 +466,9 @@ statistics of CM-PERFORMANCE-MIB. It adds the code to the OS class,
 `LibreNMS/OS/AdvaFsp150.php`:
 
 ```php
-protected function discoverOsSensors(): Collection
+protected function discoverDbmSensors(): Collection
 {
-    $sensors = parent::discoverOsSensors();
+    $sensors = parent::discoverDbmSensors();
     $data = SnmpQuery::walk([
         'CM-FACILITY-MIB::cmEthernetTrafficPortTable',
         'CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPT',
@@ -519,7 +528,10 @@ port. The sensor graphs then also appear on the page of that port, and
 not only on the Health page.
 
 To test the code, run the discovery manually with
-`lnms device:discover $device_id -m sensors`. The flag `-vv` shows the
+`lnms device:discover $device_id -m sensors`. To discover only some
+classes, add them to the module, for example
+`-m sensors/dbm,sensors/temperature`. The sensors of the other classes
+are not changed. The flag `-vv` shows the
 debug output. The flag `-vvv` shows the unredacted debug output. 
 
 The output under `#### Load discovery module sensors ####` holds a list of the

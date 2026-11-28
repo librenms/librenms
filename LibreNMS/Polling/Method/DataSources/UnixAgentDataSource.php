@@ -7,6 +7,7 @@ use App\Models\Package;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\PackagesDiscovery;
 use LibreNMS\Interfaces\Discovery\SensorsDiscovery;
@@ -219,9 +220,12 @@ final readonly class UnixAgentDataSource implements MempoolsDiscovery, MempoolsP
      *
      * @return Collection<int, Sensor>
      */
-    public function discoverSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
         $sensors = new Collection;
+        if (! in_array(SensorType::Temperature, $types, true)) {
+            return $sensors;
+        }
 
         foreach ($this->disks as $index => $disk) {
             $sensors->push(new Sensor([

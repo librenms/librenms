@@ -129,10 +129,10 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery
         $device->serial = $serial ?: $device->serial;
     }
 
-    protected function discoverOsSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        return parent::discoverOsSensors()
-            ->merge($this->discoverServerHardwareSensors())
-            ->merge($this->discoverNetSnmpSensors());
+        return parent::discoverSensors($types)
+            ->merge($this->discoverServerHardwareSensors($types))
+            ->merge($this->discoverNetSnmpSensors($types));
     }
 }

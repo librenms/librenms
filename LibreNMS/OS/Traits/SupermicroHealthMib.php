@@ -36,9 +36,10 @@ trait SupermicroHealthMib
     /**
      * Monitored fans, temperatures and voltages of smHealthMonitorTable (SuperDoctor)
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverSupermicroSensors(): Collection
+    public function discoverSupermicroSensors(array $types): Collection
     {
         $sensors = new Collection;
         $data = SnmpQuery::mibDir('supermicro')->enumStrings()->walk([
@@ -68,7 +69,7 @@ trait SupermicroHealthMib
                 default => [null, 1, '', []],
             };
 
-            if ($type === null) {
+            if (! in_array($type, $types, true)) {
                 continue;
             }
 

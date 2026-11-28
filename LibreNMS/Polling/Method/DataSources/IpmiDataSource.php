@@ -8,6 +8,7 @@ use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use LibreNMS\Data\Source\Ipmitool;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Discovery\SensorsDiscovery;
 use LibreNMS\Interfaces\Polling\SensorsPolling;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
@@ -32,7 +33,7 @@ final readonly class IpmiDataSource implements SensorsDiscovery, SensorsPolling
      *
      * @throws \LibreNMS\Exceptions\IpmiConnectionFailed
      */
-    public function discoverSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
         $sensors = new Collection;
         $values = new Ipmitool($this->device, $this->config)->sensors();
@@ -67,7 +68,7 @@ final readonly class IpmiDataSource implements SensorsDiscovery, SensorsPolling
             ]));
         }
 
-        return $sensors;
+        return $sensors->whereIn('sensor_class', array_map(fn (SensorType $type) => $type->value, $types));
     }
 
     /**

@@ -46,20 +46,21 @@ class RittalCmcIiiPu extends OS
     /**
      * ENTITY-SENSOR-MIB duplicates the CMC III sensors
      */
-    public function discoverEntitySensors(): Collection
+    public function discoverEntitySensors(array $types): Collection
     {
         return new Collection;
     }
 
-    protected function discoverOsSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        return $this->discoverCmcIiiSensors()->merge(parent::discoverOsSensors());
+        return parent::discoverSensors($types)->merge($this->discoverCmcIiiSensors($types));
     }
 
     /**
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverCmcIiiSensors(): Collection
+    public function discoverCmcIiiSensors(array $types): Collection
     {
         $variables = SnmpQuery::hideMib()->enumStrings()->walk('RITTAL-CMC-III-MIB::cmcIIIVarTable')->valuesByIndex();
         /** @var array<int, CmcSensor> $cmcSensors */
@@ -105,6 +106,7 @@ class RittalCmcIiiPu extends OS
 
         foreach ($cmcSensors as $id => $cmcSensor) {
             if (! isset($cmcSensor['oid'], $cmcSensor['type'])
+                || ! in_array($cmcSensor['type'], $types, true)
                 || in_array($cmcSensor['name'], ['System V24 Port', 'Memory USB-Stick', 'Memory SD-Card', 'Login'])
                 || preg_match('/(Power Factor)|(Runtime)/', $cmcSensor['name'])) {
                 Log::debug("{$cmcSensor['name']} skipped");

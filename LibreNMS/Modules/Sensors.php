@@ -81,7 +81,7 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
     }
 
     /**
-     * Each available method replaces its sensors, the sensors of a method that is not available are kept.
+     * Each available method replaces its sensors of the selected classes, the sensors of a method that is not available are kept.
      * IPMI and the unix agent report no sensors when their tool is not responding, their sensors are kept then too,
      * as are SNMP sensors when the device did not answer.
      */
@@ -100,11 +100,15 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
             Log::info($method->label() . ':');
             try {
-                $discovered = $source->discoverSensors();
+                [$discovered, $others] = $source->discoverSensors($types)->partition(fn (Sensor $sensor) => in_array($sensor->sensor_class, $classes, true));
             } catch (SnmpConnectionException $e) {
                 Log::warning('Device did not answer, ' . $method->label() . ' sensors were not updated: ' . $e->getMessage());
 
                 continue;
+            }
+
+            if ($others->isNotEmpty()) {
+                Log::error(sprintf('%s returned %s sensors, they were not asked for and were dropped', $source::class, $others->pluck('sensor_class')->unique()->implode(', ')));
             }
 
             if ($discovered->isEmpty() && $method !== PollingMethodType::Snmp) {
@@ -114,9 +118,7 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
             $pollerType = self::pollerType($method);
             foreach ($discovered as $sensor) {
-                if (in_array($sensor->sensor_class, $classes)) {
-                    $collector->discover($sensor->setAttribute('poller_type', $pollerType));
-                }
+                $collector->discover($sensor->setAttribute('poller_type', $pollerType));
             }
 
             foreach ($types as $type) {

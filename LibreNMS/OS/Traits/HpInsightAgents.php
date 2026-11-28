@@ -28,6 +28,7 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorType;
 use SnmpQuery;
 
 trait HpInsightAgents
@@ -51,11 +52,16 @@ trait HpInsightAgents
     /**
      * HP array controller drive states (CPQIDA-MIB)
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverHpInsightSensors(): Collection
+    public function discoverHpInsightSensors(array $types): Collection
     {
         $sensors = new Collection;
+        if (! in_array(SensorType::State, $types, true)) {
+            return $sensors;
+        }
+
         $drives = SnmpQuery::mibDir('hp')->walk([
             'CPQIDA-MIB::cpqDaPhyDrvBay',
             'CPQIDA-MIB::cpqDaPhyDrvStatus',

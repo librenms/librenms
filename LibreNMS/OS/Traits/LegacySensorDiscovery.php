@@ -43,13 +43,14 @@ trait LegacySensorDiscovery
     private ?array $legacyPreCacheData = null;
 
     /**
-     * The sensors discovered by legacy includes, in the order they ran before.
+     * The sensors of the classes discovered by legacy includes, in the order they ran before.
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    protected function discoverLegacySensors(): Collection
+    protected function discoverLegacySensors(array $types): Collection
     {
-        $files = $this->legacySensorFiles();
+        $files = $this->legacySensorFiles($types);
         if (empty($files)) {
             return new Collection;
         }
@@ -124,19 +125,22 @@ trait LegacySensorDiscovery
     }
 
     /**
+     * The includes of the sensor classes, they only discover sensors of their class
+     *
+     * @param  list<SensorType>  $types
      * @return list<string>
      */
-    private function legacySensorFiles(): array
+    private function legacySensorFiles(array $types): array
     {
         $device = $this->getDeviceArray();
         $dir = base_path('includes/discovery/sensors');
         $files = [];
 
-        foreach (SensorType::values() as $class) {
+        foreach ($types as $type) {
             if (! empty($device['os_group'])) {
-                $files[] = "$dir/$class/{$device['os_group']}.inc.php";
+                $files[] = "$dir/$type->value/{$device['os_group']}.inc.php";
             }
-            $files[] = "$dir/$class/{$device['os']}.inc.php";
+            $files[] = "$dir/$type->value/{$device['os']}.inc.php";
         }
 
         return array_values(array_filter($files, is_file(...)));

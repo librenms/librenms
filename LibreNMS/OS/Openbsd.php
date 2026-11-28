@@ -126,9 +126,9 @@ class Openbsd extends Unix implements OSPolling
     /**
      * OPENBSD-SENSORS-MIB, values are in the units LibreNMS uses
      */
-    protected function discoverOsSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        $sensors = parent::discoverOsSensors();
+        $sensors = parent::discoverSensors($types);
         $data = SnmpQuery::enumStrings()->walk([
             'OPENBSD-SENSORS-MIB::sensorDevice',
             'OPENBSD-SENSORS-MIB::sensorDescr',
@@ -149,7 +149,7 @@ class Openbsd extends Unix implements OSPolling
                 default => null,
             };
 
-            if ($type === null || ! is_numeric($value) || ! is_numeric($index)) {
+            if (! in_array($type, $types, true) || ! is_numeric($value) || ! is_numeric($index)) {
                 continue;
             }
 

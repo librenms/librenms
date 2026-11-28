@@ -175,9 +175,9 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
     /**
      * Health counters are named by their index, the name tells the type
      */
-    protected function discoverOsSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        $sensors = new Collection;
+        $sensors = parent::discoverSensors($types);
 
         foreach (SnmpQuery::walk('NS-ROOT-MIB::sysHealthCounterValue')->table(1) as $name => $data) {
             $name = trim((string) $name, '"');
@@ -194,7 +194,7 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
                 continue;
             }
 
-            if (is_numeric($value)) {
+            if (in_array($type, $types, true) && is_numeric($value)) {
                 $sensors->push(new Sensor([
                     'poller_type' => 'snmp',
                     'sensor_class' => $type->value,

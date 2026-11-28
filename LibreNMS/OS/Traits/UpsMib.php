@@ -36,11 +36,12 @@ use SnmpQuery;
 trait UpsMib
 {
     /**
-     * UPS-MIB sensors of OS that have the rfc1628_compat setting
+     * UPS-MIB sensors of the classes, of OS that have the rfc1628_compat setting
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverUpsMibSensors(): Collection
+    public function discoverUpsMibSensors(array $types): Collection
     {
         $sensors = new Collection;
 
@@ -117,7 +118,7 @@ trait UpsMib
             ['value' => 6, 'generic' => 3, 'descr' => 'noTestInitiated'],
         ]);
 
-        return $sensors;
+        return $sensors->whereIn('sensor_class', array_map(fn (SensorType $type) => $type->value, $types));
     }
 
     /**

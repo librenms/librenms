@@ -33,9 +33,9 @@ class Asa extends Shared\Cisco
     /**
      * ENTITY-SENSOR-MIB values of ASA security contexts are not valid
      */
-    public function discoverEntitySensors(): Collection
+    public function discoverEntitySensors(array $types): Collection
     {
-        return str_ends_with((string) $this->getDevice()->hardware, 'sc') ? new Collection : parent::discoverEntitySensors();
+        return str_ends_with((string) $this->getDevice()->hardware, 'sc') ? new Collection : parent::discoverEntitySensors($types);
     }
 
     // disable unsupported netstats

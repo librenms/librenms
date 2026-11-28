@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Sensor;
 use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
@@ -36,6 +37,7 @@ use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\WriteInterface;
+use LibreNMS\Interfaces\Discovery\SensorsDiscovery;
 use LibreNMS\Modules\Sensors;
 use LibreNMS\OS;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
@@ -147,6 +149,56 @@ EOT;
 
         $this->assertSame([], $updated);
         $this->assertSame($sensor_ids, $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_id')->all());
+    }
+
+    public function testIpmitoolRunsOnceForAllClasses(): void
+    {
+        (new Sensors)->discover($this->os());
+
+        Process::assertRanTimes(fn (PendingProcess $process) => in_array('sensor', (array) $process->command), 1);
+    }
+
+    public function testSubmodulesReplaceOnlyTheirClass(): void
+    {
+        (new Sensors)->discover($this->os());
+
+        // the fan and voltage are gone, only temperature is discovered
+        Process::fake(fn () => "CPU Temp | 50.000 | degrees C | ok\n");
+        $module = new Sensors;
+        $module->setSubmodules(['temperature']);
+        $module->discover($this->os());
+
+        $sensors = $this->device->sensors()->orderBy('sensor_index')->get();
+        $this->assertSame(['temperature', 'fanspeed', 'voltage'], $sensors->pluck('sensor_class')->all());
+        $this->assertEquals(50, $sensors[0]->sensor_current);
+    }
+
+    public function testSensorsOfOtherClassesAreDropped(): void
+    {
+        // the source returns a voltage sensor when only temperature is discovered
+        $source = new class implements SensorsDiscovery
+        {
+            public function discoverSensors(array $types): Collection
+            {
+                return new Collection([new Sensor([
+                    'sensor_class' => 'voltage',
+                    'sensor_oid' => '.1.3.6.1.4.1.2021.13.16.4.1.3.1',
+                    'sensor_index' => '1',
+                    'sensor_type' => 'test',
+                    'sensor_descr' => 'Voltage',
+                    'sensor_current' => 12,
+                ])]);
+            }
+        };
+        $os = Mockery::mock(OS::class);
+        $os->shouldReceive('getDevice')->andReturn($this->device);
+        $os->shouldReceive('dataSource')->andReturnUsing(fn (PollingMethodType $method) => $method === PollingMethodType::Snmp ? $source : null);
+
+        $module = new Sensors;
+        $module->setSubmodules(['temperature']);
+        $module->discover($os);
+
+        $this->assertSame(0, $this->device->sensors()->count());
     }
 
     public function testIpmiDiscoverHandlesEmptyAndShortOutput(): void

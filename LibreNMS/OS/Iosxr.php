@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Util\UserFuncHelper;
 
@@ -37,11 +38,14 @@ class Iosxr extends Shared\Cisco implements OSDiscovery
     /**
      * Optical power is reported in watts, add dBm sensors for it.
      */
-    public function discoverCiscoEntitySensors(): Collection
+    public function discoverCiscoEntitySensors(array $types): Collection
     {
-        $sensors = parent::discoverCiscoEntitySensors();
+        if (! in_array(SensorType::Dbm, $types, true)) {
+            return parent::discoverCiscoEntitySensors($types);
+        }
 
-        return $sensors->merge($sensors
+        $sensors = parent::discoverCiscoEntitySensors([...$types, SensorType::Power]);
+        $sensors = $sensors->merge($sensors
             ->filter(fn (Sensor $sensor) => $sensor->sensor_class == 'power' && preg_match('/power [RT]x|[RT]x (Power|Lane)/i', $sensor->sensor_descr))
             ->map(function (Sensor $sensor) {
                 $dbm = $sensor->replicate()->fill([
@@ -58,6 +62,9 @@ class Iosxr extends Shared\Cisco implements OSDiscovery
 
                 return $dbm;
             }));
+
+        // the power sensors are needed for the dBm sensors
+        return in_array(SensorType::Power, $types, true) ? $sensors : $sensors->where('sensor_class', '!=', 'power');
     }
 
     /**

@@ -124,11 +124,18 @@ class Cumulus extends \LibreNMS\OS
         return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'CUMULUS-BGPVRF-MIB::bgpLocalAs');
     }
 
-    protected function discoverOsSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        $sensors = parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors());
+        return parent::discoverSensors($types)->merge($this->discoverNetSnmpSensors($types));
+    }
 
-        // hardware states are the oper status of the ENTITY-SENSOR-MIB sensors, the index tells the kind
+    /**
+     * Hardware states are the oper status of the ENTITY-SENSOR-MIB sensors, the index tells the kind
+     */
+    protected function discoverStateSensors(): Collection
+    {
+        $sensors = parent::discoverStateSensors();
+
         foreach (SnmpQuery::cache()->walk('ENTITY-SENSOR-MIB::entPhySensorOperStatus')->pluck() as $index => $status) {
             if (preg_match('/^1100000\d{2}$/', (string) $index)) {
                 $kind = 'Power Supply';

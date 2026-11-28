@@ -110,9 +110,9 @@ class Cisco extends OS implements
     private Collection $qosIdxToParent;
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
 
-    public function discoverSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        return $this->withCiscoEntitySensors(parent::discoverSensors());
+        return $this->withCiscoEntitySensors($types, parent::discoverSensors($types));
     }
 
     public function discoverOS(Device $device): void
@@ -1404,62 +1404,68 @@ class Cisco extends OS implements
         return $families;
     }
 
-    protected function discoverOsSensors(): Collection
+    protected function discoverCountSensors(): Collection
     {
-        return parent::discoverOsSensors()
-            ->merge($this->discoverCiscoCountSensors())
-            ->merge($this->discoverCiscoStateSensors())
-            ->merge($this->discoverCiscoTemperatureSensors());
-    }
-
-    /**
-     * @return Collection<int, Sensor>
-     */
-    private function discoverCiscoCountSensors(): Collection
-    {
-        $sensors = new Collection;
+        $sensors = parent::discoverCountSensors();
 
         foreach ([
             ['CISCO-WAN-3G-MIB::c3gGsmNumberOfNearbyCell', '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.5', 'Nearby cells'],
             ['CISCO-WAN-CELL-EXT-MIB::cwceLteCurrOperatingBand', '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.6', 'Cellular operating band'],
         ] as [$oid, $numOid, $descr]) {
             foreach (SnmpQuery::walk($oid)->pluck() as $index => $value) {
-                $sensors->push($this->ciscoSensor('count', "$numOid.$index", $index, explode('::', $oid)[1], $this->ciscoEntityName($index) . " - $descr", $value));
+                $sensors->push(new Sensor([
+                    'sensor_class' => 'count',
+                    'sensor_oid' => "$numOid.$index",
+                    'sensor_index' => $index,
+                    'sensor_type' => explode('::', $oid)[1],
+                    'sensor_descr' => $this->ciscoEntityName($index) . " - $descr",
+                    'sensor_current' => $value,
+                    'entPhysicalIndex' => $index,
+                ]));
             }
         }
 
         return $sensors;
     }
 
-    /**
-     * @return Collection<int, Sensor>
-     */
-    private function discoverCiscoTemperatureSensors(): Collection
+    protected function discoverTemperatureSensors(): Collection
     {
-        $sensors = new Collection;
+        $sensors = parent::discoverTemperatureSensors();
 
         $data = SnmpQuery::hideMib()->enumStrings()->walk('CISCO-ENVMON-MIB::ciscoEnvMonTemperatureStatusTable')->valuesByIndex();
         foreach ($data as $index => $entry) {
             if (isset($entry['ciscoEnvMonTemperatureStatusValue']) && ($entry['ciscoEnvMonTemperatureState'] ?? null) != 'notPresent' && ! empty($entry['ciscoEnvMonTemperatureStatusDescr'])) {
-                $sensors->push($this->ciscoSensor('temperature', ".1.3.6.1.4.1.9.9.13.1.3.1.3.$index", $index, 'cisco', ucwords((string) $entry['ciscoEnvMonTemperatureStatusDescr']), $entry['ciscoEnvMonTemperatureStatusValue'], [
+                $sensors->push(new Sensor([
+                    'sensor_class' => 'temperature',
+                    'sensor_oid' => ".1.3.6.1.4.1.9.9.13.1.3.1.3.$index",
+                    'sensor_index' => $index,
+                    'sensor_type' => 'cisco',
+                    'sensor_descr' => ucwords((string) $entry['ciscoEnvMonTemperatureStatusDescr']),
+                    'sensor_current' => $entry['ciscoEnvMonTemperatureStatusValue'],
                     'sensor_limit' => $entry['ciscoEnvMonTemperatureThreshold'] ?? null,
+                    'entPhysicalIndex' => $index,
                 ]));
             }
         }
 
         foreach (SnmpQuery::walk('CISCO-WAN-3G-MIB::c3gModemTemperature')->pluck() as $index => $value) {
-            $sensors->push($this->ciscoSensor('temperature', ".1.3.6.1.4.1.9.9.661.1.1.1.12.$index", $index, 'cisco', $this->ciscoEntityName($index), $value));
+            $sensors->push(new Sensor([
+                'sensor_class' => 'temperature',
+                'sensor_oid' => ".1.3.6.1.4.1.9.9.661.1.1.1.12.$index",
+                'sensor_index' => $index,
+                'sensor_type' => 'cisco',
+                'sensor_descr' => $this->ciscoEntityName($index),
+                'sensor_current' => $value,
+                'entPhysicalIndex' => $index,
+            ]));
         }
 
         return $sensors;
     }
 
-    /**
-     * @return Collection<int, Sensor>
-     */
-    private function discoverCiscoStateSensors(): Collection
+    protected function discoverStateSensors(): Collection
     {
-        $sensors = new Collection;
+        $sensors = parent::discoverStateSensors();
         $stack = ['CISCO-STACKWISE-MIB::cswGlobals', 'CISCO-STACKWISE-MIB::cswSwitchRole', 'CISCO-STACKWISE-MIB::cswSwitchState', 'CISCO-STACKWISE-MIB::cswStackPortOperStatus'];
         // some 15.x switches report stacking when they are not stacked
         $skipStack = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value() == 'false'
@@ -1529,7 +1535,13 @@ class Cisco extends OS implements
                     $group = $this->ciscoEntityName($index);
                 }
 
-                $sensors->push($this->ciscoSensor('state', "$numOid.$index", $index, $state, trim((string) $name), $entry[$state] ?? null, [
+                $sensors->push(new Sensor([
+                    'sensor_class' => 'state',
+                    'sensor_oid' => "$numOid.$index",
+                    'sensor_index' => $index,
+                    'sensor_type' => $state,
+                    'sensor_descr' => trim((string) $name),
+                    'sensor_current' => $entry[$state] ?? null,
                     'entPhysicalIndex' => $index,
                     'group' => $group,
                 ])->withStates(self::ciscoStates($state)));
@@ -1537,27 +1549,6 @@ class Cisco extends OS implements
         }
 
         return $sensors;
-    }
-
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
-    private function ciscoSensor(string $class, string $oid, int|string $index, string $type, string $descr, mixed $value, array $attributes = []): Sensor
-    {
-        return new Sensor([
-            'poller_type' => 'snmp',
-            'sensor_class' => $class,
-            'sensor_oid' => $oid,
-            'sensor_index' => $index,
-            'sensor_type' => $type,
-            'sensor_descr' => $descr,
-            'sensor_divisor' => 1,
-            'sensor_multiplier' => 1,
-            'sensor_current' => $value,
-            'entPhysicalIndex' => $index,
-            'rrd_type' => 'GAUGE',
-            ...$attributes,
-        ]);
     }
 
     private function ciscoEntityName(int|string $index): string

@@ -42,14 +42,32 @@ use SnmpQuery;
  */
 trait EntitySensorMib
 {
+    /** The sensor class of each EntitySensorDataType */
+    private const array ENTITY_SENSOR_TYPES = [
+        'voltsDC' => SensorType::Voltage,
+        'voltsAC' => SensorType::Voltage,
+        'amperes' => SensorType::Current,
+        'watts' => SensorType::Power,
+        'hertz' => SensorType::Frequency,
+        'percentRH' => SensorType::Humidity,
+        'rpm' => SensorType::Fanspeed,
+        'celsius' => SensorType::Temperature,
+        'dBm' => SensorType::Dbm,
+    ];
+
     /**
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      *
      * @throws SnmpConnectionException when the device did not answer
      */
-    public function discoverEntitySensors(): Collection
+    public function discoverEntitySensors(array $types): Collection
     {
         $sensors = new Collection;
+
+        if (! array_any($types, fn (SensorType $type) => in_array($type, self::ENTITY_SENSOR_TYPES, true))) {
+            return $sensors;
+        }
 
         /** @var EntityNames $entities */
         $entities = SnmpQuery::hideMib()->abortOnFailure()->walk([
@@ -75,7 +93,7 @@ trait EntitySensorMib
             }
 
             $class = $this->entitySensorClass($entry, $entities[$index]['entPhysicalName'] ?? '');
-            if ($class === null || ! is_numeric($index) || ! is_numeric($entry['entPhySensorValue'] ?? null)) {
+            if (! in_array($class, $types, true) || ! is_numeric($index) || ! is_numeric($entry['entPhySensorValue'] ?? null)) {
                 continue;
             }
 
@@ -189,19 +207,14 @@ trait EntitySensorMib
      */
     private function entitySensorClass(array $entry, string $name): ?SensorType
     {
-        return match ($entry['entPhySensorType'] ?? null) {
-            'voltsDC', 'voltsAC' => SensorType::Voltage,
-            'amperes' => SensorType::Current,
-            'watts' => SensorType::Power,
-            'hertz' => SensorType::Frequency,
-            'percentRH' => SensorType::Humidity,
-            'rpm' => SensorType::Fanspeed,
-            'celsius' => SensorType::Temperature,
-            'dBm' => SensorType::Dbm,
-            // Cisco ASR920 reports optical power as other
-            'other' => Str::contains($name, ['Rx Power Sensor', 'Tx Power Sensor']) ? SensorType::Dbm : null,
-            default => null,
-        };
+        $dataType = (string) ($entry['entPhySensorType'] ?? '');
+
+        // Cisco ASR920 reports optical power as other
+        if ($dataType === 'other') {
+            return Str::contains($name, ['Rx Power Sensor', 'Tx Power Sensor']) ? SensorType::Dbm : null;
+        }
+
+        return self::ENTITY_SENSOR_TYPES[$dataType] ?? null;
     }
 
     /**

@@ -39,6 +39,7 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Enum\SnmpStringOutput;
@@ -506,26 +507,304 @@ class OS implements
     }
 
     /**
-     * ENTITY-SENSOR-MIB sensors, then the sensors of this OS, UPS-MIB and the yaml sensors.
+     * ENTITY-SENSOR-MIB sensors, then the sensors this OS discovers with code for each class,
+     * the legacy includes, UPS-MIB and the yaml sensors.
      * A sensor replaces earlier sensors of the same class, type and index.
+     * To discover several classes from the same data, override this and add the sensors of the given classes.
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        return $this->discoverEntitySensors()
-            ->merge($this->discoverOsSensors())
-            ->merge($this->discoverLegacySensors())
-            ->merge($this->discoverUpsMibSensors())
-            ->merge($this->discoverYamlSensors());
+        $sensors = $this->discoverEntitySensors($types);
+
+        foreach ($types as $type) {
+            $sensors = $sensors->merge(match ($type) {
+                SensorType::Airflow => $this->discoverAirflowSensors(),
+                SensorType::Ber => $this->discoverBerSensors(),
+                SensorType::Bitrate => $this->discoverBitrateSensors(),
+                SensorType::Charge => $this->discoverChargeSensors(),
+                SensorType::ChromaticDispersion => $this->discoverChromaticDispersionSensors(),
+                SensorType::Cooling => $this->discoverCoolingSensors(),
+                SensorType::Count => $this->discoverCountSensors(),
+                SensorType::Current => $this->discoverCurrentSensors(),
+                SensorType::Dbm => $this->discoverDbmSensors(),
+                SensorType::Delay => $this->discoverDelaySensors(),
+                SensorType::Eer => $this->discoverEerSensors(),
+                SensorType::Fanspeed => $this->discoverFanspeedSensors(),
+                SensorType::Frequency => $this->discoverFrequencySensors(),
+                SensorType::Humidity => $this->discoverHumiditySensors(),
+                SensorType::Load => $this->discoverLoadSensors(),
+                SensorType::Loss => $this->discoverLossSensors(),
+                SensorType::Percent => $this->discoverPercentSensors(),
+                SensorType::Power => $this->discoverPowerSensors(),
+                SensorType::PowerConsumed => $this->discoverPowerConsumedSensors(),
+                SensorType::PowerFactor => $this->discoverPowerFactorSensors(),
+                SensorType::Pressure => $this->discoverPressureSensors(),
+                SensorType::QualityFactor => $this->discoverQualityFactorSensors(),
+                SensorType::Runtime => $this->discoverRuntimeSensors(),
+                SensorType::Signal => $this->discoverSignalSensors(),
+                SensorType::Snr => $this->discoverSnrSensors(),
+                SensorType::State => $this->discoverStateSensors(),
+                SensorType::Temperature => $this->discoverTemperatureSensors(),
+                SensorType::TvSignal => $this->discoverTvSignalSensors(),
+                SensorType::Voltage => $this->discoverVoltageSensors(),
+                SensorType::Waterflow => $this->discoverWaterflowSensors(),
+                SensorType::SignalLoss => $this->discoverSignalLossSensors(),
+            });
+        }
+
+        return $sensors
+            ->merge($this->discoverLegacySensors($types))
+            ->merge($this->discoverUpsMibSensors($types))
+            ->merge($this->discoverYamlSensors($types));
     }
 
     /**
-     * Sensors this OS discovers with code, yaml sensors are preferred.
-     *
      * @return Collection<int, Sensor>
      */
-    protected function discoverOsSensors(): Collection
+    protected function discoverAirflowSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverBerSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverBitrateSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverChargeSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverChromaticDispersionSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverCoolingSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverCountSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverCurrentSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverDbmSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverDelaySensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverEerSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverFanspeedSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverFrequencySensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverHumiditySensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverLoadSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverLossSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverPercentSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverPowerSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverPowerConsumedSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverPowerFactorSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverPressureSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverQualityFactorSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverRuntimeSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverSignalSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverSnrSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverStateSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverTemperatureSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverTvSignalSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverVoltageSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverWaterflowSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverSignalLossSensors(): Collection
     {
         return new Collection;
     }

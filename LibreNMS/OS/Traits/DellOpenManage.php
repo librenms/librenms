@@ -52,9 +52,10 @@ trait DellOpenManage
     /**
      * Dell server sensors, from MIB-Dell-10892 and StorageManagement-MIB
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverDellOpenManageSensors(): Collection
+    public function discoverDellOpenManageSensors(array $types): Collection
     {
         $sensors = new Collection;
 
@@ -67,6 +68,10 @@ trait DellOpenManage
         ];
 
         foreach ($probes as [$table, $type, $oid, $prefix, $divisor, $filter]) {
+            if (! in_array($type, $types, true)) {
+                continue;
+            }
+
             foreach (SnmpQuery::mibDir('dell')->walk("MIB-Dell-10892::$table")->valuesByIndex() as $index => $entry) {
                 if ($filter && ! $filter($entry)) {
                     continue;
@@ -91,6 +96,10 @@ trait DellOpenManage
                     'rrd_type' => 'GAUGE',
                 ]));
             }
+        }
+
+        if (! in_array(SensorType::State, $types, true)) {
+            return $sensors;
         }
 
         foreach (self::dellStateTables() as [$table, $oid, $status, $descr, $mib, $states]) {

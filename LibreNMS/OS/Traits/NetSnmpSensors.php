@@ -34,19 +34,21 @@ use SnmpQuery;
 trait NetSnmpSensors
 {
     /**
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverNetSnmpSensors(): Collection
+    public function discoverNetSnmpSensors(array $types): Collection
     {
-        return $this->discoverLmSensors()->merge($this->discoverUpsNutSensors());
+        return $this->discoverLmSensors($types)->merge($this->discoverUpsNutSensors($types));
     }
 
     /**
      * LM-SENSORS-MIB temperature, fan and voltage tables
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverLmSensors(): Collection
+    public function discoverLmSensors(array $types): Collection
     {
         $sensors = new Collection;
         $data = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
@@ -56,6 +58,10 @@ trait NetSnmpSensors
             ['lmFanSensors', SensorType::Fanspeed, '.1.3.6.1.4.1.2021.13.16.3.1.3', 1],
             ['lmVoltSensors', SensorType::Voltage, '.1.3.6.1.4.1.2021.13.16.4.1.3', 1000],
         ] as [$table, $type, $oid, $divisor]) {
+            if (! in_array($type, $types, true)) {
+                continue;
+            }
+
             foreach ($data as $row) {
                 $index = $row[$table . 'Index'] ?? null;
                 if ($index === null || empty($row[$table . 'Device'])) {
@@ -84,9 +90,10 @@ trait NetSnmpSensors
     /**
      * The ups-nut extend outputs one value per line, the line number tells what it is
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverUpsNutSensors(): Collection
+    public function discoverUpsNutSensors(array $types): Collection
     {
         $sensors = new Collection;
         $lines = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
@@ -104,6 +111,10 @@ trait NetSnmpSensors
             8 => [SensorType::Load, 'Ups Load', 1, [0, 0, null, 100]],
             24 => [SensorType::Temperature, 'Battery Temperature', 1, [10, 15, 35, 40]],
         ] as $line => [$type, $descr, $divisor, $limits]) {
+            if (! in_array($type, $types, true)) {
+                continue;
+            }
+
             $value = $lines[$line] ?? null;
             // voltages may be 0, other values are integers that must not be 0
             $value = $type === SensorType::Voltage ? (is_numeric($value) ? $value : null) : ((int) $value ?: null);
@@ -127,6 +138,10 @@ trait NetSnmpSensors
                     'rrd_type' => 'GAUGE',
                 ]));
             }
+        }
+
+        if (! in_array(SensorType::State, $types, true)) {
+            return $sensors;
         }
 
         foreach ([

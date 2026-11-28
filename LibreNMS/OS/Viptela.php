@@ -36,8 +36,8 @@ class Viptela extends OS
     use CiscoCdpMib;
     use CiscoEntitySensorMib;
 
-    public function discoverSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        return $this->withCiscoEntitySensors(parent::discoverSensors());
+        return $this->withCiscoEntitySensors($types, parent::discoverSensors($types));
     }
 }

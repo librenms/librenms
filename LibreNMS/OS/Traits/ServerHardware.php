@@ -28,6 +28,7 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorType;
 use SnmpQuery;
 
 /**
@@ -61,19 +62,20 @@ trait ServerHardware
     /**
      * The sensors of the server management agent that answers, there is one per server
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    protected function discoverServerHardwareSensors(): Collection
+    protected function discoverServerHardwareSensors(array $types): Collection
     {
         if ($this->hasDellOpenManage()) {
-            return $this->discoverDellOpenManageSensors();
+            return $this->discoverDellOpenManageSensors($types);
         }
 
         if ($this->hasHpInsightAgents()) {
-            return $this->discoverHpInsightSensors();
+            return $this->discoverHpInsightSensors($types);
         }
 
-        return $this->discoverSupermicroSensors();
+        return $this->discoverSupermicroSensors($types);
     }
 
     private function supermicroBoard(string $name): string

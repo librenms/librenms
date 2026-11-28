@@ -156,8 +156,8 @@ class Windows extends \LibreNMS\OS
         return $builds[$build] ?? null;
     }
 
-    protected function discoverOsSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        return parent::discoverOsSensors()->merge($this->discoverServerHardwareSensors());
+        return parent::discoverSensors($types)->merge($this->discoverServerHardwareSensors($types));
     }
 }

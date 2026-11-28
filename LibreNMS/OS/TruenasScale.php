@@ -3,6 +3,7 @@
 namespace LibreNMS\OS;
 
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\NetSnmpSensors;
 
@@ -19,8 +20,8 @@ class TruenasScale extends OS
     /**
      * LM-SENSORS-MIB and ups-nut temperatures of the Linux base
      */
-    protected function discoverOsSensors(): Collection
+    protected function discoverTemperatureSensors(): Collection
     {
-        return parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors()->whereIn('sensor_class', ['temperature']));
+        return parent::discoverTemperatureSensors()->merge($this->discoverNetSnmpSensors([SensorType::Temperature]));
     }
 }

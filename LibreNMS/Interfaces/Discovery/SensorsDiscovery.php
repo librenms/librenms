@@ -28,19 +28,21 @@ namespace LibreNMS\Interfaces\Discovery;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Exceptions\SnmpConnectionException;
 
 interface SensorsDiscovery
 {
     /**
-     * Discover the sensors of every sensor class.
+     * Discover the sensors of the given sensor classes, sensors of other classes are dropped.
      * The Sensors module sets the poller_type of the sensors to that of the polling method providing them.
      * State sensors carry their state translations, see Sensor::withStates().
      * Call throwIfConnectionError() on the queries, so a device that did not answer is not mistaken for a device without sensors.
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      *
      * @throws SnmpConnectionException when the device did not answer, existing sensors are kept
      */
-    public function discoverSensors(): Collection;
+    public function discoverSensors(array $types): Collection;
 }
