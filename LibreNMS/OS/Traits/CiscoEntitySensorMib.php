@@ -54,10 +54,11 @@ trait CiscoEntitySensorMib
      */
     public function discoverEntitySensors(): Collection
     {
+        $entity = parent::discoverEntitySensors();
         $cisco = $this->discoverCiscoEntitySensors();
         $keys = $cisco->map(fn (Sensor $sensor) => "$sensor->sensor_class-$sensor->sensor_index")->flip();
 
-        return $cisco->merge(parent::discoverEntitySensors()->reject(fn (Sensor $sensor) => $keys->has("$sensor->sensor_class-$sensor->sensor_index")));
+        return $cisco->merge($entity->reject(fn (Sensor $sensor) => $keys->has("$sensor->sensor_class-$sensor->sensor_index")));
     }
 
     /**
