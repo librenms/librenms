@@ -7,14 +7,14 @@
 === "Debian/Ubuntu"
 
     ```bash
-    apt-get install libjson-perl libfile-path-perl libfile-slurp-perl libmime-base64-perl cpanminus
+    apt-get install libjson-perl libfile-path-perl libfile-slurp-perl libfile-readbackwards-perl libhash-flatten-perl libmime-base64-perl cpanminus
     cpanm Suricata::Monitoring
     ```
 
 === "FreeBSD"
 
     ```bash
-    pkg install p5-JSON p5-File-Path p5-File-Slurp p5-Time-Piece p5-MIME-Base64 p5-Hash-Flatten p5-Carp p5-App-cpanminus
+    pkg install p5-JSON p5-File-Path p5-File-Slurp p5-File-ReadBackwards p5-Time-Piece p5-MIME-Base64 p5-Hash-Flatten p5-Carp p5-App-cpanminus
     cpanm Suricata::Monitoring
     ```
 
@@ -34,13 +34,7 @@
 3. Configure snmpd.conf
 
     ```bash
-    extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c
-    ```
-
-Or if you want to use try compressing the return via Base64+GZIP...
-
-    ```bash
-    extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c -b
+    extend suricata-stats /bin/cat /var/cache/suricata-monitoring/snmp
     ```
 
 4. Restart snmpd on your system.
