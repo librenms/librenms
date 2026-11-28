@@ -2998,7 +2998,7 @@
                     "ipv6_address": "0000:0000:0000:0000:0000:0000:a9fe:0901",
                     "ipv6_compressed": "::169.254.9.1",
                     "ipv6_prefixlen": 120,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": "::169.254.9.0/120",
                     "ifIndex": 11
@@ -3007,7 +3007,7 @@
                     "ipv6_address": "0000:0000:0000:0000:0000:ffff:a9fe:0901",
                     "ipv6_compressed": "::ffff:169.254.9.1",
                     "ipv6_prefixlen": 120,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": "::ffff:169.254.9.0/120",
                     "ifIndex": 11
@@ -3016,7 +3016,7 @@
                     "ipv6_address": "2002:b906:bc30:0000:0000:0000:0000:0001",
                     "ipv6_compressed": "2002:b906:bc30::1",
                     "ipv6_prefixlen": 128,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 7
@@ -3025,7 +3025,7 @@
                     "ipv6_address": "fdfd:0000:0009:0255:0000:0000:0000:0001",
                     "ipv6_compressed": "fdfd:0:9:255::1",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": "fdfd:0:9:255::/64",
                     "ifIndex": 14
@@ -3034,7 +3034,7 @@
                     "ipv6_address": "fdfd:0001:0255:0000:0000:0000:0000:0009",
                     "ipv6_compressed": "fdfd:1:255::9",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": "fdfd:1:255::/64",
                     "ifIndex": 8
@@ -3043,7 +3043,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:0000:0003:b906:bc30",
                     "ipv6_compressed": "fe80::3:b906:bc30",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 7
@@ -3052,7 +3052,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:0200:5efe:b806:bc30",
                     "ipv6_compressed": "fe80::200:5efe:b806:bc30",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 7
@@ -3061,7 +3061,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:02fa:814c:d784:d624",
                     "ipv6_compressed": "fe80::2fa:814c:d784:d624",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 8
@@ -3070,7 +3070,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:66d1:54ff:fe9a:513c",
                     "ipv6_compressed": "fe80::66d1:54ff:fe9a:513c",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 2
@@ -3079,7 +3079,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:66d1:54ff:fe9a:5140",
                     "ipv6_compressed": "fe80::66d1:54ff:fe9a:5140",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 11
@@ -3088,7 +3088,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:66d1:54ff:fe9a:5140",
                     "ipv6_compressed": "fe80::66d1:54ff:fe9a:5140",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 12
@@ -3097,7 +3097,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:66d1:54ff:fe9a:5140",
                     "ipv6_compressed": "fe80::66d1:54ff:fe9a:5140",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 13
@@ -3106,7 +3106,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:66d1:54ff:fe9a:5140",
                     "ipv6_compressed": "fe80::66d1:54ff:fe9a:5140",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 14
@@ -3115,7 +3115,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:d0d4:25bb:8d34:53c3",
                     "ipv6_compressed": "fe80::d0d4:25bb:8d34:53c3",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 9

@@ -2,25 +2,19 @@
 
 namespace LibreNMS\Modules;
 
-use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Observers\ModuleModelObserver;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Traits\RequiresPollingMethod;
-use LibreNMS\Util\IP;
-use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use SnmpQuery;
 
 class Ipv6Addresses implements Module
 {
@@ -53,15 +47,12 @@ class Ipv6Addresses implements Module
      */
     public function discover(OS $os): void
     {
-        $ips = new Collection;
-        if ($os instanceof Ipv6AddressDiscovery) {
+        try {
             $ips = $os->discoverIpv6Addresses();
-        }
-        if ($ips->isEmpty()) {
-            $ips = $this->discoverIpMib($os->getDevice());
-        }
-        if ($ips->isEmpty()) {
-            $ips = $this->discoverIpv6Mib($os->getDevice());
+        } catch (SnmpException $e) {
+            Log::warning('Device did not answer, IPv6 addresses were not updated: ' . $e->getMessage());
+
+            return;
         }
 
         // reject localhost and populate ipv6 networks
@@ -138,140 +129,5 @@ class Ipv6Addresses implements Module
                 ->orderBy('ipv6_address')->orderBy('ipv6_prefixlen')->orderBy('ifIndex')->orderBy('ipv6_addresses.context_name')
                 ->get()->map->makeHidden(['ipv6_address_id', 'ipv6_network_id', 'port_id', 'laravel_through_key']),
         ];
-    }
-
-    private function discoverIpMib(Device $device): Collection
-    {
-        $ips = new Collection;
-        foreach ($device->getVrfContexts() as $context_name) {
-            $prefixOrigins = null; // only walked if a row needs it
-            $ips = $ips->merge(SnmpQuery::context($context_name)
-                ->enumStrings()
-                ->walk([
-                    'IP-MIB::ipAddressTable',
-                ])->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr = '') use ($context_name, $device, &$prefixOrigins) {
-                    if (! in_array($ipAddressAddrType, ['ipv6', 'ipv6z'])) {
-                        return null;
-                    }
-
-                    try {
-                        Log::debug("Attempting to parse $ipAddressAddr");
-                        $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
-                        $ip = $this->parseIp($ipAddressAddr);
-
-                        return new Ipv6Address([
-                            'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
-                            'ipv6_address' => $ip->uncompressed(),
-                            'ipv6_compressed' => $ip->compressed(),
-                            'ipv6_prefixlen' => $this->parsePrefixLen($data, $ipAddressAddrType, $ip, $context_name, $prefixOrigins),
-                            'ipv6_origin' => $data['IP-MIB::ipAddressOrigin'] ?? 'unknown',
-                            'context_name' => $context_name,
-                        ]);
-                    } catch (InvalidIpException $e) {
-                        Log::error('Failed to parse IP: ' . $e->getMessage());
-
-                        return null;
-                    }
-                }));
-        }
-
-        return $ips->filter();
-    }
-
-    public function discoverIpv6Mib(Device $device): Collection
-    {
-        $ips = new Collection;
-        foreach ($device->getVrfContexts() as $context_name) {
-            $ips = $ips->merge(SnmpQuery::walk([
-                'IPV6-MIB::ipv6AddrPfxLength',
-                'IPV6-MIB::ipv6AddrType',
-            ])->mapTable(function ($data, $ipv6IfIndex = 0, $ipv6AddrAddress = '') use ($context_name, $device) {
-                try {
-                    $ip = IPv6::parse($ipv6AddrAddress);
-                    $origin = match ($data['IP-MIB::ipv6AddrType'] ?? null) {
-                        'stateless' => 'linklayer',
-                        'stateful' => 'manual',
-                        'unknown' => 'unknown',
-                        default => 'other',
-                    };
-
-                    return new Ipv6Address([
-                        'port_id' => PortCache::getIdFromIfIndex($ipv6IfIndex, $device),
-                        'ipv6_address' => $ip->uncompressed(),
-                        'ipv6_compressed' => $ip->compressed(),
-                        'ipv6_prefixlen' => $data['IPV6-MIB::ipv6AddrPfxLength'] ?? '',
-                        'ipv6_origin' => $origin,
-                        'context_name' => $context_name,
-                    ]);
-                } catch (InvalidIpException $e) {
-                    Log::error('Failed to parse IP: ' . $e->getMessage());
-
-                    return null;
-                }
-            }));
-        }
-
-        return $ips->filter();
-    }
-
-    /**
-     * @throws InvalidIpException
-     */
-    private function parseIp(string $ipAddressAddr): IP|IPv4|IPv6|null
-    {
-        // mis-formatted showing in dot notation
-        if (str_contains($ipAddressAddr, '.')) {
-            $cleanSnmpIp = implode('.', array_slice(explode('.', ltrim($ipAddressAddr, '.')), 0, 16));
-
-            return IPv6::fromSnmpString($cleanSnmpIp);
-        }
-
-        $cleanHexIp = trim(substr($ipAddressAddr, 0, strrpos($ipAddressAddr, '%') ?: null), '"');
-
-        return IPv6::fromHexString($cleanHexIp);
-    }
-
-    private function parsePrefixLen(array $snmpRowData, string $ipAddressAddrType, IP $ip, string $context_name, ?array &$prefixOrigins): int
-    {
-        $prefix = $snmpRowData['IP-MIB::ipAddressPrefix'] ?? '';
-
-        // prefix len is the last index of the ipAddressPrefixTable, fetch it from the pointer
-        if (str_contains($prefix, '.')) {
-            return (int) substr($prefix, strrpos($prefix, '.') + 1);
-        }
-
-        if (preg_match('/]\[(\d{1,3})]$/', $prefix, $prefix_match)) {
-            return (int) $prefix_match[1];
-        }
-
-        // try IP-MIB::ipAddressPrefixTable to get the prefix length
-        if (isset($snmpRowData['IP-MIB::ipAddressIfIndex'])) {
-            $prefixOrigins ??= SnmpQuery::context($context_name)->cache()->walk('IP-MIB::ipAddressPrefixOrigin')->table(4); // walk this and parse from index
-            $longestPrefixLen = 0;
-            foreach ($prefixOrigins[$snmpRowData['IP-MIB::ipAddressIfIndex']][$ipAddressAddrType] ?? [] as $prefix => $prefixData) {
-                foreach (array_keys($prefixData) as $prefixLen) {
-                    try {
-                        // broken output, parse from raw index
-                        if ($prefixLen === 'IP-MIB::ipAddressPrefixOrigin') {
-                            if (preg_match('/^\.(?<ip>.+)\.(?<prefix_len>\d{1,3})$/', (string) $prefix, $prefix_match)) {
-                                $prefix = $prefix_match['ip'];
-                                $prefixLen = (int) $prefix_match['prefix_len'];
-                            }
-                        }
-
-                        if ($ip->inNetwork($this->parseIp($prefix)->getNetwork($prefixLen))) {
-                            $longestPrefixLen = max($longestPrefixLen, (int) $prefixLen);
-                        }
-                    } catch (InvalidIpException) {
-                        // ignore failures, the result is 0 if no matches found
-                        Log::debug("Failed to parse ipv6 prefix: $prefix");
-                    }
-                }
-            }
-
-            return $longestPrefixLen;
-        }
-
-        return 0;
     }
 }

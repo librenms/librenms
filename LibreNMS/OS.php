@@ -49,6 +49,8 @@ use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
+use LibreNMS\Interfaces\Discovery\Ipv4AddressDiscovery;
+use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\MefDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
@@ -80,6 +82,7 @@ use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\EntitySensorMib;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\IpMib;
 use LibreNMS\OS\Traits\LegacySensorDiscovery;
 use LibreNMS\OS\Traits\LegacySensorPolling;
 use LibreNMS\OS\Traits\LldpMib;
@@ -112,6 +115,8 @@ class OS implements
     EntityPhysicalDiscovery,
     FdbTableDiscovery,
     IcmpNetstatsPolling,
+    Ipv4AddressDiscovery,
+    Ipv6AddressDiscovery,
     NeighborDiscovery,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
@@ -151,6 +156,7 @@ class OS implements
     use BridgeMib;
     use EntityMib;
     use EntitySensorMib;
+    use IpMib;
     use LldpMib;
     use MefUniEvcMib;
     use MplsVpnMib;
