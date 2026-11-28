@@ -33,7 +33,7 @@ class Twilio extends Transport
         ];
 
         $res = Http::client()->asForm()
-            ->withBasicAuth($this->config['twilio-sid'], $this->config['twilio-token'])
+            ->withBasicAuth(($this->config['twilio-api-sid'] ?? '') ?: $this->config['twilio-sid'], $this->config['twilio-token'])
             ->post($url, $data);
 
         if ($res->successful()) {
@@ -48,16 +48,22 @@ class Twilio extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'SID',
+                    'title' => 'Account SID',
                     'name' => 'twilio-sid',
-                    'descr' => 'Twilio SID',
+                    'descr' => 'Twilio Account SID',
                     'type' => 'text',
                 ],
                 [
                     'title' => 'Token',
                     'name' => 'twilio-token',
-                    'descr' => 'Twilio Account Token',
+                    'descr' => 'Twilio Auth Token, or the API Key Secret if API SID is set',
                     'type' => 'password',
+                ],
+                [
+                    'title' => 'API SID',
+                    'name' => 'twilio-api-sid',
+                    'descr' => 'Optional. Twilio API Key SID (starts with SK). Leave blank to use Account SID and Auth Token.',
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'Mobile Number',
@@ -77,6 +83,7 @@ class Twilio extends Transport
                 'twilio-token' => 'required|string',
                 'twilio-to' => 'required',
                 'twilio-sender' => 'required',
+                'twilio-api-sid' => 'nullable|string|starts_with:SK',
             ],
         ];
     }
