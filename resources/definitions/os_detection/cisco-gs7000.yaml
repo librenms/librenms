@@ -1,0 +1,10 @@
+os: cisco-gs7000
+text: 'Cisco GS7000'
+type: network
+icon: cisco
+mib_dir: scte
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.2082.7.1.302.3612
