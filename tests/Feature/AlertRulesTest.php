@@ -907,6 +907,54 @@ class AlertRulesTest extends TestCase
         ]);
     }
 
+    public function testSyncAlertStateSyncsNotesWhenAcknowledgedAndClearsOnRecovery(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'note' => 'Stale note',
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        $fault = AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::ACKNOWLEDGED,
+            'open' => 1,
+            'alerted' => 0,
+            'note' => 'Fault ack note',
+            'details' => ['rule' => []],
+        ]);
+
+        new AlertRules($device)->syncAlertState($rule);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACKNOWLEDGED,
+            'note' => 'Fault ack note',
+        ]);
+
+        $fault->update(['state' => AlertState::RECOVERED]);
+        new AlertRules($device)->syncAlertState($rule);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'note' => '',
+        ]);
+    }
+
     public function testRunRulesClearsAlert(): void
     {
         $device = Device::factory()->create(['status' => 1]);
