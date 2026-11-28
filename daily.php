@@ -13,6 +13,7 @@ use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\LegacyScheduleOptions;
 use LibreNMS\Util\Notifications;
 use LibreNMS\Validations\Php;
 
@@ -46,6 +47,10 @@ require __DIR__ . '/includes/init.php';
 if (isset($options['d'])) {
     echo "DEBUG\n";
     Debug::set();
+}
+
+if ($options['f'] === 'legacy_schedule_options') {
+    LegacyScheduleOptions::notify();
 }
 
 if ($options['f'] === 'update') {
