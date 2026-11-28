@@ -350,15 +350,18 @@ The sensors module discovers all sensor classes, or only those of
 `-m sensors/<class>`, such as `-m sensors/dbm,sensors/temperature`.
 The OS discovers, in this order:
 
-1. ENTITY-SENSOR-MIB sensors (`discoverEntitySensors()`). OS that use
-   the `CiscoEntitySensorMib` trait add CISCO-ENTITY-SENSOR-MIB sensors,
-   they replace the ENTITY-SENSOR-MIB sensors of the same entity.
-2. The sensors of the OS code, the methods with the `DiscoversSensors`
-   attribute. OS that run on servers (Unix, Windows, VMware ESXi) use
-   the `ServerHardware` trait, it adds the sensors of the Dell
-   OpenManage, HP Insight or Supermicro SuperDoctor agent that answers.
-3. UPS-MIB sensors when the OS has the `rfc1628_compat` setting.
-4. The YAML sensors.
+1. The sensors of the methods with the `DiscoversSensors` attribute,
+   those of parent classes and traits first. Every OS has:
+   - ENTITY-SENSOR-MIB sensors (`discoverEntitySensors()`). OS that use
+     the `CiscoEntitySensorMib` trait add CISCO-ENTITY-SENSOR-MIB
+     sensors, they replace the ENTITY-SENSOR-MIB sensors of the same
+     entity.
+   - UPS-MIB sensors when the OS has the `rfc1628_compat` setting.
+
+   OS that run on servers (Unix, Windows, VMware ESXi) use the
+   `ServerHardware` trait, it adds the sensors of the Dell OpenManage,
+   HP Insight or Supermicro SuperDoctor agent that answers.
+2. The YAML sensors.
 
 A sensor replaces earlier sensors of the same class, type and index.
 
@@ -367,9 +370,9 @@ Collection of `App\Models\Sensor` models, and list the sensor classes
 it returns in its `#[DiscoversSensors(...)]` attribute. The method only
 runs when one of its classes is discovered, and sensors of classes the
 attribute does not list are dropped. Walk a table that has sensors of
-several classes once, in one method that lists all of them. The name of the method is free, name it after what it
-discovers. Methods of a parent class and its traits run too, you do not
-need to call them.
+several classes once, in one method that lists all of them. The name of
+the method is free, name it after what it discovers. Methods of a
+parent class and its traits run too, you do not need to call them.
 
 ```php
 #[DiscoversSensors(SensorType::Fanspeed, SensorType::Temperature)]

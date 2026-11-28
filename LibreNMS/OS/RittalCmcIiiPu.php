@@ -41,7 +41,7 @@ class RittalCmcIiiPu extends OS
     /**
      * Sensor class by cmcIIIVarUnit, values without a unit are states
      */
-    private const UNIT_TYPES = [
+    private const array UNIT_TYPES = [
         '' => SensorType::State,
         'mA' => SensorType::Current,
         'A' => SensorType::Current,

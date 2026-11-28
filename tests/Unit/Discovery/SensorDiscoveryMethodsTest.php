@@ -15,25 +15,25 @@ final class SensorDiscoveryMethodsTest extends TestCase
     public function testOnlyMethodsOfTheRequestedClassesRun(): void
     {
         $os = $this->makeOs();
+        $os->discoverSensors([SensorType::Temperature]);
 
-        $this->assertSame(['temperature-entity', 'temperature-mislabeled'], $this->discovered($os, [SensorType::Temperature]));
         $this->assertSame(['entity', 'mislabeled', 'anything'], $os->called);
     }
 
     public function testOverrideKeepsTheClassesOfTheOverriddenMethod(): void
     {
         $os = $this->makeOs();
+        $os->discoverSensors([SensorType::State]);
 
-        $this->assertSame(['state-states'], $this->discovered($os, [SensorType::State]));
         $this->assertSame(['states', 'anything'], $os->called);
     }
 
     public function testMethodWithoutClassesRunsForAnyClass(): void
     {
         $os = $this->makeOs();
+        $os->discoverSensors([SensorType::Airflow]);
 
-        $this->assertSame(['humidity-anything'], $this->discovered($os, [SensorType::Humidity]));
-        $this->assertSame(['entity', 'anything'], $os->called);
+        $this->assertSame(['anything'], $os->called);
     }
 
     public function testClassesMissingFromTheAttributeAreDropped(): void
@@ -41,7 +41,7 @@ final class SensorDiscoveryMethodsTest extends TestCase
         Log::shouldReceive('error')->once()->with('discoverMislabeled() returned a voltage sensor, which its DiscoversSensors attribute does not list');
         $os = $this->makeOs();
 
-        $this->assertSame(['temperature-entity', 'temperature-mislabeled'], $this->discovered($os, [SensorType::Temperature, SensorType::Voltage]));
+        $this->assertSame(['temperature-entity', 'dbm-entity', 'temperature-mislabeled', 'humidity-anything'], $this->discovered($os, [SensorType::Temperature, SensorType::Voltage]));
     }
 
     public function testNothingRunsWithoutClasses(): void
@@ -122,7 +122,7 @@ final class SensorDiscoveryMethodsTest extends TestCase
                 return new Collection;
             }
 
-            public function discoverUpsMibSensors(array $types): Collection
+            public function discoverUpsMibSensors(): Collection
             {
                 return new Collection;
             }

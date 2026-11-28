@@ -100,15 +100,11 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
             Log::info($method->label() . ':');
             try {
-                [$discovered, $others] = $source->discoverSensors($types)->partition(fn (Sensor $sensor) => in_array($sensor->sensor_class, $classes, true));
+                $discovered = $source->discoverSensors($types)->whereIn('sensor_class', $classes);
             } catch (SnmpConnectionException $e) {
                 Log::warning('Device did not answer, ' . $method->label() . ' sensors were not updated: ' . $e->getMessage());
 
                 continue;
-            }
-
-            if ($others->isNotEmpty()) {
-                Log::error(sprintf('%s returned %s sensors, they were not asked for and were dropped', $source::class, $others->pluck('sensor_class')->unique()->implode(', ')));
             }
 
             if ($discovered->isEmpty() && $method !== PollingMethodType::Snmp) {

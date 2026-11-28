@@ -100,11 +100,6 @@ class GwEydfa extends OS
         $readings[] = [SensorType::Dbm, '.1.3.6.1.4.1.17409.1.11.3.0', 'oaInputOpticalPower.0', 'Input Power',
             SnmpQuery::get('NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB::oaInputOpticalPower.0')->value(), 10, null];
 
-        $readings = array_filter($readings, fn (array $reading) => is_numeric($reading[4]));
-        if (empty($readings)) {
-            return $sensors;
-        }
-
         // the limits are indexed by the length prefixed oid of the value
         $limits = SnmpQuery::numericIndex()->walk([
             'NSCRTV-HFCEMS-PROPERTY-MIB::analogAlarmLOLO',
@@ -114,6 +109,10 @@ class GwEydfa extends OS
         ])->valuesByIndex();
 
         foreach ($readings as [$type, $oid, $index, $descr, $value, $divisor, $limitOid]) {
+            if (! is_numeric($value)) {
+                continue;
+            }
+
             $limitOid ??= $oid;
             $limitDivisor = $limitOid === $oid ? $divisor : 1;
             $entry = $limits[count(explode('.', trim($limitOid, '.'))) . $limitOid] ?? [];

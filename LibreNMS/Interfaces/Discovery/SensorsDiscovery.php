@@ -34,7 +34,7 @@ use LibreNMS\Exceptions\SnmpConnectionException;
 interface SensorsDiscovery
 {
     /**
-     * Discover the sensors of the given sensor classes, sensors of other classes are dropped.
+     * Discover the sensors of the given sensor classes, the classes allow skipping work, sensors of other classes are dropped.
      * The Sensors module sets the poller_type of the sensors to that of the polling method providing them.
      * State sensors carry their state translations, see Sensor::withStates().
      * Call throwIfConnectionError() on the queries, so a device that did not answer is not mistaken for a device without sensors.

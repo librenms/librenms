@@ -513,9 +513,8 @@ class OS implements
     }
 
     /**
-     * Sensors of the given classes from the methods that have the DiscoversSensors attribute,
-     * then the legacy includes, UPS-MIB and the yaml sensors.
-     * ENTITY-SENSOR-MIB comes first, a sensor replaces earlier sensors of the same class, type and index.
+     * Sensors from the methods that have the DiscoversSensors attribute and one of the given classes, those of parent classes first,
+     * then the legacy includes and the yaml sensors. A sensor replaces earlier sensors of the same class, type and index.
      *
      * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
@@ -530,18 +529,16 @@ class OS implements
             }
 
             foreach ($this->$method() as $sensor) {
-                $type = SensorType::tryFrom((string) $sensor->sensor_class);
-                if (! empty($methodTypes) && ! in_array($type, $methodTypes, true)) {
-                    Log::error("$method() returned a $sensor->sensor_class sensor, which its DiscoversSensors attribute does not list");
-                } elseif (in_array($type, $types, true)) {
+                if (empty($methodTypes) || in_array(SensorType::tryFrom((string) $sensor->sensor_class), $methodTypes, true)) {
                     $sensors->push($sensor);
+                } else {
+                    Log::error("$method() returned a $sensor->sensor_class sensor, which its DiscoversSensors attribute does not list");
                 }
             }
         }
 
         return $sensors
             ->merge($this->discoverLegacySensors($types))
-            ->merge($this->discoverUpsMibSensors($types))
             ->merge($this->discoverYamlSensors($types));
     }
 
@@ -561,7 +558,7 @@ class OS implements
         $parent = get_parent_class($class);
         $methods = $parent ? self::sensorDiscoveryMethods($parent) : [];
 
-        foreach ((new ReflectionClass($class))->getMethods() as $method) {
+        foreach (new ReflectionClass($class)->getMethods() as $method) {
             $attribute = $method->getAttributes(DiscoversSensors::class)[0] ?? null;
             if ($attribute !== null) {
                 $methods[$method->getName()] = $attribute->newInstance()->types;

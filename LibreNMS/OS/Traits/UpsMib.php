@@ -29,6 +29,7 @@ namespace LibreNMS\OS\Traits;
 use App\Facades\LibrenmsConfig;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Util\Number;
 use SnmpQuery;
@@ -36,12 +37,12 @@ use SnmpQuery;
 trait UpsMib
 {
     /**
-     * UPS-MIB sensors of the classes, of OS that have the rfc1628_compat setting
+     * UPS-MIB sensors of OS that have the rfc1628_compat setting
      *
-     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverUpsMibSensors(array $types): Collection
+    #[DiscoversSensors(SensorType::Charge, SensorType::Count, SensorType::Current, SensorType::Frequency, SensorType::Load, SensorType::Power, SensorType::Runtime, SensorType::State, SensorType::Temperature, SensorType::Voltage)]
+    public function discoverUpsMibSensors(): Collection
     {
         $sensors = new Collection;
 
@@ -118,7 +119,7 @@ trait UpsMib
             ['value' => 6, 'generic' => 3, 'descr' => 'noTestInitiated'],
         ]);
 
-        return $sensors->whereIn('sensor_class', array_map(fn (SensorType $type) => $type->value, $types));
+        return $sensors;
     }
 
     /**
