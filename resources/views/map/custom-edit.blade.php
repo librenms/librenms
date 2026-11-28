@@ -1111,7 +1111,7 @@
         }
 
         $(document).on('keydown.map-container', function (e) {
-            if (!network) return;
+            if (!network || Alpine.$data(document.getElementById("showHelpContainer")).showHelp) return;
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
                 return;
             }
