@@ -1126,6 +1126,7 @@
                 e.preventDefault();
                 network.selectNodes(network_nodes.getIds());
             } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                e.preventDefault();
                 deleteItems(network.getSelectedEdges(), network.getSelectedNodes());
             } else if (e.key === '?') {
                 e.preventDefault();
