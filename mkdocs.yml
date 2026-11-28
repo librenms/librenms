@@ -176,6 +176,7 @@ nav:
     - Configuration: Support/Configuration.md
     - Dashboards: Extensions/Dashboards.md
     - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
+    - Junos NAT Pool: Extensions/Junos-NAT-Pool.md
     - Network Maps:
       - Availability Map: Extensions/Availability-Map.md
       - Dependency Map: Extensions/Dependency-Map.md
