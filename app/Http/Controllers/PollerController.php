@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 
 class PollerController extends Controller
 {
@@ -48,10 +49,17 @@ class PollerController extends Controller
     {
         $this->authorize('viewAny', PollerCluster::class);
 
+        $pollerCluster = $this->pollerCluster();
+        $clusterGroups = $this->clusterGroups($pollerCluster);
+
         return view('poller.poller', [
             'current_tab' => 'poller',
             'pollers' => $this->poller(),
-            'poller_cluster' => $this->pollerCluster(),
+            'poller_cluster' => $pollerCluster,
+            'poller_cluster_meta' => $this->pollersMeta($pollerCluster),
+            'cluster_groups' => $clusterGroups,
+            'healthy_count' => $pollerCluster->where('row_class', 'success')->count(),
+            'can_delete_any' => $pollerCluster->contains(fn ($poller) => $poller->long_not_polled && Gate::allows('delete', $poller)),
         ]);
     }
 
@@ -81,6 +89,22 @@ class PollerController extends Controller
         $poller->row_class = $this->checkTimeSinceLastPoll($since_last_poll);
         $poller->long_not_polled = $since_last_poll > ($this->rrdstep * 2);
 
+        if ($poller instanceof PollerCluster) {
+            foreach ($poller->stats as $stat) {
+                $maxSeconds = (int) $stat->frequency * (int) $stat->workers;
+                $stat->setAttribute('max_seconds', $maxSeconds);
+                $stat->setAttribute('util_pct', $maxSeconds > 0 ? (int) round($stat->worker_seconds / $maxSeconds * 100) : 0);
+            }
+
+            $primaryStat = $poller->stats->firstWhere('poller_type', 'poller') ?? $poller->stats->first();
+            $poller->setAttribute('primary_stat', $primaryStat);
+            $poller->setAttribute('other_stats', $poller->stats->reject(fn ($stat) => $stat === $primaryStat));
+
+            if ($poller->row_class === 'success' && $primaryStat?->getAttribute('util_pct') > 100) {
+                $poller->row_class = 'warning';
+            }
+        }
+
         return $poller;
     }
 
@@ -92,6 +116,74 @@ class PollerController extends Controller
     private function pollerCluster()
     {
         return PollerCluster::with('stats')->orderBy('poller_name')->get()->map(fn ($poller) => $this->pollerStatus($poller, $poller->last_report));
+    }
+
+    /**
+     * Name, node id, status and groups of each poller for the search/status/group filter
+     *
+     * @return Collection<int, array{name: string, nodeId: string, rowClass: string, groupIds: array<mixed>}>
+     */
+    private function pollersMeta(Collection $pollers): Collection
+    {
+        return $pollers->map(fn ($p): array => [
+            'name' => (string) $p->poller_name,
+            'nodeId' => (string) $p->node_id,
+            'rowClass' => (string) $p->row_class,
+            'groupIds' => (array) ($p->getAttribute('group_ids') ?? [0]),
+        ])->values();
+    }
+
+    private function clusterGroups(Collection $pollerCluster): Collection
+    {
+        $groups = PollerGroup::query()->withCount('devices')->orderBy('id')->get()->keyBy('id');
+        $defaultGroup = (string) LibrenmsConfig::get('distributed_poller_group', '0');
+        $groupName = function (int $gid) use ($groups): string {
+            if ($gid === 0) {
+                return __('General');
+            }
+            $groupModel = $groups->get($gid);
+
+            return $groupModel ? $groupModel->group_name : __('Group') . ' #' . $gid;
+        };
+        $usedGroupIds = [];
+
+        foreach ($pollerCluster as $poller) {
+            $rawGroups = ($poller->poller_groups === null || $poller->poller_groups === '')
+                ? $defaultGroup
+                : (string) $poller->poller_groups;
+
+            $groupIds = array_values(array_unique(array_map(
+                intval(...),
+                array_filter(explode(',', $rawGroups), fn (string $v): bool => trim($v) !== '')
+            )));
+
+            if ($groupIds === []) {
+                $groupIds = [0];
+            }
+
+            $poller->setAttribute('group_ids', $groupIds);
+            $poller->setAttribute('groups_served', implode(', ', array_map($groupName, $groupIds)));
+
+            foreach ($groupIds as $gid) {
+                $usedGroupIds[$gid] = true;
+            }
+        }
+
+        ksort($usedGroupIds);
+        $ungroupedCount = isset($usedGroupIds[0]) ? Device::where('poller_group', 0)->count() : 0;
+
+        $result = new Collection();
+        foreach (array_keys($usedGroupIds) as $gid) {
+            $groupModel = $groups->get($gid);
+
+            $result->push([
+                'id' => (int) $gid,
+                'group_name' => $groupName((int) $gid),
+                'devices_count' => $gid === 0 ? $ungroupedCount : ($groupModel ? (int) $groupModel->devices_count : 0),
+            ]);
+        }
+
+        return $result;
     }
 
     private function checkTimeSinceLastPoll($seconds)
