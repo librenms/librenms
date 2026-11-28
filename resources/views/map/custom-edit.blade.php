@@ -1114,6 +1114,9 @@
                 // Make sure the add node / add edge modes are not active
                 network.disableEditMode();
                 network.enableEditMode();
+            } else if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault();
+                network.selectNodes(network_nodes.getIds());
             } else if (e.key === '?') {
                 e.preventDefault();
                 Alpine.$data(document.getElementById("showHelpContainer")).toggleHelp();
