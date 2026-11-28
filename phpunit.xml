@@ -19,6 +19,7 @@
     </exclude>
   </groups>
   <php>
+    <ini name="date.timezone" value="UTC"/>
     <env name="APP_ENV" value="testing"/>
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_STORE" value="array"/>

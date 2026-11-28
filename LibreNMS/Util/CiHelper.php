@@ -99,6 +99,7 @@ class CiHelper
             $this->snmpsim = new Snmpsim('127.1.6.2', 1162);
             $this->snmpsim->setupVenv();
             $this->snmpsim->start();
+            $this->snmpsim->waitForStartup();
         }
 
         $this->unitEnv['SNMPSIM'] = '127.1.6.2:1162';
