@@ -139,6 +139,49 @@ function port_fill_missing_and_trim(&$port, $device)
 }
 
 /**
+ * Check whether IF-X data covers every port that LibreNMS polls.
+ *
+ * @param  array<int|string, array<string, mixed>>  $port_stats
+ * @param  array<int|string, array<string, mixed>>  $ports
+ */
+function has_complete_if_x_entry(array $port_stats, array $ports): bool
+{
+    $required_oids = ['ifHCInOctets', 'ifHCOutOctets', 'ifHighSpeed'];
+    $has_expected_ports = false;
+
+    foreach ($ports as $port) {
+        if (($port['deleted'] ?? false) || ($port['disabled'] ?? false)) {
+            continue;
+        }
+
+        $has_expected_ports = true;
+        $if_index = $port['ifIndex'] ?? null;
+        $interface_stats = $if_index === null ? null : ($port_stats[$if_index] ?? null);
+
+        if (! is_array($interface_stats)) {
+            return false;
+        }
+
+        foreach ($required_oids as $oid) {
+            if (! isset($interface_stats[$oid]) || ! is_numeric($interface_stats[$oid])) {
+                return false;
+            }
+        }
+    }
+
+    return $has_expected_ports;
+}
+
+/**
+ * Check whether this device is an NT24K running firmware 2.2.3.
+ */
+function is_ntron_nt24k_v223(array $device): bool
+{
+    return ($device['os'] ?? '') === 'ntron'
+        && preg_match('/\bNT[\s-]?24K(?:[-\w]*)?,\s*v?2\.2\.3\b/i', (string) ($device['sysDescr'] ?? '')) === 1;
+}
+
+/**
  * Create a new state index.  Update translations if $states is given.
  *
  * For for backward compatibility:
