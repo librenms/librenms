@@ -27,12 +27,78 @@
 namespace LibreNMS\OS;
 
 use App\Models\Sensor;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use Illuminate\Support\Str;
 use LibreNMS\Util\UserFuncHelper;
 use SnmpQuery;
 
-class AristaEos extends Shared\Arista
+class AristaEos extends Shared\Arista implements TransceiverDiscovery
 {
+    /** @var Collection<int, Transceiver>|null */
+    private ?Collection $plr4Transceivers = null;
+
+    /**
+     * A PLR4 breakout exposes a transceiver lane entity for each logical 100G port.
+     * Keep the native transceiver-to-port association instead of interpreting a sensor's port label.
+     *
+     * @return Collection<int, Transceiver>
+     */
+    public function discoverTransceivers(): Collection
+    {
+        if ($this->plr4Transceivers !== null) {
+            return $this->plr4Transceivers;
+        }
+
+        $entities = SnmpQuery::cache()->hideMib()->enumStrings()->walk('ENTITY-MIB::entPhysicalTable')->table(1);
+        $ports = $this->getDevice()->ports()->where('deleted', 0)->get()->keyBy('ifName');
+        $transceivers = new Collection;
+        foreach ($entities as $moduleIndex => $module) {
+            if (! str_contains($module['entPhysicalDescr'] ?? '', '400GBASE-PLR4')
+                || ! preg_match('/^Xcvr for (Ethernet[0-9]+):/', $module['entPhysicalName'] ?? '', $match)) {
+                continue;
+            }
+
+            $parent = $match[1];
+            $breakout = $ports->filter(fn ($port) => str_starts_with($port->ifName, $parent . '/'))->sortBy('ifName', SORT_NATURAL)->values();
+            if ($ports->has($parent) || $breakout->count() !== 4
+                || $breakout->contains(fn ($port) => (int) $port->ifSpeed !== 100000000000)
+                || ! in_array($breakout->pluck('ifName')->all(), [
+                    array_map(fn ($lane) => "$parent/$lane", [1, 3, 5, 7]),
+                    array_map(fn ($lane) => "$parent/$lane", [1, 2, 3, 4]),
+                ], true)) {
+                continue; // Standalone, 8x50G and ambiguous layouts are not four-port PLR4 breakouts.
+            }
+
+            $lanes = collect($entities)->filter(fn ($entity) => ($entity['entPhysicalContainedIn'] ?? null) == $moduleIndex
+                && ($entity['entPhysicalClass'] ?? '') === 'module'
+                && preg_match('/^Lane [0-9]+ for Xcvr for ' . preg_quote($parent, '/') . '$/', $entity['entPhysicalName'] ?? '')
+                && isset($entity['entPhysicalParentRelPos']) && in_array((int) $entity['entPhysicalParentRelPos'], [0, 1, 2, 3], true));
+            if ($lanes->count() !== 4 || $lanes->pluck('entPhysicalParentRelPos')->unique()->count() !== 4) {
+                continue;
+            }
+
+            foreach ($lanes as $index => $lane) {
+                $port = $breakout[(int) $lane['entPhysicalParentRelPos']];
+                $transceivers->put($index, new Transceiver([
+                    'index' => $index,
+                    'entity_physical_index' => $index,
+                    'port_id' => $port->port_id,
+                    'type' => $module['entPhysicalDescr'],
+                    'vendor' => $module['entPhysicalMfgName'] ?? null,
+                    'model' => $module['entPhysicalModelName'] ?? null,
+                    'serial' => $module['entPhysicalSerialNum'] ?? null,
+                    'revision' => $module['entPhysicalHardwareRev'] ?? null,
+                    'channels' => 1,
+                    'ddm' => true,
+                ])->setRelation('port', $port));
+            }
+        }
+
+        return $this->plr4Transceivers = $transceivers;
+    }
+
     /**
      * Unnamed entities get a name from their description and the unit they belong to
      */
@@ -99,6 +165,17 @@ class AristaEos extends Shared\Arista
         } else {
             $sensor->group = 'System';
             $sensor->sensor_descr = Str::replaceLast('temp sensor', '', $descr);
+        }
+
+        if (preg_match('/^DOM (RX|TX) Power\s+For Ethernet[0-9]+\/([1-4])$/i', $sensor->sensor_descr, $match)) {
+            $entities = SnmpQuery::cache()->hideMib()->enumStrings()->walk('ENTITY-MIB::entPhysicalTable')->table(1);
+            $parent = $entities[$sensor->sensor_index]['entPhysicalContainedIn'] ?? null;
+            $transceiver = $this->discoverTransceivers()->get($parent);
+            if ($transceiver !== null) {
+                $sensor->entPhysicalIndex = (string) $transceiver->entity_physical_index;
+                $sensor->group = 'transceiver';
+                $sensor->sensor_descr = 'DOM ' . strtoupper($match[1]) . ' Power For ' . $transceiver->port->ifName . ' (optical lane ' . ($entities[$parent]['entPhysicalParentRelPos'] + 1) . ')';
+            }
         }
 
         return $sensor;
