@@ -122,7 +122,6 @@
         networkOptions: {{ Js::from($map_conf) }},
         baseUrl: '{{ $base_url }}',
         enableKeyboard: true,
-        autoRefresh: {{ (int) $page_refresh }},
         alertId: 'alert',
         alertRowId: 'alert-row'
     });
@@ -137,4 +136,5 @@
         }));
     });
 </script>
+<x-refresh-timer :refresh="$page_refresh" callback="mapViewer.refresh"></x-refresh-timer>
 @endsection

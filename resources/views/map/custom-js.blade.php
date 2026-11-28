@@ -509,7 +509,6 @@
                 this.baseUrl = config.baseUrl || '';
                 this.customImageBase = this.baseUrl + 'images/custommap/icons/';
                 this.enableKeyboard = Boolean(config.enableKeyboard);
-                this.autoRefresh = config.autoRefresh || 0;
                 this.alertId = config.alertId;
                 this.alertRowId = config.alertRowId;
                 this.isWidget = Boolean(config.isWidget);
@@ -519,7 +518,6 @@
                 this.networkEdges = new vis.DataSet({ queue: { delay: 100 } });
                 this.edgePortMap = {};
                 this.resizeObserver = null;
-                this.refreshInterval = null;
                 this.isDestroyed = false;
 
                 custommap.baseUrl = this.baseUrl;
@@ -887,16 +885,7 @@
                     });
                 }
 
-                if (this.autoRefresh > 0) {
-                    this.refreshInterval = setInterval(function () {
-                        self.refresh();
-                    }, this.autoRefresh * 1000);
-                }
-
                 var $cont = $('#' + this.containerId);
-                $cont.on('refresh', function () {
-                    self.refresh();
-                });
                 $cont.on('destroy', function () {
                     self.destroy();
                 });
@@ -904,17 +893,13 @@
 
             destroy() {
                 this.isDestroyed = true;
-                if (this.refreshInterval) {
-                    clearInterval(this.refreshInterval);
-                    this.refreshInterval = null;
-                }
                 if (this.resizeObserver) {
                     this.resizeObserver.disconnect();
                     this.resizeObserver = null;
                 }
                 $(window).off('resize.custommap_' + this.elementId);
                 $(document).off('keydown.custommap_' + this.elementId);
-                $('#' + this.containerId).off('refresh destroy');
+                $('#' + this.containerId).off('destroy');
                 if (this.network) {
                     this.network.destroy();
                     this.network = null;
