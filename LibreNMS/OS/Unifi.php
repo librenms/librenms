@@ -60,6 +60,13 @@ class Unifi extends OS implements
 
     public function discoverOS(Device $device): void
     {
+        if (str_starts_with((string) $device->sysDescr, 'Ubiquiti UniFi UCG-')) {
+            parent::discoverOS($device);
+            $device->type = 'network';
+
+            return;
+        }
+
         // try the Unifi MIB first, then fall back to dot11manufacturer
         $response = SnmpQuery::next(['UBNT-UniFi-MIB::unifiApSystemModel', 'UBNT-UniFi-MIB::unifiApSystemVersion']);
         if ($response->isValid()) {
@@ -86,7 +93,18 @@ class Unifi extends OS implements
     {
         $processors = $this->discoverHrProcessors();
 
-        return $processors->isNotEmpty() ? $processors : $this->discoverFrogfootProcessors();
+        if ($processors->isEmpty()) {
+            $processors = $this->discoverFrogfootProcessors();
+        }
+
+        return $processors->isNotEmpty() ? $processors : $this->discoverUcdProcessors();
+    }
+
+    public function discoverMempools(): Collection
+    {
+        $mempools = parent::discoverMempools();
+
+        return $mempools->isNotEmpty() ? $mempools : $this->discoverUcdMempools();
     }
 
     /**
