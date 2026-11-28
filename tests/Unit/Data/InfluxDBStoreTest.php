@@ -105,6 +105,20 @@ final class InfluxDBStoreTest extends TestCase
         $influx->write($measurement, $fields, $tags, $meta);
     }
 
+    public function testZeroTagValuesAreKeptAndEmptyTagValuesAreBlank(): void
+    {
+        $mock = \Mockery::mock(\InfluxDB\Database::class);
+        $influx = new InfluxDB($mock);
+        $tags = ['ifIndex' => 0, 'sensor_index' => '0', 'ifAlias' => null, 'ifName' => ''];
+        $expected = ['hostname' => 'testhost', 'ifIndex' => 0, 'sensor_index' => '0', 'ifAlias' => '_blank_', 'ifName' => '_blank_'];
+
+        $mock->shouldReceive('writePoints')
+            ->with(\Mockery::on(fn ($points) => $points[0] instanceof Point && $points[0]->getTags() === $expected), 's')
+            ->once();
+        $influx->write('testmeasure', ['value' => 1.0], $tags, ['device' => new Device(['hostname' => 'testhost'])]); // @phpstan-ignore argument.type (null tags are outside the contract but still sent by callers)
+        $influx->terminate();
+    }
+
     public function testMetricIdentityTagsReplaceTheDeviceHostname(): void
     {
         $mock = \Mockery::mock(\InfluxDB\Database::class);

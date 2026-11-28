@@ -96,6 +96,19 @@ final class OpenTSDBStoreTest extends TestCase
         $opentsdb->write($measurement, $fields, $tags, $meta);
     }
 
+    public function testZeroTagValuesAreKeptAndEmptyTagValuesAreDropped(): void
+    {
+        $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
+        $opentsdb = $this->mockOpenTSDB($mockSocket);
+
+        $tags = ['ifIndex' => 0, 'sensor_index' => '0', 'ifAlias' => null, 'ifName' => ''];
+        $meta = ['device' => new Device(['hostname' => 'testhost'])];
+
+        $mockSocket->shouldReceive('write')
+            ->with("put net.testmeasure $this->timestamp 1.000000 hostname=testhost ifIndex=0 sensor_index=0 key=value\n")->once();
+        $opentsdb->write('testmeasure', ['value' => 1], $tags, $meta); // @phpstan-ignore argument.type (null tags are outside the contract but still sent by callers)
+    }
+
     public function testMetricIdentityTagsReplaceTheDeviceHostname(): void
     {
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);

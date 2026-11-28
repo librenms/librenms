@@ -77,7 +77,7 @@ class InfluxDB extends BaseDatastore
         $tmp_fields = [];
         $tmp_tags = [];
         foreach ($this->seriesTags($tags, $meta) as $k => $v) {
-            if (empty($v)) {
+            if ($v === null || $v === '') {
                 $v = '_blank_';
             }
             $tmp_tags[$k] = $v;

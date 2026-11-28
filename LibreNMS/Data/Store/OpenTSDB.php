@@ -77,7 +77,7 @@ class OpenTSDB extends BaseDatastore
         $tmp_tags = [];
         foreach ($this->seriesTags($tags, $meta) as $k => $v) {
             $v = str_replace([' ', ',', '='], '_', (string) $v);
-            if (! empty($v)) {
+            if ($v !== '') {
                 $tmp_tags[] = $k . '=' . $v;
             }
         }
