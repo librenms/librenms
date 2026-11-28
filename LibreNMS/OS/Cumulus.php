@@ -32,6 +32,8 @@ use App\Models\Sensor;
 use App\Models\Vrf;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\OS\Traits\NetSnmpSensors;
 use LibreNMS\Util\Bgp;
 use LibreNMS\Util\IP;
@@ -124,12 +126,17 @@ class Cumulus extends \LibreNMS\OS
         return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'CUMULUS-BGPVRF-MIB::bgpLocalAs');
     }
 
-    protected function discoverOsSensors(): Collection
+    /**
+     * Hardware states are the oper status of the ENTITY-SENSOR-MIB sensors, the index tells the kind
+     *
+     * @return Collection<int, Sensor>
+     */
+    #[DiscoversSensors(SensorType::State)]
+    protected function discoverHardwareStateSensors(): Collection
     {
-        $sensors = parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors());
+        $sensors = new Collection;
 
-        // hardware states are the oper status of the ENTITY-SENSOR-MIB sensors, the index tells the kind
-        foreach (SnmpQuery::cache()->walk('ENTITY-SENSOR-MIB::entPhySensorOperStatus')->pluck() as $index => $status) {
+        foreach (SnmpQuery::walk('ENTITY-SENSOR-MIB::entPhySensorOperStatus')->pluck() as $index => $status) {
             if (preg_match('/^1100000\d{2}$/', (string) $index)) {
                 $kind = 'Power Supply';
             } elseif (preg_match('/^1000110\d{2}$/', (string) $index)) {

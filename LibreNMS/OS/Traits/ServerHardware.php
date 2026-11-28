@@ -28,6 +28,8 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
+use LibreNMS\Enum\SensorType;
 use SnmpQuery;
 
 /**
@@ -63,6 +65,7 @@ trait ServerHardware
      *
      * @return Collection<int, Sensor>
      */
+    #[DiscoversSensors(SensorType::Fanspeed, SensorType::Power, SensorType::State, SensorType::Temperature, SensorType::Voltage)]
     protected function discoverServerHardwareSensors(): Collection
     {
         if ($this->hasDellOpenManage()) {

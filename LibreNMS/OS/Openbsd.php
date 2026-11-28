@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -125,10 +126,13 @@ class Openbsd extends Unix implements OSPolling
 
     /**
      * OPENBSD-SENSORS-MIB, values are in the units LibreNMS uses
+     *
+     * @return Collection<int, Sensor>
      */
-    protected function discoverOsSensors(): Collection
+    #[DiscoversSensors(SensorType::Current, SensorType::Fanspeed, SensorType::Frequency, SensorType::Humidity, SensorType::Power, SensorType::Temperature, SensorType::Voltage)]
+    protected function discoverOpenbsdSensors(): Collection
     {
-        $sensors = parent::discoverOsSensors();
+        $sensors = new Collection;
         $data = SnmpQuery::enumStrings()->walk([
             'OPENBSD-SENSORS-MIB::sensorDevice',
             'OPENBSD-SENSORS-MIB::sensorDescr',

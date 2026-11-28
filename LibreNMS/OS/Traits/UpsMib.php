@@ -29,6 +29,7 @@ namespace LibreNMS\OS\Traits;
 use App\Facades\LibrenmsConfig;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Util\Number;
 use SnmpQuery;
@@ -40,6 +41,7 @@ trait UpsMib
      *
      * @return Collection<int, Sensor>
      */
+    #[DiscoversSensors(SensorType::Charge, SensorType::Count, SensorType::Current, SensorType::Frequency, SensorType::Load, SensorType::Power, SensorType::Runtime, SensorType::State, SensorType::Temperature, SensorType::Voltage)]
     public function discoverUpsMibSensors(): Collection
     {
         $sensors = new Collection;

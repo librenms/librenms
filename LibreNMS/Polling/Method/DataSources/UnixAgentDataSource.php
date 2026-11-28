@@ -219,7 +219,7 @@ final readonly class UnixAgentDataSource implements MempoolsDiscovery, MempoolsP
      *
      * @return Collection<int, Sensor>
      */
-    public function discoverSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
         $sensors = new Collection;
 

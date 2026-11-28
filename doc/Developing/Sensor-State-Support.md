@@ -126,8 +126,9 @@ modules:
 
 ## Advanced Example
 
-For advanced state discovery, add the sensors to `discoverOsSensors()`
-of the OS class (see [Health Information](os/Health-Information.md)).
+For advanced state discovery, add a method with the
+`#[DiscoversSensors(SensorType::State)]` attribute to the OS class
+(see [Health Information](os/Health-Information.md)).
 A state sensor carries its state translations, set them with
 `withStates()`. The state name is the `sensor_type` of the sensor.
 
@@ -135,9 +136,10 @@ This example gives full state support for the power supplies of Cisco
 switches.
 
 ```php
-protected function discoverOsSensors(): Collection
+#[DiscoversSensors(SensorType::State)]
+protected function discoverPowerSupplySensors(): Collection
 {
-    $sensors = parent::discoverOsSensors();
+    $sensors = new Collection;
     $states = [
         ['value' => 1, 'generic' => 0, 'descr' => 'normal'],
         ['value' => 2, 'generic' => 1, 'descr' => 'warning'],

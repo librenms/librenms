@@ -32,7 +32,7 @@ final readonly class IpmiDataSource implements SensorsDiscovery, SensorsPolling
      *
      * @throws \LibreNMS\Exceptions\IpmiConnectionFailed
      */
-    public function discoverSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
         $sensors = new Collection;
         $values = new Ipmitool($this->device, $this->config)->sensors();

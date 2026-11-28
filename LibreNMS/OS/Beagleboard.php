@@ -27,6 +27,8 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use SnmpQuery;
 
@@ -45,10 +47,13 @@ class Beagleboard extends Linux implements OSDiscovery
 
     /**
      * The beagleboard extend outputs CPU, GPU, Core, DSP and IVA-HD temperatures in millidegrees
+     *
+     * @return Collection<int, Sensor>
      */
-    protected function discoverOsSensors(): Collection
+    #[DiscoversSensors(SensorType::Temperature)]
+    protected function discoverBeagleboardSensors(): Collection
     {
-        $sensors = parent::discoverOsSensors();
+        $sensors = new Collection;
         $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.11.98.101.97.103.108.101.98.111.97.114.100';
         $values = array_values(SnmpQuery::numeric()->walk($oid)->values());
 

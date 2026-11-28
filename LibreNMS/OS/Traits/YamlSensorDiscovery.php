@@ -36,23 +36,31 @@ use LibreNMS\Enum\SensorType;
 trait YamlSensorDiscovery
 {
     /**
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverYamlSensors(): Collection
+    public function discoverYamlSensors(array $types): Collection
     {
         $yaml = $this->getDiscovery('sensors');
         $sensors = new Collection;
 
-        if (empty($yaml)) {
+        $sections = [];
+        foreach ($types as $type) {
+            if (! empty($yaml[$type->value]['data'])) {
+                $sections[$type->value] = $yaml[$type->value];
+            }
+        }
+
+        if (empty($sections)) {
             return $sensors;
         }
 
         // items may use data walked for other items and sensor classes
-        $walked = $this->walkSensorYaml($yaml);
+        $walked = $this->walkSensorYaml($sections);
 
-        foreach (SensorType::cases() as $type) {
-            $section = $yaml[$type->value] ?? [];
-            if (empty($section['data'])) {
+        foreach ($types as $type) {
+            $section = $sections[$type->value] ?? null;
+            if ($section === null) {
                 continue;
             }
 

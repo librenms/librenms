@@ -31,6 +31,7 @@ use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Util\Rewrite;
@@ -47,6 +48,7 @@ trait EntitySensorMib
      *
      * @throws SnmpConnectionException when the device did not answer
      */
+    #[DiscoversSensors(SensorType::Current, SensorType::Dbm, SensorType::Fanspeed, SensorType::Frequency, SensorType::Humidity, SensorType::Power, SensorType::Temperature, SensorType::Voltage)]
     public function discoverEntitySensors(): Collection
     {
         $sensors = new Collection;

@@ -32,6 +32,7 @@ use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\OS\Traits\VminfoVmware;
@@ -173,13 +174,6 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         return $string;
     }
 
-    protected function discoverOsSensors(): Collection
-    {
-        return $this->discoverRpiGpioMonitorSensors()
-            ->merge(parent::discoverOsSensors())
-            ->merge($this->discoverLinuxSensors());
-    }
-
     /**
      * The rpigpiomonitor extend outputs a configuration line for each sensor
      * (name,type,descr,low limit,low warn limit,warn limit,high limit[,group];value,generic,descr;...)
@@ -187,7 +181,8 @@ class Linux extends Shared\Unix implements VminfoDiscovery
      *
      * @return Collection<int, Sensor>
      */
-    private function discoverRpiGpioMonitorSensors(): Collection
+    #[DiscoversSensors]
+    protected function discoverRpiGpioMonitorSensors(): Collection
     {
         $sensors = new Collection;
         $lines = SnmpQuery::numericIndex()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."rpigpiomonitor"')->valuesByIndex();
@@ -270,7 +265,8 @@ class Linux extends Shared\Unix implements VminfoDiscovery
      *
      * @return Collection<int, Sensor>
      */
-    private function discoverLinuxSensors(): Collection
+    #[DiscoversSensors(SensorType::Charge, SensorType::Current, SensorType::Frequency, SensorType::State, SensorType::Temperature, SensorType::Voltage)]
+    protected function discoverLinuxSensors(): Collection
     {
         $sensors = new Collection;
         $sensor = fn (SensorType $type, string $oid, int|string $index, string $sensorType, string $descr, mixed $value, array $extra = []) => new Sensor([

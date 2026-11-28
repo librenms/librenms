@@ -27,7 +27,6 @@
 namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\OS\Traits\NetSnmpSensors;
@@ -127,12 +126,5 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery
             '.1.3.6.1.4.1.2021.7890.4.101.1', // legacy UCD-SNMP-MIB exec
         ])->value();
         $device->serial = $serial ?: $device->serial;
-    }
-
-    protected function discoverOsSensors(): Collection
-    {
-        return parent::discoverOsSensors()
-            ->merge($this->discoverServerHardwareSensors())
-            ->merge($this->discoverNetSnmpSensors());
     }
 }

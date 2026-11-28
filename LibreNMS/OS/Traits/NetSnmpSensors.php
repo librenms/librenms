@@ -28,28 +28,22 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use SnmpQuery;
 
 trait NetSnmpSensors
 {
     /**
-     * @return Collection<int, Sensor>
-     */
-    public function discoverNetSnmpSensors(): Collection
-    {
-        return $this->discoverLmSensors()->merge($this->discoverUpsNutSensors());
-    }
-
-    /**
      * LM-SENSORS-MIB temperature, fan and voltage tables
      *
      * @return Collection<int, Sensor>
      */
+    #[DiscoversSensors(SensorType::Fanspeed, SensorType::Temperature, SensorType::Voltage)]
     public function discoverLmSensors(): Collection
     {
         $sensors = new Collection;
-        $data = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
+        $data = SnmpQuery::hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
 
         foreach ([
             ['lmTempSensors', SensorType::Temperature, '.1.3.6.1.4.1.2021.13.16.2.1.3', 1000],
@@ -86,10 +80,11 @@ trait NetSnmpSensors
      *
      * @return Collection<int, Sensor>
      */
+    #[DiscoversSensors(SensorType::Charge, SensorType::Load, SensorType::Runtime, SensorType::State, SensorType::Temperature, SensorType::Voltage)]
     public function discoverUpsNutSensors(): Collection
     {
         $sensors = new Collection;
-        $lines = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
+        $lines = SnmpQuery::hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
         $lines = array_map(fn ($line) => $line['nsExtendOutLine'] ?? null, array_shift($lines) ?? []);
         $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116';
 

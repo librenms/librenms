@@ -30,6 +30,7 @@ use App\Facades\PortCache;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\SensorType;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Util\Rewrite;
 use SnmpQuery;
 
@@ -47,16 +48,16 @@ trait CiscoEntitySensorMib
     /**
      * CISCO-ENTITY-SENSOR-MIB sensors replace the ENTITY-SENSOR-MIB sensors of the same entity.
      *
-     * @param  Collection<int, Sensor>  $sensors
      * @return Collection<int, Sensor>
+     *
+     * @throws SnmpConnectionException when the device did not answer
      */
-    protected function withCiscoEntitySensors(Collection $sensors): Collection
+    public function discoverEntitySensors(): Collection
     {
         $cisco = $this->discoverCiscoEntitySensors();
         $keys = $cisco->map(fn (Sensor $sensor) => "$sensor->sensor_class-$sensor->sensor_index")->flip();
 
-        return $cisco->merge($sensors->reject(fn (Sensor $sensor) => $sensor->sensor_type == 'entity-sensor'
-            && $keys->has("$sensor->sensor_class-$sensor->sensor_index")));
+        return $cisco->merge(parent::discoverEntitySensors()->reject(fn (Sensor $sensor) => $keys->has("$sensor->sensor_class-$sensor->sensor_index")));
     }
 
     /**
@@ -166,7 +167,7 @@ trait CiscoEntitySensorMib
      */
     protected function ciscoEntitySensorName(int $index, array $entities): string
     {
-        return ($entities[$index]['ENTITY-MIB::entPhysicalName'] ?? null) ?: $entities[$index]['ENTITY-MIB::entPhysicalDescr'] ?? '';
+        return ($entities[$index]['ENTITY-MIB::entPhysicalName'] ?? '') ?: $entities[$index]['ENTITY-MIB::entPhysicalDescr'] ?? '';
     }
 
     private function ciscoEntitySensorClass(?string $type): ?SensorType

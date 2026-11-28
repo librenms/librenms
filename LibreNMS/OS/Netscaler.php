@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -174,8 +175,11 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
 
     /**
      * Health counters are named by their index, the name tells the type
+     *
+     * @return Collection<int, Sensor>
      */
-    protected function discoverOsSensors(): Collection
+    #[DiscoversSensors(SensorType::Fanspeed, SensorType::Temperature, SensorType::Voltage)]
+    protected function discoverHealthCounterSensors(): Collection
     {
         $sensors = new Collection;
 

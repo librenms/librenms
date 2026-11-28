@@ -34,11 +34,14 @@ use App\Models\Sensor;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Enum\SnmpStringOutput;
@@ -93,6 +96,7 @@ use LibreNMS\OS\Traits\YamlSensorDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
+use ReflectionClass;
 
 class OS implements
     BgpPeerDiscovery,
@@ -162,6 +166,9 @@ class OS implements
     private ?PerDeviceMethodResults $methodResults = null;
 
     protected ?string $entityVendorTypeMib = null;
+
+    /** @var array<class-string<OS>, array<string, list<SensorType>>> */
+    private static array $sensorDiscoveryMethods = [];
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
@@ -506,28 +513,59 @@ class OS implements
     }
 
     /**
-     * ENTITY-SENSOR-MIB sensors, then the sensors of this OS, UPS-MIB and the yaml sensors.
-     * A sensor replaces earlier sensors of the same class, type and index.
+     * Sensors from the methods that have the DiscoversSensors attribute and one of the given classes, those of parent classes first,
+     * then the legacy includes and the yaml sensors. A sensor replaces earlier sensors of the same class, type and index.
      *
+     * @param  list<SensorType>  $types
      * @return Collection<int, Sensor>
      */
-    public function discoverSensors(): Collection
+    public function discoverSensors(array $types): Collection
     {
-        return $this->discoverEntitySensors()
-            ->merge($this->discoverOsSensors())
-            ->merge($this->discoverLegacySensors())
-            ->merge($this->discoverUpsMibSensors())
-            ->merge($this->discoverYamlSensors());
+        $sensors = new Collection;
+
+        foreach (self::sensorDiscoveryMethods(static::class) as $method => $methodTypes) {
+            if (! array_any($methodTypes ?: $types, fn (SensorType $type) => in_array($type, $types, true))) {
+                continue;
+            }
+
+            foreach ($this->$method() as $sensor) {
+                if (empty($methodTypes) || in_array(SensorType::tryFrom((string) $sensor->sensor_class), $methodTypes, true)) {
+                    $sensors->push($sensor);
+                } else {
+                    Log::error("$method() returned a $sensor->sensor_class sensor, which its DiscoversSensors attribute does not list");
+                }
+            }
+        }
+
+        return $sensors
+            ->merge($this->discoverLegacySensors($types))
+            ->merge($this->discoverYamlSensors($types));
     }
 
     /**
-     * Sensors this OS discovers with code, yaml sensors are preferred.
+     * The methods of the class that have the DiscoversSensors attribute and their sensor classes,
+     * the methods of parent classes first.
      *
-     * @return Collection<int, Sensor>
+     * @param  class-string<OS>  $class
+     * @return array<string, list<SensorType>>
      */
-    protected function discoverOsSensors(): Collection
+    private static function sensorDiscoveryMethods(string $class): array
     {
-        return new Collection;
+        if (isset(self::$sensorDiscoveryMethods[$class])) {
+            return self::$sensorDiscoveryMethods[$class];
+        }
+
+        $parent = get_parent_class($class);
+        $methods = $parent ? self::sensorDiscoveryMethods($parent) : [];
+
+        foreach (new ReflectionClass($class)->getMethods() as $method) {
+            $attribute = $method->getAttributes(DiscoversSensors::class)[0] ?? null;
+            if ($attribute !== null) {
+                $methods[$method->getName()] = $attribute->newInstance()->types;
+            }
+        }
+
+        return self::$sensorDiscoveryMethods[$class] = $methods;
     }
 
     /**

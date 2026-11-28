@@ -27,7 +27,6 @@
 namespace LibreNMS\OS;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
 use LibreNMS\OS\Traits\NetSnmpSensors;
 
 class AristaMos extends Shared\Arista
@@ -49,13 +48,5 @@ class AristaMos extends Shared\Arista
         }
 
         return $values;
-    }
-
-    /**
-     * LM-SENSORS-MIB and ups-nut fan, temperature and voltage sensors of the Linux base
-     */
-    protected function discoverOsSensors(): Collection
-    {
-        return parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors()->whereIn('sensor_class', ['fanspeed', 'temperature', 'voltage']));
     }
 }
